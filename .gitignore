@@ -1,0 +1,7 @@
+﻿# Cache e importações do Godot (gerados automaticamente)
+.godot/
+*.tmp
+
+# Ferramentas locais
+graft/
+.ignore

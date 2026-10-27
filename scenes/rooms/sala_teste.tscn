@@ -1,0 +1,158 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/placeholder_room.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/era/era_visibility.gd" id="2_vis"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/player/personagem.tscn" id="4_char"]
+[ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="5_router"]
+[ext_resource type="Script" path="res://scripts/puzzles/teste/cabinet_push.gd" id="6_cabinet"]
+[ext_resource type="Script" path="res://scripts/world/era_linked_object.gd" id="7_linked"]
+[ext_resource type="Script" path="res://scripts/interaction/message_interactable.gd" id="8_message"]
+[ext_resource type="Script" path="res://scripts/core/room.gd" id="9_room"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cabinet"]
+size = Vector2(48, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_passage"]
+size = Vector2(32, 64)
+
+[node name="SalaTeste" type="Node2D"]
+script = ExtResource("9_room")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(320, 180)
+
+[node name="World1923" type="Node2D" parent="."]
+script = ExtResource("1_room")
+
+[node name="EraVisibility" type="Node" parent="World1923"]
+script = ExtResource("2_vis")
+
+[node name="Armario" type="Node2D" parent="World1923"]
+position = Vector2(480, 248)
+
+[node name="Moldura" type="ColorRect" parent="World1923/Armario"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Corpo" type="ColorRect" parent="World1923/Armario"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/Armario"]
+script = ExtResource("6_cabinet")
+prompt_text = "Empurrar"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Armario/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_cabinet")
+
+[node name="WorldToday" type="Node2D" parent="."]
+visible = false
+script = ExtResource("1_room")
+wall_color = Color(0.109804, 0.14902, 0.188235, 1)
+detail_color = Color(0.227451, 0.290196, 0.345098, 1)
+floor_color = Color(0.243137, 0.290196, 0.184314, 1)
+
+[node name="EraVisibility" type="Node" parent="WorldToday"]
+script = ExtResource("2_vis")
+era = 1
+
+[node name="Passagem" type="Node2D" parent="WorldToday"]
+position = Vector2(480, 248)
+script = ExtResource("7_linked")
+flag_key = "teste.armario.empurrado"
+
+[node name="Marca" type="ColorRect" parent="WorldToday/Passagem"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.164706, 0.219608, 0.27451, 1)
+
+[node name="Vao" type="ColorRect" parent="WorldToday/Passagem"]
+offset_left = 6.0
+offset_top = 20.0
+offset_right = 26.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="Interacao" type="Area2D" parent="WorldToday/Passagem"]
+script = ExtResource("8_message")
+message = "Passagem encontrada."
+prompt_text = "Examinar"
+available_in = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/Passagem/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_passage")
+
+[node name="ArmarioOriginal" type="Node2D" parent="WorldToday"]
+position = Vector2(480, 248)
+script = ExtResource("7_linked")
+flag_key = "teste.armario.empurrado"
+visible_when_set = false
+
+[node name="Moldura" type="ColorRect" parent="WorldToday/ArmarioOriginal"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="Corpo" type="ColorRect" parent="WorldToday/ArmarioOriginal"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="ArmarioMovido" type="Node2D" parent="WorldToday"]
+position = Vector2(528, 248)
+script = ExtResource("7_linked")
+flag_key = "teste.armario.empurrado"
+
+[node name="Moldura" type="ColorRect" parent="WorldToday/ArmarioMovido"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="Corpo" type="ColorRect" parent="WorldToday/ArmarioMovido"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="Helena" parent="." instance=ExtResource("4_char")]
+position = Vector2(200, 312)
+body_color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="EraVisibility" type="Node" parent="Helena"]
+script = ExtResource("2_vis")
+
+[node name="Lia" parent="." instance=ExtResource("4_char")]
+visible = false
+position = Vector2(440, 312)
+era = 1
+body_color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="EraVisibility" type="Node" parent="Lia"]
+script = ExtResource("2_vis")
+era = 1
+
+[node name="SoloInputRouter" type="Node" parent="." node_paths=PackedStringArray("helena", "lia")]
+script = ExtResource("5_router")
+helena = NodePath("../Helena")
+lia = NodePath("../Lia")
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
