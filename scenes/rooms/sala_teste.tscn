@@ -9,6 +9,10 @@
 [ext_resource type="Script" path="res://scripts/world/era_linked_object.gd" id="7_linked"]
 [ext_resource type="Script" path="res://scripts/interaction/message_interactable.gd" id="8_message"]
 [ext_resource type="Script" path="res://scripts/core/room.gd" id="9_room"]
+[ext_resource type="Script" path="res://scripts/interaction/door.gd" id="10_door"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(32, 64)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cabinet"]
 size = Vector2(48, 64)
@@ -22,11 +26,41 @@ script = ExtResource("9_room")
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(320, 180)
 
+[node name="DaSalaDeCima" type="Marker2D" parent="."]
+position = Vector2(40, 312)
+
 [node name="World1923" type="Node2D" parent="."]
 script = ExtResource("1_room")
 
 [node name="EraVisibility" type="Node" parent="World1923"]
 script = ExtResource("2_vis")
+
+[node name="Porta" type="Node2D" parent="World1923"]
+position = Vector2(24, 248)
+
+[node name="Moldura" type="ColorRect" parent="World1923/Porta"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Folha" type="ColorRect" parent="World1923/Porta"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/Porta"]
+script = ExtResource("10_door")
+target_scene = "res://scenes/rooms/sala_teste_de_cima.tscn"
+target_spawn = "DaSalaLateral"
+prompt_text = "Entrar"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Porta/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_door")
 
 [node name="Armario" type="Node2D" parent="World1923"]
 position = Vector2(480, 248)
@@ -64,6 +98,33 @@ floor_color = Color(0.243137, 0.290196, 0.184314, 1)
 [node name="EraVisibility" type="Node" parent="WorldToday"]
 script = ExtResource("2_vis")
 era = 1
+
+[node name="Porta" type="Node2D" parent="WorldToday"]
+position = Vector2(24, 248)
+
+[node name="Moldura" type="ColorRect" parent="WorldToday/Porta"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="Folha" type="ColorRect" parent="WorldToday/Porta"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="Interacao" type="Area2D" parent="WorldToday/Porta"]
+script = ExtResource("10_door")
+target_scene = "res://scenes/rooms/sala_teste_de_cima.tscn"
+target_spawn = "DaSalaLateral"
+prompt_text = "Entrar"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/Porta/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_door")
 
 [node name="Passagem" type="Node2D" parent="WorldToday"]
 position = Vector2(480, 248)

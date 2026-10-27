@@ -21,8 +21,8 @@ func has_save() -> bool:
 
 
 func save_game() -> bool:
-	# No meio do fade a época ainda vai mudar; espera a troca terminar
-	if EraManager.is_switching():
+	# No meio de um fade a época ou a sala ainda vão mudar; espera terminar
+	if EraManager.is_switching() or RoomManager.is_changing():
 		return false
 	var scene := get_tree().current_scene
 	if scene == null or scene.scene_file_path.is_empty():
@@ -30,7 +30,7 @@ func save_game() -> bool:
 		return false
 
 	var characters := {}
-	for motor in _find_characters(scene):
+	for motor in RoomManager.find_characters(scene):
 		characters[Era.character_name(motor.era)] = {"x": motor.position.x, "y": motor.position.y}
 
 	var data := {
@@ -50,9 +50,9 @@ func save_game() -> bool:
 	return true
 
 
-## Recarrega a sala salva do zero, para que todo objeto leia as flags no _ready.
+## Recarrega a sala salva do zero (via RoomManager), para que todo objeto leia as flags no _ready.
 func load_game() -> bool:
-	if EraManager.is_switching():
+	if EraManager.is_switching() or RoomManager.is_changing():
 		return false
 	if not has_save():
 		_notify("Nenhum jogo salvo.")
@@ -65,25 +65,16 @@ func load_game() -> bool:
 	# Flags e época antes de abrir a sala, para os objetos já nascerem no estado certo
 	WorldState.load_dict(data["world_state"])
 	EraManager.set_era(int(data["era"]))
-	get_tree().change_scene_to_file(data["scene"])
-	await get_tree().scene_changed
-
 	var characters: Dictionary = data["characters"]
-	for motor in _find_characters(get_tree().current_scene):
-		var key := Era.character_name(motor.era)
-		if characters.has(key):
-			motor.position = Vector2(characters[key]["x"], characters[key]["y"])
-			motor.velocity = Vector2.ZERO
+	var place_characters := func(room: Node) -> void:
+		for motor in RoomManager.find_characters(room):
+			var key := Era.character_name(motor.era)
+			if characters.has(key):
+				motor.position = Vector2(characters[key]["x"], characters[key]["y"])
+				motor.velocity = Vector2.ZERO
+	await RoomManager.go_to(data["scene"], place_characters)
 	_notify("Jogo carregado.")
 	return true
-
-
-func _find_characters(scene: Node) -> Array[PlayerMotor]:
-	var result: Array[PlayerMotor] = []
-	for node in scene.find_children("*", "", true, false):
-		if node is PlayerMotor:
-			result.append(node)
-	return result
 
 
 func _notify(text: String) -> void:

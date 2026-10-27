@@ -54,6 +54,10 @@ res://
 - **`WorldState`** (autoload): dicionário de flags (`String → bool/int`), por exemplo `"cozinha.elevador.travado"`. É a memória do que Helena mudou. Exporta e importa as flags (`to_dict` / `load_dict`) para o `SaveSystem`.
 - **`SaveSystem`** (autoload): salva e carrega em `user://save.json` as flags, a época ativa, a sala atual e a posição das duas personagens. Ao carregar, define flags e época e **recarrega a sala do zero**, para que todo objeto leia as flags no `_ready`. Por isso, objetos que dependem de flags devem aplicá-las no `_ready`.
 - **`Room`**: script da raiz de cada sala. Declara `camera_mode` e o repassa às personagens.
+- **`RoomManager`** (autoload): troca de sala com fade. **Helena e Lia sempre mudam de sala juntas** e aparecem num ponto de entrada (`Marker2D` da sala de destino). O `SaveSystem` também carrega salas por ele.
+- **`Door`**: `Interactable` que leva à sala `target_scene`, no ponto de entrada `target_spawn`. Usa-se com E.
+- **Menu de pausa** (`scripts/ui/pause_menu.gd`, dentro de `hud.tscn`): Esc/Start pausa o jogo, com Continuar, Salvar, Carregar e Sair.
+- **Toda sala precisa ter**: `Room` na raiz, `Camera2D`, `World1923` e `WorldToday` (cada um com `EraVisibility`), Helena e Lia (`personagem.tscn`, cada uma com `EraVisibility`), `SoloInputRouter`, `HUD` e um `Marker2D` para cada porta que chega nela. Use `sala_teste.tscn` como modelo.
 - **`EraLinkedObject`**: nó do presente que lê flags do `WorldState` e aplica o estado correspondente quando a época vira `PRESENT` (ex.: se `cozinha.elevador.travado`, o poço aparece aberto com os cabos).
 - **`Interactable`**: `Area2D` base para objetos com interação (ação `interact`), com um texto de prompt curto e restrição de época (só 1923, só hoje ou ambas).
 - **Personagens**: `PlayerMotor` (`CharacterBody2D`, movimento lateral ou de cima, conforme a sala) pede comandos a um `CharacterInput` (classe base com `get_move() -> Vector2`, `is_jump_just_pressed() -> bool`, `is_interact_just_pressed() -> bool`). No modo solo, um `SoloInputRouter` entrega o input só para a personagem da época ativa; a outra recebe input vazio e fica parada. No co-op futuro, cada personagem terá um `CharacterInput` ligado ao próprio dispositivo.
@@ -82,8 +86,8 @@ Ações do Input Map (em `project.godot`):
 | `jump` (só lateral) | Espaço | A / X |
 | `interact` | E | B / Bola |
 | `switch_era` | Tab | Y / Triângulo |
-| `pause` | Esc | Start |
-| `quick_save` / `quick_load` (provisório, até existir menu de pausa) | F2 / F3 | — |
+| `pause` (abre o menu de pausa) | Esc | Start |
+| `quick_save` / `quick_load` (atalhos) | F2 / F3 | — |
 
 ## Como trabalhar neste projeto
 
@@ -95,7 +99,7 @@ Ações do Input Map (em `project.godot`):
 - Trabalhe em **etapas pequenas**. Ao fim de cada etapa, diga exatamente o que Roberto deve fazer no Godot para testar (qual cena abrir, F5/F6, quais teclas usar) e o que ele deve ver.
 - Se Roberto encontrar erro na aba **Saída** ou **Depurador** do Godot, ele vai colar o texto aqui.
 - Não adicione plugins nem addons sem perguntar antes.
-- Prefira código simples e legível a padrões complexos. Autoloads só para `EraManager`, `WorldState` e `SaveSystem` (e algo novo só com motivo claro).
+- Prefira código simples e legível a padrões complexos. Autoloads só para `EraManager`, `WorldState`, `SaveSystem` e `RoomManager` (e algo novo só com motivo claro).
 - Antes de decisões de design que não estejam neste arquivo, **pergunte ao Roberto** em vez de decidir sozinho.
 
 ## Etapas do protótipo
@@ -108,6 +112,13 @@ Ações do Input Map (em `project.godot`):
 6. **Salvar e carregar** o `WorldState` e a posição das personagens.
 
 Concluída a etapa 6, o protótipo da mecânica central está pronto para o primeiro capítulo (Cozinha).
+
+Infraestrutura feita depois do protótipo:
+
+7. **Troca de sala**: `RoomManager`, `Door` e pontos de entrada; portas ligando `sala_teste` e `sala_teste_de_cima`.
+8. **Menu de pausa** no Esc/Start.
+
+Próximo: **Capítulo 1 — Cozinha**, a partir do GDD do Roberto.
 
 ## Referência
 

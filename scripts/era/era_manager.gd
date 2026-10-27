@@ -33,7 +33,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Troca para a outra época com fade. Ignora pedidos durante uma troca em andamento.
 func switch_era() -> void:
-	if _is_switching:
+	if _is_switching or RoomManager.is_changing():
 		return
 	_is_switching = true
 
