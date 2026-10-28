@@ -15,6 +15,10 @@ extends Node2D
 @export var wall_color: Color = Color("#3B1A1F")
 @export var detail_color: Color = Color("#C9973B")
 @export var floor_color: Color = Color("#1F3A2E")
+## Blocos sólidos extras (pisos intermediários, prateleiras), com a cor do piso e colisão.
+@export var solid_blocks: Array[Rect2] = []
+## Faixas de realce extras (rodapés de outros andares), sem colisão.
+@export var detail_blocks: Array[Rect2] = []
 
 var _generated_count: int = 0
 
@@ -43,6 +47,8 @@ func _build_side() -> void:
 	# Sanca perto do teto e rodapé logo acima do piso
 	_add_block("Cornice", Rect2(0, 32, room_size.x, 4), detail_color)
 	_add_block("Baseboard", Rect2(0, floor_top - 8, room_size.x, 8), detail_color)
+	for rect in detail_blocks:
+		_add_block("Detail", rect, detail_color)
 
 	# Piso com colisão
 	var floor_body := StaticBody2D.new()
@@ -51,6 +57,9 @@ func _build_side() -> void:
 	var floor_rect := Rect2(0, floor_top, room_size.x, floor_height)
 	floor_body.add_child(_make_rect("FloorBlock", floor_rect, floor_color))
 	_add_collision(floor_body, floor_rect)
+	for rect in solid_blocks:
+		floor_body.add_child(_make_rect("Solid", rect, floor_color))
+		_add_collision(floor_body, rect)
 
 	# Paredes invisíveis nas bordas, para ninguém sair da tela
 	_add_collision(floor_body, Rect2(-16, 0, 16, room_size.y))

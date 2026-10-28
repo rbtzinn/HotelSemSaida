@@ -57,6 +57,10 @@ res://
 - **`RoomManager`** (autoload): troca de sala com fade. **Helena e Lia sempre mudam de sala juntas** e aparecem num ponto de entrada (`Marker2D` da sala de destino). O `SaveSystem` também carrega salas por ele.
 - **`Door`**: `Interactable` que leva à sala `target_scene`, no ponto de entrada `target_spawn`. Usa-se com E.
 - **Menu de pausa** (`scripts/ui/pause_menu.gd`, dentro de `hud.tscn`): Esc/Start pausa o jogo, com Continuar, Salvar, Carregar e Sair.
+- **`Interactable`** aceita `required_flag` (só funciona com a flag ligada) e `done_flag` (para de funcionar quando a flag liga). Subclasses prontas: `Door`, `Passage`, `MessageInteractable`, `NoteInteractable` (abre a tela de leitura `NoteUI`), `CodeLockInteractable` (abre o minigame `CodeLockUI`) e `ItemPickup`.
+- **Objeto na mão**: cada personagem segura um objeto por vez, guardado no `WorldState` em `"helena.mao"` / `"lia.mao"` (entra no save). O catálogo fica em `scripts/core/items.gd`. Use `PlayerMotor.get_held_item()` / `set_held_item()`.
+- **`EraLinkedObject`** com `update_immediately`: reage na hora à flag (para objetos de 1923, como o cadeado que some ao abrir).
+- **Telas em close** (`NoteUI`, `CodeLockUI`, menu de pausa): pausam o jogo e, ao fechar, só despausam depois que E/Enter/Espaço forem soltos (`UIUtil.unpause_after_release`), para a mesma tecla não virar interação ou pulo.
 - **Toda sala precisa ter**: `Room` na raiz, `Camera2D`, `World1923` e `WorldToday` (cada um com `EraVisibility`), Helena e Lia (`personagem.tscn`, cada uma com `EraVisibility`), `SoloInputRouter`, `HUD` e um `Marker2D` para cada porta que chega nela. Use `sala_teste.tscn` como modelo.
 - **`EraLinkedObject`**: nó do presente que lê flags do `WorldState` e aplica o estado correspondente quando a época vira `PRESENT` (ex.: se `cozinha.elevador.travado`, o poço aparece aberto com os cabos).
 - **`Interactable`**: `Area2D` base para objetos com interação (ação `interact`), com um texto de prompt curto e restrição de época (só 1923, só hoje ou ambas).
@@ -118,8 +122,18 @@ Infraestrutura feita depois do protótipo:
 7. **Troca de sala**: `RoomManager`, `Door` e pontos de entrada; portas ligando `sala_teste` e `sala_teste_de_cima`.
 8. **Menu de pausa** no Esc/Start.
 
-Próximo: **Capítulo 1 — Cozinha**, a partir do GDD do Roberto.
+## Capítulo 1 — Cozinha (design no `GDD.md`)
+
+Cena `scenes/rooms/cozinha.tscn` (cena principal do projeto): uma tela lateral em corte, com a Cozinha em cima (piso em y=200) e a Despensa embaixo (piso em y=344). `Passage` leva uma só personagem a outro ponto da mesma sala (escada, cabos).
+
+- **C1. Layout**: os dois andares nas duas épocas, a escada de 1923 (Descer/Subir), o forno, o poço do elevador e a prateleira quebrada de hoje (alta demais sem degrau).
+- **C2. Despensa trancada**: objeto na mão de Helena, cardápio rasgado nas duas épocas e minigame do cadeado de 4 dígitos.
+- **C3. Massa que cresce**: fermento e forno; hoje, o forno petrificado vira degrau até a prateleira.
+- **C4. Elevador de serviço**: Helena trava o elevador no alto; hoje, Lia entra pela portinhola e desce pelos cabos.
+- **C5. Fogo e gelo**: corrente de ar no piso hoje, gelo de 1923 no ponto certo, piso apodrecido e fim do andar.
+  - A geladeira dá gelo sem limite. Helena deixa o bloco onde estiver parada (`IceDropZone`); só a até 12 px do ponto da fresta (x=376) o piso apodrece. Hoje, uma mancha de água marca onde ficou o último bloco.
+  - O fim do andar ainda é provisório (tela "Fim da Cozinha" + flag `cozinha.concluida`): o GDD não define como o jogador percebe o fim de um andar nem para onde vai.
 
 ## Referência
 
-O design completo (história, capítulos, enigmas, minigames) está no GDD do Roberto. Se precisar de algo que não está aqui, pergunte.
+O design completo (história, capítulos, enigmas, minigames) está em **`GDD.md`**, na raiz do projeto. Leia-o antes de trabalhar em qualquer capítulo ou enigma. Em conflito, este CLAUDE.md vale para o código e o GDD vale para o design. Se precisar de algo que não está em nenhum dos dois, pergunte.

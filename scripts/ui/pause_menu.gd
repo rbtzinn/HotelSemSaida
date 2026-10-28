@@ -31,12 +31,8 @@ func _ready() -> void:
 	column.add_child(title)
 
 	_first_button = _add_button(column, "Continuar", close)
-	_add_button(column, "Salvar", func() -> void:
-		close()
-		SaveSystem.save_game())
-	_add_button(column, "Carregar", func() -> void:
-		close()
-		SaveSystem.load_game())
+	_add_button(column, "Salvar", _save)
+	_add_button(column, "Carregar", _load)
 	_add_button(column, "Sair do jogo", func() -> void: get_tree().quit())
 
 
@@ -50,8 +46,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func open() -> void:
-	# Não pausa no meio de uma troca de sala
-	if RoomManager.is_changing():
+	# Não pausa no meio de uma troca de sala nem por cima de outra tela (leitura, cadeado)
+	if RoomManager.is_changing() or get_tree().paused:
 		return
 	get_tree().paused = true
 	visible = true
@@ -59,8 +55,18 @@ func open() -> void:
 
 
 func close() -> void:
-	get_tree().paused = false
 	visible = false
+	await UIUtil.unpause_after_release(get_tree())
+
+
+func _save() -> void:
+	await close()
+	SaveSystem.save_game()
+
+
+func _load() -> void:
+	await close()
+	SaveSystem.load_game()
 
 
 func _add_button(parent: Control, text: String, action: Callable) -> Button:

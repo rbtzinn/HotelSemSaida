@@ -52,6 +52,8 @@ func _ready() -> void:
 	row.add_child(_label)
 
 	EraManager.era_changed.connect(_refresh)
+	# O objeto na mão fica no WorldState
+	WorldState.flag_changed.connect(_on_flag_changed)
 	_refresh(EraManager.current_era)
 
 
@@ -65,6 +67,14 @@ func show_message(text: String) -> void:
 	_message_tween.tween_property(_message, "modulate:a", 0.0, 0.5)
 
 
+func _on_flag_changed(_key: String, _value: Variant) -> void:
+	_refresh(EraManager.current_era)
+
+
 func _refresh(era: Era.Id) -> void:
 	_icon_style.bg_color = Era.character_color(era)
-	_label.text = "%s · %s" % [Era.character_name(era), Era.year_label(era)]
+	var name_text := Era.character_name(era)
+	_label.text = "%s · %s" % [name_text, Era.year_label(era)]
+	var item := str(WorldState.get_flag("%s.mao" % name_text.to_lower(), ""))
+	if item != "":
+		_label.text += " · %s" % Items.display_name(item)

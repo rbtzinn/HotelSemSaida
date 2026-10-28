@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Hotel Sem Saída"
-run/main_scene="res://scenes/rooms/sala_teste.tscn"
+run/main_scene="res://scenes/rooms/cozinha.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]

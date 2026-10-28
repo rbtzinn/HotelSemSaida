@@ -14,6 +14,10 @@ const GROUP: StringName = &"interactables"
 @export var available_in: Availability = Availability.BOTH
 ## Posição do prompt, relativa a esta área.
 @export var prompt_position: Vector2 = Vector2(0, -14)
+## Só aceita interação com esta flag do WorldState ligada (vazio = sempre).
+@export var required_flag: String = ""
+## Deixa de aceitar interação quando esta flag liga (vazio = nunca).
+@export var done_flag: String = ""
 
 ## Desligado, o objeto não mostra prompt nem aceita interação.
 var enabled: bool = true:
@@ -32,6 +36,7 @@ func _ready() -> void:
 	monitorable = false
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	WorldState.flag_changed.connect(func(_key: String, _value: Variant) -> void: _update_prompt())
 
 	_prompt = Label.new()
 	_prompt.text = "[E] " + prompt_text
@@ -51,6 +56,10 @@ func has_body(body: PlayerMotor) -> bool:
 
 func can_interact(by: PlayerMotor) -> bool:
 	if not enabled:
+		return false
+	if required_flag != "" and not WorldState.is_set(required_flag):
+		return false
+	if done_flag != "" and WorldState.is_set(done_flag):
 		return false
 	match available_in:
 		Availability.PAST_ONLY:

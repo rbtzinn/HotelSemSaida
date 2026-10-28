@@ -27,10 +27,18 @@ var _gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _side_shape: Shape2D
 var _side_shape_position: Vector2
 var _top_down_shape: RectangleShape2D
+var _held_item_rect: ColorRect
 
 
 func _ready() -> void:
 	$Body.color = body_color
+	_held_item_rect = ColorRect.new()
+	_held_item_rect.size = Vector2(8, 8)
+	_held_item_rect.position = Vector2(8, -28)
+	_held_item_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_held_item_rect)
+	WorldState.flag_changed.connect(_on_flag_changed)
+	_refresh_held_item()
 	_side_shape = $CollisionShape2D.shape
 	_side_shape_position = $CollisionShape2D.position
 	_top_down_shape = RectangleShape2D.new()
@@ -76,6 +84,30 @@ func _apply_mode() -> void:
 		collision.shape = _side_shape
 		collision.position = _side_shape_position
 	velocity = Vector2.ZERO
+
+
+## Objeto na mão ("" = mãos vazias). Fica no WorldState, então entra no save.
+func get_held_item() -> String:
+	return str(WorldState.get_flag(_hand_key(), ""))
+
+
+func set_held_item(item_id: String) -> void:
+	WorldState.set_flag(_hand_key(), item_id)
+
+
+func _hand_key() -> String:
+	return "%s.mao" % Era.character_name(era).to_lower()
+
+
+func _on_flag_changed(key: String, _value: Variant) -> void:
+	if key == _hand_key():
+		_refresh_held_item()
+
+
+func _refresh_held_item() -> void:
+	var item := get_held_item()
+	_held_item_rect.visible = item != ""
+	_held_item_rect.color = Items.color(item)
 
 
 ## Usa o primeiro objeto interativo sob a personagem que aceite a interação.

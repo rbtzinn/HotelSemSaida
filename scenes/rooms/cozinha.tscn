@@ -1,0 +1,754 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/room.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/core/placeholder_room.gd" id="2_placeholder"]
+[ext_resource type="Script" path="res://scripts/era/era_visibility.gd" id="3_vis"]
+[ext_resource type="PackedScene" path="res://scenes/player/personagem.tscn" id="4_char"]
+[ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="5_router"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
+[ext_resource type="Script" path="res://scripts/interaction/passage.gd" id="7_passage"]
+[ext_resource type="Script" path="res://scripts/interaction/code_lock_interactable.gd" id="8_lock"]
+[ext_resource type="Script" path="res://scripts/interaction/note_interactable.gd" id="9_note"]
+[ext_resource type="Script" path="res://scripts/interaction/item_pickup.gd" id="10_pickup"]
+[ext_resource type="Script" path="res://scripts/world/era_linked_object.gd" id="11_linked"]
+[ext_resource type="Script" path="res://scripts/interaction/item_use_interactable.gd" id="12_use"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="13_interactable"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/service_elevator.gd" id="14_elevator"]
+[ext_resource type="Script" path="res://scripts/interaction/message_interactable.gd" id="15_message"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/ice_drop_zone.gd" id="16_ice_zone"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/ice_stain.gd" id="17_ice_stain"]
+[ext_resource type="Script" path="res://scripts/interaction/chapter_end_interactable.gd" id="18_end"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_icebox"]
+size = Vector2(40, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pantry_floor"]
+size = Vector2(368, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crack"]
+size = Vector2(32, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lever"]
+size = Vector2(14, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_brake"]
+size = Vector2(12, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hatch"]
+size = Vector2(28, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cables_bottom"]
+size = Vector2(40, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oven"]
+size = Vector2(56, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oven_stone"]
+size = Vector2(48, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_menu"]
+size = Vector2(40, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_menu_today"]
+size = Vector2(40, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yeast"]
+size = Vector2(32, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(32, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stairs_bottom"]
+size = Vector2(32, 48)
+
+[node name="Cozinha" type="Node2D"]
+script = ExtResource("1_room")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(320, 180)
+
+[node name="Pontos" type="Node2D" parent="."]
+
+[node name="TopoEscada" type="Marker2D" parent="Pontos"]
+position = Vector2(64, 200)
+
+[node name="BaseEscada" type="Marker2D" parent="Pontos"]
+position = Vector2(168, 344)
+
+[node name="BaseCabos" type="Marker2D" parent="Pontos"]
+position = Vector2(600, 344)
+
+[node name="Prateleira" type="Marker2D" parent="Pontos"]
+position = Vector2(552, 136)
+
+[node name="World1923" type="Node2D" parent="."]
+script = ExtResource("2_placeholder")
+floor_height = 16
+solid_blocks = Array[Rect2]([Rect2(0, 200, 640, 16), Rect2(576, 24, 64, 176)])
+detail_blocks = Array[Rect2]([Rect2(0, 192, 576, 8)])
+
+[node name="EraVisibility" type="Node" parent="World1923"]
+script = ExtResource("3_vis")
+
+[node name="PortaDespensa" type="Node2D" parent="World1923"]
+position = Vector2(48, 136)
+
+[node name="Moldura" type="ColorRect" parent="World1923/PortaDespensa"]
+offset_right = 32.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Folha" type="ColorRect" parent="World1923/PortaDespensa"]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/PortaDespensa" node_paths=PackedStringArray("target")]
+script = ExtResource("7_passage")
+target = NodePath("../../../Pontos/BaseEscada")
+prompt_text = "Descer"
+available_in = 0
+required_flag = "cozinha.despensa.aberta"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/PortaDespensa/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Cadeado" type="Node2D" parent="World1923/PortaDespensa"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.despensa.aberta"
+visible_when_set = false
+update_immediately = true
+
+[node name="Corpo" type="ColorRect" parent="World1923/PortaDespensa/Cadeado"]
+offset_left = 20.0
+offset_top = 30.0
+offset_right = 28.0
+offset_bottom = 38.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/PortaDespensa/Cadeado"]
+script = ExtResource("8_lock")
+code = "3815"
+flag_key = "cozinha.despensa.aberta"
+prompt_text = "Cadeado"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/PortaDespensa/Cadeado/Interacao"]
+position = Vector2(16, 32)
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Cardapio" type="Node2D" parent="World1923"]
+position = Vector2(200, 120)
+
+[node name="Papel" type="ColorRect" parent="World1923/Cardapio"]
+offset_right = 20.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.94902, 0.901961, 0.788235, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/Cardapio"]
+script = ExtResource("9_note")
+title = "Grand Hotel Aurora — Cardápio do dia"
+text = "Consommé de faisão
+Linguado ao molho de manteiga
+Pato com laranja
+
+No pé da página, a lápis: \"despensa 3 8\"
+O resto da folha foi rasgado."
+prompt_text = "Ler"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Cardapio/Interacao"]
+position = Vector2(10, 40)
+shape = SubResource("RectangleShape2D_menu")
+
+[node name="Escada" type="Node2D" parent="World1923"]
+
+[node name="Degrau1" type="ColorRect" parent="World1923/Escada"]
+offset_left = 48.0
+offset_top = 224.0
+offset_right = 64.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Degrau2" type="ColorRect" parent="World1923/Escada"]
+offset_left = 64.0
+offset_top = 244.0
+offset_right = 80.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Degrau3" type="ColorRect" parent="World1923/Escada"]
+offset_left = 80.0
+offset_top = 264.0
+offset_right = 96.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Degrau4" type="ColorRect" parent="World1923/Escada"]
+offset_left = 96.0
+offset_top = 284.0
+offset_right = 112.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Degrau5" type="ColorRect" parent="World1923/Escada"]
+offset_left = 112.0
+offset_top = 304.0
+offset_right = 128.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Degrau6" type="ColorRect" parent="World1923/Escada"]
+offset_left = 128.0
+offset_top = 324.0
+offset_right = 144.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="SaidaEscada" type="Node2D" parent="World1923"]
+position = Vector2(152, 296)
+
+[node name="Interacao" type="Area2D" parent="World1923/SaidaEscada" node_paths=PackedStringArray("target")]
+script = ExtResource("7_passage")
+target = NodePath("../../../Pontos/TopoEscada")
+prompt_text = "Subir"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/SaidaEscada/Interacao"]
+position = Vector2(16, 24)
+shape = SubResource("RectangleShape2D_stairs_bottom")
+
+[node name="Forno" type="Node2D" parent="World1923"]
+position = Vector2(480, 176)
+
+[node name="Corpo" type="ColorRect" parent="World1923/Forno"]
+offset_right = 48.0
+offset_bottom = 24.0
+mouse_filter = 2
+color = Color(0.141176, 0.07451, 0.082353, 1)
+
+[node name="Tampo" type="ColorRect" parent="World1923/Forno"]
+offset_right = 48.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Boca" type="ColorRect" parent="World1923/Forno"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 36.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Massa" type="Node2D" parent="World1923/Forno"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+update_immediately = true
+
+[node name="Pao" type="ColorRect" parent="World1923/Forno/Massa"]
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 34.0
+offset_bottom = 20.0
+mouse_filter = 2
+color = Color(0.909804, 0.85098, 0.690196, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/Forno"]
+script = ExtResource("12_use")
+accepted_item = "fermento"
+result_flag = "cozinha.forno.massa"
+success_message = "A massa de pão ficou no forno, fermentando."
+idle_message = "Um forno a lenha, ainda quente."
+prompt_text = "Forno"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Forno/Interacao"]
+position = Vector2(24, 0)
+shape = SubResource("RectangleShape2D_oven")
+
+[node name="Poco" type="ColorRect" parent="World1923"]
+offset_left = 576.0
+offset_top = 24.0
+offset_right = 624.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.101961, 0.047059, 0.058824, 1)
+
+[node name="Elevador" type="Node2D" parent="World1923"]
+script = ExtResource("14_elevator")
+
+[node name="Cabine" type="Node2D" parent="World1923/Elevador"]
+
+[node name="Moldura" type="ColorRect" parent="World1923/Elevador/Cabine"]
+offset_left = 578.0
+offset_top = 152.0
+offset_right = 622.0
+offset_bottom = 200.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Porta" type="ColorRect" parent="World1923/Elevador/Cabine"]
+offset_left = 582.0
+offset_top = 156.0
+offset_right = 618.0
+offset_bottom = 200.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="PainelFreio" type="ColorRect" parent="World1923/Elevador"]
+offset_left = 538.0
+offset_top = 160.0
+offset_right = 550.0
+offset_bottom = 188.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Alca" type="ColorRect" parent="World1923/Elevador/PainelFreio"]
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 9.0
+offset_bottom = 25.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="PainelAlavanca" type="ColorRect" parent="World1923/Elevador"]
+offset_left = 562.0
+offset_top = 156.0
+offset_right = 574.0
+offset_bottom = 188.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Alca" type="ColorRect" parent="World1923/Elevador/PainelAlavanca"]
+offset_left = 3.0
+offset_top = 18.0
+offset_right = 9.0
+offset_bottom = 30.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Freio" type="Area2D" parent="World1923/Elevador"]
+script = ExtResource("13_interactable")
+prompt_text = "Freio"
+available_in = 0
+prompt_position = Vector2(530, 138)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Elevador/Freio"]
+position = Vector2(544, 176)
+shape = SubResource("RectangleShape2D_brake")
+
+[node name="Alavanca" type="Area2D" parent="World1923/Elevador"]
+script = ExtResource("13_interactable")
+prompt_text = "Alavanca"
+available_in = 0
+prompt_position = Vector2(540, 138)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Elevador/Alavanca"]
+position = Vector2(569, 176)
+shape = SubResource("RectangleShape2D_lever")
+
+[node name="Prateleira1" type="ColorRect" parent="World1923"]
+offset_left = 224.0
+offset_top = 264.0
+offset_right = 336.0
+offset_bottom = 268.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Prateleira2" type="ColorRect" parent="World1923"]
+offset_left = 224.0
+offset_top = 296.0
+offset_right = 336.0
+offset_bottom = 300.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="Fermento" type="Node2D" parent="World1923"]
+position = Vector2(272, 284)
+script = ExtResource("11_linked")
+flag_key = "cozinha.fermento.pego"
+visible_when_set = false
+update_immediately = true
+
+[node name="Pote" type="ColorRect" parent="World1923/Fermento"]
+offset_right = 10.0
+offset_bottom = 12.0
+mouse_filter = 2
+color = Color(0.909804, 0.85098, 0.690196, 1)
+
+[node name="Interacao" type="Area2D" parent="World1923/Fermento"]
+script = ExtResource("10_pickup")
+item_id = "fermento"
+taken_flag = "cozinha.fermento.pego"
+prompt_text = "Pegar"
+available_in = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Fermento/Interacao"]
+position = Vector2(5, 30)
+shape = SubResource("RectangleShape2D_yeast")
+
+[node name="GeladeiraMoldura" type="ColorRect" parent="World1923"]
+offset_left = 416.0
+offset_top = 280.0
+offset_right = 456.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.788235, 0.592157, 0.231373, 1)
+
+[node name="GeladeiraPorta" type="ColorRect" parent="World1923"]
+offset_left = 418.0
+offset_top = 282.0
+offset_right = 454.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="Geladeira" type="Area2D" parent="World1923"]
+script = ExtResource("10_pickup")
+item_id = "gelo"
+infinite = true
+prompt_text = "Pegar gelo"
+available_in = 0
+prompt_position = Vector2(404, 262)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Geladeira"]
+position = Vector2(436, 320)
+shape = SubResource("RectangleShape2D_icebox")
+
+[node name="PisoDespensa" type="Area2D" parent="World1923"]
+script = ExtResource("16_ice_zone")
+prompt_text = "Deixar o gelo"
+available_in = 0
+
+[node name="Bloco" type="ColorRect" parent="World1923/PisoDespensa"]
+offset_top = 334.0
+offset_right = 12.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.74902, 0.890196, 0.941176, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/PisoDespensa"]
+position = Vector2(376, 320)
+shape = SubResource("RectangleShape2D_pantry_floor")
+
+[node name="WorldToday" type="Node2D" parent="."]
+visible = false
+script = ExtResource("2_placeholder")
+floor_height = 16
+wall_color = Color(0.109804, 0.14902, 0.188235, 1)
+detail_color = Color(0.227451, 0.290196, 0.345098, 1)
+floor_color = Color(0.243137, 0.290196, 0.184314, 1)
+solid_blocks = Array[Rect2]([Rect2(0, 200, 640, 16), Rect2(576, 24, 64, 176), Rect2(528, 136, 48, 8)])
+detail_blocks = Array[Rect2]([Rect2(0, 192, 576, 8)])
+
+[node name="EraVisibility" type="Node" parent="WorldToday"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="EscombrosPorta" type="ColorRect" parent="WorldToday"]
+offset_left = 40.0
+offset_top = 168.0
+offset_right = 88.0
+offset_bottom = 200.0
+mouse_filter = 2
+color = Color(0.164706, 0.219608, 0.27451, 1)
+
+[node name="EscadaDesabada" type="ColorRect" parent="WorldToday"]
+offset_left = 48.0
+offset_top = 312.0
+offset_right = 144.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.164706, 0.219608, 0.27451, 1)
+
+[node name="FornoDesmoronado" type="Node2D" parent="WorldToday"]
+position = Vector2(480, 176)
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+visible_when_set = false
+
+[node name="Ferrugem" type="ColorRect" parent="WorldToday/FornoDesmoronado"]
+offset_top = 12.0
+offset_right = 48.0
+offset_bottom = 24.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="FornoPetrificado" type="StaticBody2D" parent="WorldToday"]
+position = Vector2(480, 168)
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+
+[node name="Corpo" type="ColorRect" parent="WorldToday/FornoPetrificado"]
+offset_top = 8.0
+offset_right = 48.0
+offset_bottom = 32.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="MassaPetrificada" type="ColorRect" parent="WorldToday/FornoPetrificado"]
+offset_left = -4.0
+offset_right = 52.0
+offset_bottom = 10.0
+mouse_filter = 2
+color = Color(0.54902, 0.541176, 0.478431, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/FornoPetrificado"]
+position = Vector2(24, 16)
+shape = SubResource("RectangleShape2D_oven_stone")
+
+[node name="Poco" type="ColorRect" parent="WorldToday"]
+offset_left = 576.0
+offset_top = 216.0
+offset_right = 624.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="PortinholaMoldura" type="ColorRect" parent="WorldToday"]
+offset_left = 578.0
+offset_top = 94.0
+offset_right = 614.0
+offset_bottom = 136.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="Portinhola" type="ColorRect" parent="WorldToday"]
+offset_left = 580.0
+offset_top = 96.0
+offset_right = 612.0
+offset_bottom = 136.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="CabineEmbaixo" type="Node2D" parent="WorldToday"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.elevador.travado"
+visible_when_set = false
+
+[node name="CabineEnferrujada" type="ColorRect" parent="WorldToday/CabineEmbaixo"]
+offset_left = 576.0
+offset_top = 136.0
+offset_right = 624.0
+offset_bottom = 200.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="Olhar" type="Area2D" parent="WorldToday/CabineEmbaixo"]
+script = ExtResource("15_message")
+message = "Logo abaixo da portinhola, o teto enferrujado da cabine tapa o poço."
+prompt_text = "Portinhola"
+available_in = 1
+prompt_position = Vector2(520, 70)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/CabineEmbaixo/Olhar"]
+position = Vector2(562, 112)
+shape = SubResource("RectangleShape2D_hatch")
+
+[node name="PocoAberto" type="Node2D" parent="WorldToday"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.elevador.travado"
+
+[node name="Vazio" type="ColorRect" parent="WorldToday/PocoAberto"]
+offset_left = 576.0
+offset_top = 24.0
+offset_right = 624.0
+offset_bottom = 216.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="CabineNoAlto" type="ColorRect" parent="WorldToday/PocoAberto"]
+offset_left = 576.0
+offset_top = 24.0
+offset_right = 624.0
+offset_bottom = 64.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="Cabo1" type="ColorRect" parent="WorldToday/PocoAberto"]
+offset_left = 594.0
+offset_top = 64.0
+offset_right = 596.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="Cabo2" type="ColorRect" parent="WorldToday/PocoAberto"]
+offset_left = 604.0
+offset_top = 64.0
+offset_right = 606.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="DescerCabos" type="Area2D" parent="WorldToday/PocoAberto" node_paths=PackedStringArray("target")]
+script = ExtResource("7_passage")
+target = NodePath("../../../Pontos/BaseCabos")
+prompt_text = "Descer pelos cabos"
+available_in = 1
+prompt_position = Vector2(500, 70)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/PocoAberto/DescerCabos"]
+position = Vector2(562, 112)
+shape = SubResource("RectangleShape2D_hatch")
+
+[node name="SubirCabos" type="Area2D" parent="WorldToday" node_paths=PackedStringArray("target")]
+script = ExtResource("7_passage")
+target = NodePath("../../Pontos/Prateleira")
+prompt_text = "Subir pelos cabos"
+available_in = 1
+prompt_position = Vector2(530, 280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/SubirCabos"]
+position = Vector2(600, 320)
+shape = SubResource("RectangleShape2D_cables_bottom")
+
+[node name="CardapioDesbotado" type="Node2D" parent="WorldToday"]
+position = Vector2(360, 150)
+
+[node name="Papel" type="ColorRect" parent="WorldToday/CardapioDesbotado"]
+offset_right = 16.0
+offset_bottom = 18.0
+mouse_filter = 2
+color = Color(0.54902, 0.541176, 0.478431, 1)
+
+[node name="Interacao" type="Area2D" parent="WorldToday/CardapioDesbotado"]
+script = ExtResource("9_note")
+title = "Um pedaço de papel amarelado"
+text = "A tinta quase sumiu.
+
+...pudim de pão
+...café e licores
+
+No pé, a lápis: \"1 5\""
+prompt_text = "Ler"
+available_in = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/CardapioDesbotado/Interacao"]
+position = Vector2(8, 25)
+shape = SubResource("RectangleShape2D_menu_today")
+
+[node name="PrateleiraTorta" type="ColorRect" parent="WorldToday"]
+offset_left = 224.0
+offset_top = 300.0
+offset_right = 336.0
+offset_bottom = 304.0
+mouse_filter = 2
+color = Color(0.227451, 0.290196, 0.345098, 1)
+
+[node name="GeladeiraEnferrujada" type="ColorRect" parent="WorldToday"]
+offset_left = 416.0
+offset_top = 288.0
+offset_right = 456.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="Mancha" type="Node2D" parent="WorldToday"]
+script = ExtResource("17_ice_stain")
+flag_key = "cozinha.gelo.posto"
+
+[node name="Agua" type="ColorRect" parent="WorldToday/Mancha"]
+offset_left = -12.0
+offset_top = 341.0
+offset_right = 12.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.180392, 0.219608, 0.137255, 1)
+
+[node name="Fresta" type="Node2D" parent="WorldToday"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.piso.apodrecido"
+visible_when_set = false
+
+[node name="Rachadura" type="ColorRect" parent="WorldToday/Fresta"]
+offset_left = 368.0
+offset_top = 342.0
+offset_right = 384.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="Olhar" type="Area2D" parent="WorldToday/Fresta"]
+script = ExtResource("15_message")
+message = "Uma corrente de ar frio sobe por uma fresta entre as tábuas."
+prompt_text = "Fresta"
+available_in = 1
+prompt_position = Vector2(356, 280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/Fresta/Olhar"]
+position = Vector2(376, 320)
+shape = SubResource("RectangleShape2D_crack")
+
+[node name="Buraco" type="Node2D" parent="WorldToday"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.piso.apodrecido"
+
+[node name="TabuasPodres" type="ColorRect" parent="WorldToday/Buraco"]
+offset_left = 356.0
+offset_top = 338.0
+offset_right = 396.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.180392, 0.219608, 0.137255, 1)
+
+[node name="Vao" type="ColorRect" parent="WorldToday/Buraco"]
+offset_left = 362.0
+offset_top = 340.0
+offset_right = 390.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.027451, 0.035294, 0.047059, 1)
+
+[node name="Descer" type="Area2D" parent="WorldToday/Buraco"]
+script = ExtResource("18_end")
+flag_key = "cozinha.concluida"
+title = "Fim da Cozinha"
+text = "Lia desce pelo buraco no piso apodrecido.
+
+(Provisório: aqui o jogo levará ao próximo andar.)"
+prompt_text = "Descer pelo buraco"
+available_in = 1
+prompt_position = Vector2(336, 280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/Buraco/Descer"]
+position = Vector2(376, 320)
+shape = SubResource("RectangleShape2D_crack")
+
+[node name="Helena" parent="." instance=ExtResource("4_char")]
+position = Vector2(120, 200)
+body_color = Color(0.419608, 0.117647, 0.164706, 1)
+
+[node name="EraVisibility" type="Node" parent="Helena"]
+script = ExtResource("3_vis")
+
+[node name="Lia" parent="." instance=ExtResource("4_char")]
+visible = false
+position = Vector2(200, 200)
+era = 1
+body_color = Color(0.431373, 0.521569, 0.588235, 1)
+
+[node name="EraVisibility" type="Node" parent="Lia"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="SoloInputRouter" type="Node" parent="." node_paths=PackedStringArray("helena", "lia")]
+script = ExtResource("5_router")
+helena = NodePath("../Helena")
+lia = NodePath("../Lia")
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]
