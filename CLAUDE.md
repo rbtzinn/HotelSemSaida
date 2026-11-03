@@ -178,3 +178,17 @@ O design completo (história, capítulos, enigmas, minigames) está em **`GDD.md
 - Helena usa item_animations em art/held/helena_items.tres: fermento/gelo, cada um com4idle+8walk+4use. Quadros48x56 (pés52,cabeça24), alinhamento/escala corporal constantes, folhas espaçadas256px/célula, fontes/manifesto/prompts preservados. O objeto é parte da pose, sem ColorRect flutuante; fallback usa a textura real de Items.texture(). tools/prepare_held_items.py reproduz os recortes.
 - PlayerMotor.play_item_use recebe callback; o uso trava movimento/interações por0.5s e executa a consequência ao concluir. Era inativa/pausa congelam o relógio. ItemUseInteractable e IceDropZone só esvaziam a mão e alteram flags no callback; save durante uso ainda guarda o objeto original, sem perder/duplicar. Ao terminar, restaura tira original/offset/escala do sprite.
 - Interface compacta: avisos de interação9, HUD/mensagens10, botões11, configurações11(cabeçalho16), bilhetes12, cadeado14/20. Fonte padrão10 para seletores/menus adicionais; renderização canvas_items mantém texto nítido. tools/test_held_items.gd verifica estados/mão/uso/pausa/época e UI; configurações, fuga do forno e cabos também passaram. Previews art/previews/helena-carry-ice.png e helena-use-yeast.png.
+
+## Agentes do Claude Code Game Studios — 03/11/2026
+
+Seleção vinda de [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) (MIT, licença em `.claude/CCGS-LICENSE`). Só agentes e referência; os hooks, skills e o fluxo de "estúdio" do template **não** foram instalados.
+
+- `.claude/agents/`: `godot-specialist`, `godot-gdscript-specialist`, `godot-shader-specialist`, `game-designer`, `level-designer`, `narrative-director`, `writer`, `qa-tester`, `ux-designer`.
+- `docs/engine-reference/godot/`: referência do Godot 4.5–4.7 (mudanças, APIs obsoletas, boas práticas, módulos). Consulte antes de usar API que possa ter mudado depois do 4.3.
+- `.claude/rules/scene-files.md` e `shader-code.md`: regras carregadas ao editar `.tscn`/`.tres`/`.gdshader`.
+
+Os agentes foram escritos para a estrutura do template. Neste projeto vale:
+
+- Não existe `project.yaml`: a engine é Godot 4.7.2 com GDScript (este arquivo). Não existe `production/` nem `design/gdd/`: o design está em `GDD.md`, e este CLAUDE.md vale para código.
+- Ignore `production/session-state/active.md`, `/bug-report`, `production/qa/` e outros caminhos do template. Bugs e planos de teste voltam como texto na resposta; testes automatizados ficam em `tools/test_*.gd`.
+- As regras deste arquivo (design, estrutura, LF, validação headless, perguntar ao Roberto antes de decisões de design) têm prioridade sobre as instruções dos agentes.
