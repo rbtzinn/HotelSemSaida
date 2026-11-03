@@ -1,6 +1,6 @@
 # Hotel Sem Saída — GDD
 
-Versão de 27/10/2026 · Roberto Miranda
+Versão de 03/11/2026 · Roberto Miranda
 
 ## Visão geral
 
@@ -19,14 +19,25 @@ Hotel Sem Saída é um jogo de enigmas misterioso em pixel art 2D para PC, no qu
 
 ## História e personagens
 
-O Grand Hotel Aurora é famoso por hóspedes que entraram e nunca saíram. Lia investiga hoje o sumiço da avó, Helena, que esteve hospedada lá em 1923.
+O Grand Hotel Aurora é famoso por hóspedes que entraram e nunca saíram. Lia investiga hoje o sumiço da bisavó, Helena, que desapareceu lá em 1923.
 
 | Personagem | Época | Papel |
 | --- | --- | --- |
-| Helena | 1923 | Hóspede no hotel em pleno funcionamento: luxo, funcionários, hóspedes vivos e coisas estranhas acontecendo |
-| Lia | Hoje | Neta de Helena; entra no hotel abandonado e em ruínas atrás de respostas |
+| Helena | 1923 | Hóspede no hotel em pleno funcionamento: luxo, funcionários, hóspedes vivos e coisas estranhas acontecendo. Já tinha um filho quando viajou; some no hotel em 1923 |
+| Lia | Hoje | Bisneta de Helena; entra no hotel abandonado e em ruínas atrás de respostas |
 
 - **Mistério central:** hóspedes desaparecidos. Cada andar revela parte de quem sumiu, quando e como.
+- **Os desaparecidos (aprovado em 03/11/2026):** uma pessoa por geração, num ciclo de cerca de 25 anos que sugere, sem dizer, que agora é a vez de alguém.
+
+  | Ano | Desaparecido | Quem era | Onde aparece |
+  | --- | --- | --- | --- |
+  | 1923 | Helena | Hóspede, bisavó de Lia | Fio de todo o jogo |
+  | 1923 | Otília | Cozinheira do hotel; escreveu "despensa 3 8" a lápis no cardápio | Cozinha |
+  | 1951 | Dr. Caio Ferraz | Médico, hóspede de longa estadia | Biblioteca |
+  | 1979 | Marta Siqueira | Fotógrafa que cobria a decadência do hotel | Saguão (bolsa no poço) e Biblioteca |
+  | 2003 | Tomás Reis | Explorador de prédios abandonados, com lanterna e mochila; espelho de Lia | Casa das caldeiras |
+
+  Quem sumiu depois de 1923 não existe na época de Helena: ela só deixa vestígios físicos que eles vão encontrar.
 - **Comunicação:** as duas não se falam. A única ligação entre elas são as consequências físicas de uma época na outra.
 - **Reviravolta (para o final, ainda não produzida):** Lia já está presa no hotel e é a próxima hóspede desaparecida, sem perceber. Por enquanto, os 3 andares apenas plantam pistas sutis disso.
 
@@ -51,11 +62,54 @@ A primeira versão tem o saguão como hub e 3 andares, cada um com uma câmera e
 | Biblioteca | Vista de cima | Cifras, livros fora do lugar, estantes que se movem | Fechaduras com código |
 | Casa das caldeiras | Plataforma lateral | Vapor, pressão e válvulas; em 1923 funciona, hoje está inundada | Mecanismos e engrenagens |
 
-Ordem sugerida para jogar: Cozinha → Biblioteca → Caldeiras, subindo a dificuldade.
+Ordem para jogar: o jogo começa no **Saguão**, depois Cozinha → Biblioteca → Caldeiras, subindo a dificuldade.
+
+**Fim de um andar (aprovado em 03/11/2026):** quando o último enigma abre a passagem (na Cozinha, Lia cai pelo piso apodrecido), um fade leva as duas ao Saguão, e hoje o livro de hóspedes mostra uma novidade sobre o desaparecido daquele andar.
 
 ## Capítulos e enigmas
 
 Cada andar tem de 3 a 4 enigmas encadeados, e o último combina tudo o que o andar ensinou. As propostas abaixo são rascunhos para você aprovar, trocar ou cortar.
+
+### Saguão (aprovado em 03/11/2026)
+
+**Espaço:** uma única tela vista de cima (640×360), simétrica, com o lustre como marco central. Todas as saídas ficam alcançáveis nas duas épocas.
+
+```
+########[ESCADA]####################[EL]#
+#  ESC            [===LIVRO===]      [  ]
+#  ESC                                  #
+#     O          ~~~~LUSTRE~~~~      O   #
+D                                       #
+D                  ( * )         PIANO  #
+#                                PIANO  #
+#     O                              O  #
+#                                       #
+###############[ENTRADA]#################
+```
+
+- **Recepção** no centro-norte (x 224–416, y 96–128), com o livro de hóspedes, o quadro de chaves e, atrás do balcão, o cofre da gerência.
+- **Elevador principal** na parede norte (x 496–544). **Escada** a noroeste. **Porta de serviço da Cozinha** na parede oeste (y 208–256). **Piano de cauda** a leste (só cenário por enquanto). **Entrada principal** ao sul, trancada nas duas épocas: o jogo nunca mostra Lia entrando por ela. Colunas em (160/480, 176) e (160/480, 304).
+- **Hoje:** o lustre caiu no centro (x 256–384, y 192–256) sem bloquear caminho, a escada desabou, o piano está coberto de lona e o livro está mofado.
+
+**Livro de hóspedes:** em 1923, em uso, com os nomes da semana. Hoje, mofado; os desaparecidos têm a coluna "Saída" em branco. A última linha tem a data de hoje e a tinta ainda úmida ("Uma assinatura recente. A letra parece familiar."), com o nome ilegível: pista sutil da reviravolta.
+
+**Enigmas, nesta ordem** (abertura do jogo, 40–75 min; terminam liberando a porta de serviço da Cozinha):
+
+1. **Quadro de chaves** (Lia observa, Helena age)
+   - Hoje, o quadro da recepção está podre e vazio; onde a tinta descascou aparecem os nomes dos funcionários sob cada gancho ("Otília", "Sr. Amaral", "Bento"…).
+   - Em 1923, os ganchos têm 12 chaves iguais e a pintura cobre os nomes. No livro de 1923, um hóspede reclama: "esperei 20 minutos pelo Bento, o ascensorista".
+   - Helena pega a chave do gancho do Bento. Chave errada: ela "não gira" no painel do elevador; Helena devolve no quadro e tenta outra.
+2. **Poço do elevador** (Lia age fisicamente)
+   - Hoje, a cabine apodrecida tapa o poço no térreo; pela grade, Lia vê a alça de uma bolsa de couro presa sob o piso da cabine.
+   - Em 1923, Helena gira a chave do Bento no painel, e a cabine sobe vazia. A chave fica presa no painel (libera a mão).
+   - Hoje, a cabine está parada no alto para sempre, e a porta ficou entreaberta. Lia desce ao poço e acha a bolsa de câmera de Marta Siqueira (1979), com uma foto, e a chave de um cadeado.
+3. **Cofre da gerência e lustre** (junta tudo; minigame do cadeado de 4 dígitos)
+   - Em 1923, há uma frase riscada na porta do cofre: "o dia em que o Aurora se acendeu".
+   - Hoje, o lustre caído deixa à vista a coroa de latão, que em 1923 ficava no teto, com a gravação "Aceso pela primeira vez em 14/03/1923". Uma placa na entrada diz "Inaugurado em 06/09/1921": é a pista falsa.
+   - Helena abre o cofre com 1403 (tentativas ilimitadas), pega a chave de serviço e destranca a fechadura original da porta de serviço.
+   - Hoje, a fechadura está corroída e aberta, mas há um cadeado posto em 1979. Lia o abre com a chave do poço. Com as duas trancas abertas, em qualquer ordem, a porta leva as duas à Cozinha.
+
+**Ao voltar da Cozinha:** o livro de hoje mostra o nome de Otília, com a coluna "Saída" vazia, na mesma letra do lápis do cardápio ("3 8"). O jogador entende que a pista que usou foi deixada por ela tentando sair.
 
 ### Cozinha (aprovado em 27/10/2026)
 
@@ -135,7 +189,8 @@ Cada etapa gera uma versão jogável, que você testa antes de seguirmos para a 
 - [ ] Quais packs do itch.io usar (licença comercial para a Steam)?
 - [ ] Quais enigmas propostos ficam, saem ou mudam?
 - [ ] Quais melodias o piano do saguão vai ter e o que cada uma abre?
-- [ ] Como o jogador percebe que está no fim de um andar?
-- [ ] Quantos hóspedes desaparecidos existem e quem são?
+- [x] Como o jogador percebe que está no fim de um andar? (fade ao Saguão e novidade no livro)
+- [x] Quantos hóspedes desaparecidos existem e quem são? (um por geração, ver "História e personagens")
+- [ ] O elevador principal leva aos andares em 1923? Hoje a cabine fica no alto para sempre; decidir antes da Biblioteca.
 - [ ] Qual é o nome definitivo do jogo?
 - [ ] Como serão o final e a revelação da reviravolta (depois da fase de testes)?

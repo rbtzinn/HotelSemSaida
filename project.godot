@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Hotel Sem Saída"
-run/main_scene="res://scenes/rooms/cozinha.tscn"
+run/main_scene="res://scenes/rooms/saguao.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
@@ -32,9 +32,9 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/default_font_size=10
 theme/default_font_hinting=2
 theme/default_font_subpixel_positioning=0
+theme/default_font_size=10
 
 [input]
 

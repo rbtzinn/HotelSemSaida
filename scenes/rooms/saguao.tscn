@@ -1,0 +1,129 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/room.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/puzzles/saguao/lobby_room.gd" id="2_lobby"]
+[ext_resource type="Script" path="res://scripts/era/era_visibility.gd" id="3_vis"]
+[ext_resource type="PackedScene" path="res://scenes/player/personagem.tscn" id="4_char"]
+[ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="5_router"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
+[ext_resource type="Script" path="res://scripts/interaction/door.gd" id="7_door"]
+[ext_resource type="Script" path="res://scripts/interaction/message_interactable.gd" id="8_message"]
+[ext_resource type="Texture2D" path="res://art/sprites/helena.png" id="t_helena"]
+[ext_resource type="Texture2D" path="res://art/sprites/lia.png" id="t_lia"]
+[ext_resource type="SpriteFrames" path="res://art/future/lia_animations.tres" id="f_lia_animation"]
+[ext_resource type="SpriteFrames" path="res://art/held/helena_items.tres" id="held_animations"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kitchen_door"]
+size = Vector2(28, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_entrance"]
+size = Vector2(64, 24)
+
+[node name="Saguao" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_room")
+camera_mode = 1
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(320, 180)
+
+[node name="Pontos" type="Node2D" parent="."]
+
+[node name="DaCozinha" type="Marker2D" parent="Pontos"]
+position = Vector2(40, 244)
+
+[node name="World1923" type="Node2D" parent="."]
+y_sort_enabled = true
+script = ExtResource("2_lobby")
+top_down = true
+
+[node name="EraVisibility" type="Node" parent="World1923"]
+script = ExtResource("3_vis")
+
+[node name="PortaCozinha" type="Area2D" parent="World1923"]
+position = Vector2(16, 208)
+script = ExtResource("7_door")
+target_scene = "res://scenes/rooms/cozinha.tscn"
+target_spawn = "DoSaguao"
+prompt_text = "Cozinha"
+prompt_position = Vector2(4, -14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/PortaCozinha"]
+position = Vector2(14, 24)
+shape = SubResource("RectangleShape2D_kitchen_door")
+
+[node name="Entrada" type="Area2D" parent="World1923"]
+position = Vector2(288, 320)
+script = ExtResource("8_message")
+message = "A porta giratória está travada. Ninguém a destrava."
+prompt_text = "Examinar"
+prompt_position = Vector2(8, -14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World1923/Entrada"]
+position = Vector2(32, 12)
+shape = SubResource("RectangleShape2D_entrance")
+
+[node name="WorldToday" type="Node2D" parent="."]
+visible = false
+y_sort_enabled = true
+script = ExtResource("2_lobby")
+present = true
+top_down = true
+wall_color = Color(0.109804, 0.14902, 0.188235, 1)
+detail_color = Color(0.227451, 0.290196, 0.345098, 1)
+floor_color = Color(0.243137, 0.290196, 0.184314, 1)
+
+[node name="EraVisibility" type="Node" parent="WorldToday"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="PortaCozinha" type="Area2D" parent="WorldToday"]
+position = Vector2(16, 208)
+script = ExtResource("7_door")
+target_scene = "res://scenes/rooms/cozinha.tscn"
+target_spawn = "DoSaguao"
+prompt_text = "Cozinha"
+prompt_position = Vector2(4, -14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/PortaCozinha"]
+position = Vector2(14, 24)
+shape = SubResource("RectangleShape2D_kitchen_door")
+
+[node name="Entrada" type="Area2D" parent="WorldToday"]
+position = Vector2(288, 320)
+script = ExtResource("8_message")
+message = "Tábuas e correntes. Pregadas por dentro."
+prompt_text = "Examinar"
+prompt_position = Vector2(8, -14)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldToday/Entrada"]
+position = Vector2(32, 12)
+shape = SubResource("RectangleShape2D_entrance")
+
+[node name="Helena" parent="." instance=ExtResource("4_char")]
+position = Vector2(220, 300)
+body_color = Color(0.419608, 0.117647, 0.164706, 1)
+sprite_sheet = ExtResource("t_helena")
+item_animations = ExtResource("held_animations")
+
+[node name="EraVisibility" type="Node" parent="Helena"]
+script = ExtResource("3_vis")
+
+[node name="Lia" parent="." instance=ExtResource("4_char")]
+visible = false
+position = Vector2(420, 300)
+era = 1
+body_color = Color(0.431373, 0.521569, 0.588235, 1)
+sprite_sheet = ExtResource("t_lia")
+drawn_animations = ExtResource("f_lia_animation")
+
+[node name="EraVisibility" type="Node" parent="Lia"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="SoloInputRouter" type="Node" parent="." node_paths=PackedStringArray("helena", "lia")]
+script = ExtResource("5_router")
+helena = NodePath("../Helena")
+lia = NodePath("../Lia")
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]

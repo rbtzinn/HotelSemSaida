@@ -133,7 +133,7 @@ Infraestrutura feita depois do protótipo:
 
 ## Capítulo 1 — Cozinha (design no `GDD.md`)
 
-Cena `scenes/rooms/cozinha.tscn` (cena principal do projeto): uma tela lateral em corte, com a Cozinha em cima (piso em y=200) e a Despensa embaixo (piso em y=344). `Passage` leva uma só personagem a outro ponto da mesma sala (escada, cabos).
+Cena `scenes/rooms/cozinha.tscn`: uma tela lateral em corte, com a Cozinha em cima (piso em y=200) e a Despensa embaixo (piso em y=344). `Passage` leva uma só personagem a outro ponto da mesma sala (escada, cabos).
 
 - **C1. Layout**: os dois andares nas duas épocas, a escada de 1923 (Descer/Subir), o forno, o poço do elevador e a prateleira quebrada de hoje (alta demais sem degrau).
 - **C2. Despensa trancada**: objeto na mão de Helena, cardápio rasgado nas duas épocas e minigame do cadeado de 4 dígitos.
@@ -142,6 +142,13 @@ Cena `scenes/rooms/cozinha.tscn` (cena principal do projeto): uma tela lateral e
 - **C5. Fogo e gelo**: corrente de ar no piso hoje, gelo de 1923 no ponto certo, piso apodrecido e fim do andar.
   - A geladeira dá gelo sem limite. Helena deixa o bloco onde estiver parada (`IceDropZone`); só a até 12 px do ponto da fresta (x=376) o piso apodrece. Hoje, uma mancha de água marca onde ficou o último bloco.
   - O fim do andar ainda é provisório (tela "Fim da Cozinha" + flag `cozinha.concluida`): o GDD não define como o jogador percebe o fim de um andar nem para onde vai.
+
+## Saguão (hub) — design no `GDD.md`
+
+Cena `scenes/rooms/saguao.tscn` (cena principal do projeto: o jogo começa aqui), vista de cima, uma tela. `LobbyRoom` (`scripts/puzzles/saguao/lobby_room.gd`, estende `PlaceholderRoom`) monta a mesma geometria nas duas épocas; `present = true` liga a versão em ruínas (lustre caído e sólido no centro, escada em escombros, entrada com tábuas).
+
+- **S1. Sala**: layout simétrico, porta de serviço na parede oeste levando à Cozinha (`Pontos/DoSaguao` em `cozinha.tscn`); entrada sul trancada nas duas épocas. Por enquanto a porta da Cozinha está sempre aberta; a S4 a liga a `saguao.porta_servico.livre`. Teste: `tools/test_saguao.gd` (`-- --capture` sem `--headless` salva capturas na pasta TEMP).
+- Próximas: **S2** quadro de chaves e elevador, **S3** poço, **S4** cofre, porta com duas trancas e fim da Cozinha voltando ao Saguão.
 
 ## Referência
 

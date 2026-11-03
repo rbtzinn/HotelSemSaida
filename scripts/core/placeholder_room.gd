@@ -37,6 +37,8 @@ func _ready() -> void:
 func _build() -> void:
 	for child in get_children():
 		if child.has_meta("generated"):
+			# Sai da árvore já, para os novos blocos não colidirem com os nomes antigos
+			remove_child(child)
 			child.queue_free()
 	_generated_count = 0
 

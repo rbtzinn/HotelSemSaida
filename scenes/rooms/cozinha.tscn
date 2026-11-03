@@ -159,6 +159,9 @@ position = Vector2(580, 344)
 [node name="Prateleira" type="Marker2D" parent="Pontos"]
 position = Vector2(552, 136)
 
+[node name="DoSaguao" type="Marker2D" parent="Pontos"]
+position = Vector2(120, 200)
+
 [node name="World1923" type="Node2D" parent="."]
 script = ExtResource("2_placeholder")
 floor_height = 16
