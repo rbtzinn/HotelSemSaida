@@ -20,6 +20,15 @@ func _on_interact(by: PlayerMotor) -> void:
 	if by.get_held_item() != accepted_item:
 		get_tree().call_group("hud", "show_message", idle_message)
 		return
+	by.face_toward(get_focus_point())
+	if by.play_item_use(accepted_item, _complete_use.bind(by)):
+		return
+	_complete_use(by)
+
+
+func _complete_use(by: PlayerMotor) -> void:
+	if by.get_held_item() != accepted_item:
+		return
 	by.set_held_item("")
 	WorldState.set_flag(result_flag)
 	get_tree().call_group("hud", "show_message", success_message)

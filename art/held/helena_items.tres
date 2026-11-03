@@ -1,0 +1,68 @@
+[gd_resource type="SpriteFrames" load_steps=33 format=3]
+
+[ext_resource type="Texture2D" path="res://art/held/fermento_00.png" id="fermento0"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_01.png" id="fermento1"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_02.png" id="fermento2"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_03.png" id="fermento3"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_04.png" id="fermento4"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_05.png" id="fermento5"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_06.png" id="fermento6"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_07.png" id="fermento7"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_08.png" id="fermento8"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_09.png" id="fermento9"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_10.png" id="fermento10"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_11.png" id="fermento11"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_12.png" id="fermento12"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_13.png" id="fermento13"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_14.png" id="fermento14"]
+[ext_resource type="Texture2D" path="res://art/held/fermento_15.png" id="fermento15"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_00.png" id="gelo0"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_01.png" id="gelo1"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_02.png" id="gelo2"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_03.png" id="gelo3"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_04.png" id="gelo4"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_05.png" id="gelo5"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_06.png" id="gelo6"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_07.png" id="gelo7"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_08.png" id="gelo8"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_09.png" id="gelo9"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_10.png" id="gelo10"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_11.png" id="gelo11"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_12.png" id="gelo12"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_13.png" id="gelo13"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_14.png" id="gelo14"]
+[ext_resource type="Texture2D" path="res://art/held/gelo_15.png" id="gelo15"]
+
+[resource]
+animations = [{"frames":[{"duration":1.0,"texture":ExtResource("fermento0")},
+{"duration":1.0,"texture":ExtResource("fermento1")},
+{"duration":1.0,"texture":ExtResource("fermento2")},
+{"duration":1.0,"texture":ExtResource("fermento3")}],"loop":true,"name":&"fermento_idle","speed":4.0},
+{"frames":[{"duration":1.0,"texture":ExtResource("fermento4")},
+{"duration":1.0,"texture":ExtResource("fermento5")},
+{"duration":1.0,"texture":ExtResource("fermento6")},
+{"duration":1.0,"texture":ExtResource("fermento7")},
+{"duration":1.0,"texture":ExtResource("fermento8")},
+{"duration":1.0,"texture":ExtResource("fermento9")},
+{"duration":1.0,"texture":ExtResource("fermento10")},
+{"duration":1.0,"texture":ExtResource("fermento11")}],"loop":true,"name":&"fermento_walk","speed":8.0},
+{"frames":[{"duration":1.0,"texture":ExtResource("fermento12")},
+{"duration":1.0,"texture":ExtResource("fermento13")},
+{"duration":1.0,"texture":ExtResource("fermento14")},
+{"duration":1.0,"texture":ExtResource("fermento15")}],"loop":false,"name":&"fermento_use","speed":8.0},
+{"frames":[{"duration":1.0,"texture":ExtResource("gelo0")},
+{"duration":1.0,"texture":ExtResource("gelo1")},
+{"duration":1.0,"texture":ExtResource("gelo2")},
+{"duration":1.0,"texture":ExtResource("gelo3")}],"loop":true,"name":&"gelo_idle","speed":4.0},
+{"frames":[{"duration":1.0,"texture":ExtResource("gelo4")},
+{"duration":1.0,"texture":ExtResource("gelo5")},
+{"duration":1.0,"texture":ExtResource("gelo6")},
+{"duration":1.0,"texture":ExtResource("gelo7")},
+{"duration":1.0,"texture":ExtResource("gelo8")},
+{"duration":1.0,"texture":ExtResource("gelo9")},
+{"duration":1.0,"texture":ExtResource("gelo10")},
+{"duration":1.0,"texture":ExtResource("gelo11")}],"loop":true,"name":&"gelo_walk","speed":8.0},
+{"frames":[{"duration":1.0,"texture":ExtResource("gelo12")},
+{"duration":1.0,"texture":ExtResource("gelo13")},
+{"duration":1.0,"texture":ExtResource("gelo14")},
+{"duration":1.0,"texture":ExtResource("gelo15")}],"loop":false,"name":&"gelo_use","speed":8.0}]

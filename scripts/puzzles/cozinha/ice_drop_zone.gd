@@ -13,7 +13,7 @@ const ROT_FLAG: String = "cozinha.piso.apodrecido"
 ## Distância máxima, em pixels, entre o gelo e o ponto certo.
 @export var tolerance: float = 12.0
 
-@onready var _block: ColorRect = $Bloco
+@onready var _block: Control = $Bloco
 
 
 func _ready() -> void:
@@ -33,6 +33,14 @@ func can_interact(by: PlayerMotor) -> bool:
 
 func _on_interact(by: PlayerMotor) -> void:
 	var x := roundi(by.global_position.x)
+	if by.play_item_use(ITEM, _finish_drop.bind(by,x)):
+		return
+	_finish_drop(by,x)
+
+
+func _finish_drop(by: PlayerMotor, x: int) -> void:
+	if by.get_held_item() != ITEM:
+		return
 	by.set_held_item("")
 	WorldState.set_flag(X_FLAG, x)
 	WorldState.set_flag(PLACED_FLAG, true)

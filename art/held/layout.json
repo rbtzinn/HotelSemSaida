@@ -1,0 +1,358 @@
+{
+  "fermento": [
+    {
+      "file": "fermento_00.png",
+      "bbox": [
+        17,
+        4,
+        33,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_01.png",
+      "bbox": [
+        17,
+        4,
+        33,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_02.png",
+      "bbox": [
+        17,
+        4,
+        33,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_03.png",
+      "bbox": [
+        17,
+        4,
+        33,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_04.png",
+      "bbox": [
+        15,
+        4,
+        37,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_05.png",
+      "bbox": [
+        14,
+        4,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_06.png",
+      "bbox": [
+        13,
+        4,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_07.png",
+      "bbox": [
+        15,
+        3,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_08.png",
+      "bbox": [
+        13,
+        3,
+        40,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_09.png",
+      "bbox": [
+        15,
+        3,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_10.png",
+      "bbox": [
+        16,
+        3,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_11.png",
+      "bbox": [
+        14,
+        3,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_12.png",
+      "bbox": [
+        15,
+        4,
+        43,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_13.png",
+      "bbox": [
+        15,
+        3,
+        43,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_14.png",
+      "bbox": [
+        13,
+        4,
+        40,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "fermento_15.png",
+      "bbox": [
+        17,
+        4,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    }
+  ],
+  "gelo": [
+    {
+      "file": "gelo_00.png",
+      "bbox": [
+        17,
+        4,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_01.png",
+      "bbox": [
+        17,
+        4,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_02.png",
+      "bbox": [
+        17,
+        4,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_03.png",
+      "bbox": [
+        17,
+        4,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_04.png",
+      "bbox": [
+        12,
+        3,
+        35,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_05.png",
+      "bbox": [
+        13,
+        4,
+        35,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_06.png",
+      "bbox": [
+        12,
+        3,
+        35,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_07.png",
+      "bbox": [
+        14,
+        3,
+        35,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_08.png",
+      "bbox": [
+        14,
+        3,
+        37,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_09.png",
+      "bbox": [
+        12,
+        2,
+        35,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_10.png",
+      "bbox": [
+        14,
+        2,
+        37,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_11.png",
+      "bbox": [
+        13,
+        3,
+        36,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_12.png",
+      "bbox": [
+        8,
+        12,
+        33,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_13.png",
+      "bbox": [
+        7,
+        16,
+        34,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_14.png",
+      "bbox": [
+        6,
+        20,
+        38,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    },
+    {
+      "file": "gelo_15.png",
+      "bbox": [
+        13,
+        5,
+        45,
+        52
+      ],
+      "feet": 52,
+      "head_x": 24
+    }
+  ]
+}

@@ -16,13 +16,14 @@ func _ready() -> void:
 	add_to_group("hud")
 
 	_message = Label.new()
-	_message.position = Vector2(0, 328)
-	_message.size = Vector2(640, 16)
+	_message.position = Vector2(16, 322)
+	_message.size = Vector2(608, 26)
 	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.add_theme_font_size_override("font_size", 10)
 	_message.add_theme_color_override("font_color", Color("#E8E2D0"))
 	_message.add_theme_color_override("font_outline_color", Color.BLACK)
-	_message.add_theme_constant_override("outline_size", 2)
+	_message.add_theme_constant_override("outline_size", 1)
 	_message.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_message.modulate.a = 0.0
 	add_child(_message)
@@ -38,7 +39,7 @@ func _ready() -> void:
 	_icon_style.set_border_width_all(1)
 	_icon_style.border_color = Color("#E8E2D0")
 	_icon = Panel.new()
-	_icon.custom_minimum_size = Vector2(8, 16)
+	_icon.custom_minimum_size = Vector2(6, 12)
 	_icon.add_theme_stylebox_override("panel", _icon_style)
 	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_icon)
@@ -47,7 +48,7 @@ func _ready() -> void:
 	_label.add_theme_font_size_override("font_size", 10)
 	_label.add_theme_color_override("font_color", Color("#E8E2D0"))
 	_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	_label.add_theme_constant_override("outline_size", 2)
+	_label.add_theme_constant_override("outline_size", 1)
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_label)
 

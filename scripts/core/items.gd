@@ -14,3 +14,8 @@ static func display_name(item_id: String) -> String:
 
 static func color(item_id: String) -> Color:
 	return DATA[item_id]["color"] if DATA.has(item_id) else Color.WHITE
+
+
+static func texture(item_id: String) -> Texture2D:
+	var files := {"fermento": "res://art/sprites/fermento.png", "gelo": "res://art/sprites/gelo.png"}
+	return load(files[item_id]) if files.has(item_id) else null

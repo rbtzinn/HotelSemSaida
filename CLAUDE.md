@@ -20,7 +20,7 @@ O Grand Hotel Aurora existe em duas épocas, 1923 e hoje. O jogador alterna com 
 - **Godot 4** (última versão 4.x estável), edição **padrão** (não a .NET). Roda sem instalação e sem acesso de administrador.
 - Linguagem: **GDScript** com tipagem estática (`var speed: float = 80.0`, `func get_move() -> Vector2:`).
 - Nomes de código (classes, funções, variáveis, sinais, nós) em inglês, seguindo o estilo do Godot: `snake_case` para funções e variáveis, `PascalCase` para `class_name` e nós. Comentários e textos de interface em português.
-- Resolução de referência: **640×360**. Em `project.godot`: stretch mode `viewport`, aspect `keep`, scale mode `integer` (escala inteira para 1280×720, 1920×1080 e 4K). Filtro de textura padrão: `Nearest`.
+- Resolução de referência: **640×360**. Em `project.godot`: stretch mode `canvas_items` (texto e arte do presente em resolução da janela; ver "Atualização visual"). Filtro de textura padrão: `Nearest`.
 - Unidade = pixel. Grade de **16 px**. Personagens têm **24×48 px**.
 - Uma `Camera2D` fixa por sala.
 - Luzes 2D: `PointLight2D` e `CanvasModulate`.
@@ -80,6 +80,14 @@ Nada de arte final ainda. Use **blocos coloridos**: `ColorRect` (cenário) ou `P
 | Personagem | Helena `#6B1E2A` | Lia `#6E8596` |
 | Luz | `#F2D49B` | `#E8E2D0` (lanterna) |
 
+## Arte (pixel art)
+
+- As folhas originais ficam em `art/source/` (fundo magenta `#FF00FF`, escala 4x: cada pixel do jogo = 4×4). Foram geradas por IA a partir de prompts com o tamanho exato de cada objeto.
+- `tools/slice_sprites.gd` recorta as folhas em `art/sprites/<nome>.png` no tamanho do jogo. Rodar: `Godot_console.exe --headless --path . -s res://tools/slice_sprites.gd` (com `-- --list` só lista as caixas). Os nomes de cada folha ficam na constante `NAMES`, na ordem em que os sprites aparecem.
+- Personagens: tira de 5 quadros de 24×48 (`helena.png`, `lia.png`), usada em `PlayerMotor.sprite_sheet`; sem ela, a personagem é um bloco colorido.
+- `PlaceholderRoom` aceita `wall_texture`, `detail_texture`, `floor_texture` (repetidas) e `wall_tint` (escurece a parede para os objetos se destacarem).
+- Objetos são `TextureRect` com as mesmas coordenadas dos blocos antigos. Salas ainda sem arte continuam com blocos coloridos.
+
 ## Controles
 
 Ações do Input Map (em `project.godot`):
@@ -103,7 +111,8 @@ Ações do Input Map (em `project.godot`):
 - Trabalhe em **etapas pequenas**. Ao fim de cada etapa, diga exatamente o que Roberto deve fazer no Godot para testar (qual cena abrir, F5/F6, quais teclas usar) e o que ele deve ver.
 - Se Roberto encontrar erro na aba **Saída** ou **Depurador** do Godot, ele vai colar o texto aqui.
 - Não adicione plugins nem addons sem perguntar antes.
-- Prefira código simples e legível a padrões complexos. Autoloads só para `EraManager`, `WorldState`, `SaveSystem` e `RoomManager` (e algo novo só com motivo claro).
+- Salve `.tscn`, `.tres` e `.gd` com quebras de linha **LF**. Com CRLF, o `\r` vira linha em branco extra nos textos de várias linhas das cenas (bilhetes, cardápio).
+- Prefira código simples e legível a padrões complexos. Autoloads só para `Settings`, `EraManager`, `WorldState`, `SaveSystem` e `RoomManager` (e algo novo só com motivo claro).
 - Antes de decisões de design que não estejam neste arquivo, **pergunte ao Roberto** em vez de decidir sozinho.
 
 ## Etapas do protótipo
@@ -137,3 +146,35 @@ Cena `scenes/rooms/cozinha.tscn` (cena principal do projeto): uma tela lateral e
 ## Referência
 
 O design completo (história, capítulos, enigmas, minigames) está em **`GDD.md`**, na raiz do projeto. Leia-o antes de trabalhar em qualquer capítulo ou enigma. Em conflito, este CLAUDE.md vale para o código e o GDD vale para o design. Se precisar de algo que não está em nenhum dos dois, pergunte.
+
+
+## Atualização visual e configurações — 28/10/2026
+
+- Por pedido do Roberto, o passado preserva pixel art e o presente inicia uma direção desenhada mais realista, mantendo o hotel abandonado e tecnologia deteriorada. Não transformar o hotel atual em um hotel funcionando.
+- A resolução lógica e as colisões continuam 640x360 e 24x48. O stretch agora é canvas_items: textos e arte de alta resolução são renderizados na resolução da janela, enquanto o passado conserva filtro Nearest.
+- Settings é um novo autoload justificado pela persistência entre salas. Preferências ficam em user://settings.cfg, separadas do save: vídeo, volume/mudo, teclas/botões do mouse e zona morta. Mudanças de modo/tamanho de vídeo exigem confirmação em 15 segundos.
+- Esc > Configurações abre a tela dividida entre passado e presente. Os prompts exibem o botão de interação realmente configurado.
+- As duas paredes discretas de art/source/paredes.png estão integradas em art/sprites/parede_1923.png e parede_hoje.png.
+- Arte desenhada do presente em art/future/: fontes ImageGen e recortes. Lia usa drawn_animations (SpriteFrames idle/walk, 4/16 quadros), com pés alinhados e tamanho físico preservado. É uma primeira passagem visual; não declarar a animação finalizada com acabamento cinematográfico.
+- Tests: Godot --headless --path . --fixed-fps 60 --script res://tools/test_settings.gd (não grava preferências reais), tools/test_visuals.gd e tools/test_stairway.gd. Com -- --capture nos testes visuais, capturas vão à pasta TEMP.
+
+
+### Lia — descida pelos cabos (28/10/2026)
+- art/future/cables/: 4 quadros de entrada, 12 de descida e 4 de saída, recortes individuais256x384 e folhas separadas em sheets/ com células512x512 e margens amplas. layout.json registra caixas, linha de pegada, pés e hashes. Fontes ImageGen originais preservadas no diretório generated_images do chat.
+- CablePassage e PlayerMotor controlam aproximação/entrada/descida/saída, sem teleporte. Pausa e época inativa interrompem a ação; save usa o patamar de origem. Os quadros de cabo mantêm a mesma referência de pés352 e escala48/288.
+- tools/test_lia_cables.gd testa o percurso; -- --capture salva capturas em TEMP. A subida pelos cabos mantém o comportamento anterior; este trabalho produz a descida pedida.
+
+### Cenários consolidados —28/10/2026
+- Pedido aprovado: dois PNGs completos por época, móveis fixos pintados juntos, papel menor e rasgos claros no presente. art/environment/kitchen_1923.png (640x360,128cores,Nearest) e kitchen_present.png (1920x1080,Linear), ambos enquadrados na geometria lógica640x360. Fontes, guias e prompts.json preservados na mesma pasta.
+- RoomArtwork instala os PNGs sob os objetos mutáveis, oculta somente os desenhos antigos dos móveis fixos e os CanvasItems gerados; os corpos/colisões continuam na cena. Porta/cadeado, painéis, cabine, massa/forno do presente, fermento/gelo, fresta/buraco e personagens continuam separados. Stairwell.baked_background evita cobrir a escada pintada com o vão antigo, mantendo a porta aberta dinâmica.
+- Cardápio do passado12x16 e papel do presente10x12, silhuetas rasgadas novas. O papel presente foi elevado visualmente para a parede acima da bancada sem alterar a área de leitura. Texto/pistas permanecem na NoteUI. Futuro mantém papel de parede rasgado, manchas e fissuras visíveis independentemente dos estados dos enigmas.
+- tools/test_room_artwork.gd valida os dois PNGs, dimensões lógicas, ausência de móveis duplicados, tamanhos dos papéis e estados da porta/forno/elevador. Regressões test_stairway e test_lia_cables passaram. Capturas art/previews/kitchen-complete-*.png.
+
+### Correção de bloqueio ao lado do forno —28/10/2026
+- Reproduzido: Lia no intervalo x541..563,y200 ficava presa entre forno e parede, pois a prateleira limitava o pulo a~8px. A prateleira do presente agora é plataforma de colisão só por cima (one_way_block_indices=[2] no PlaceholderRoom). O forno continua sólido; altura e força do pulo não mudaram.
+- tools/test_oven_escape.gd confirmou fuga pulando à esquerda a partir de3posições, impossibilidade de alcançar a prateleira diretamente do chão e rota forno→prateleira→portinhola. Regressões escada e cabos passaram. Se um save tiver Lia nesse intervalo, ela consegue escapar depois de carregar a cena corrigida.
+
+### Objetos carregados e interface compacta —28/10/2026
+- Helena usa item_animations em art/held/helena_items.tres: fermento/gelo, cada um com4idle+8walk+4use. Quadros48x56 (pés52,cabeça24), alinhamento/escala corporal constantes, folhas espaçadas256px/célula, fontes/manifesto/prompts preservados. O objeto é parte da pose, sem ColorRect flutuante; fallback usa a textura real de Items.texture(). tools/prepare_held_items.py reproduz os recortes.
+- PlayerMotor.play_item_use recebe callback; o uso trava movimento/interações por0.5s e executa a consequência ao concluir. Era inativa/pausa congelam o relógio. ItemUseInteractable e IceDropZone só esvaziam a mão e alteram flags no callback; save durante uso ainda guarda o objeto original, sem perder/duplicar. Ao terminar, restaura tira original/offset/escala do sprite.
+- Interface compacta: avisos de interação9, HUD/mensagens10, botões11, configurações11(cabeçalho16), bilhetes12, cadeado14/20. Fonte padrão10 para seletores/menus adicionais; renderização canvas_items mantém texto nítido. tools/test_held_items.gd verifica estados/mão/uso/pausa/época e UI; configurações, fuga do forno e cabos também passaram. Previews art/previews/helena-carry-ice.png e helena-use-yeast.png.

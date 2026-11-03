@@ -1,0 +1,368 @@
+{
+  "enter": [
+    {
+      "file": "enter_00.png",
+      "cell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        64,
+        23,
+        181,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "c59b11b1184febe8f289044bfe4d31e7a55e24b49066c6f41a74dba72a5a2439"
+    },
+    {
+      "file": "enter_01.png",
+      "cell": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        64,
+        26,
+        181,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "d885546249bc511783d68e5789e638e218f4bc0eb8d423d626762b8a61d28833"
+    },
+    {
+      "file": "enter_02.png",
+      "cell": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        79,
+        40,
+        196,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "dd1fe6bfed583903869e21104a9c6c5330781d4563f199b6600ab02e7aa22106"
+    },
+    {
+      "file": "enter_03.png",
+      "cell": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        82,
+        62,
+        207,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "1dcf2ec595bfbd3308cfb356dd34b6adcd1c1b08c541845318d46dd883144ab1"
+    }
+  ],
+  "descend": [
+    {
+      "file": "descend_00.png",
+      "cell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        58,
+        63,
+        181,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "c213aef28fd7c6cc8617b4b874f2b444d3540c42cae39fd14c62e544265010d7"
+    },
+    {
+      "file": "descend_01.png",
+      "cell": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        55,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "e02b92f69477488e8465a08700c730e26f8733d944757df8ec74146ec64d14d8"
+    },
+    {
+      "file": "descend_02.png",
+      "cell": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        53,
+        63,
+        181,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "9515341bc44af600201138bef2e6e62aad62b0e4969f72579ce0f1f0abe129b4"
+    },
+    {
+      "file": "descend_03.png",
+      "cell": [
+        1536,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        50,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "b9296a4b3d0aa371eb6a1dfcb59a1ff0086c213233858ab6f591c76e8f185552"
+    },
+    {
+      "file": "descend_04.png",
+      "cell": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        49,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "b057c21ffa675f75c9d0659d972ac4b9bc2c8763e38e87c462c91f4ee03353b5"
+    },
+    {
+      "file": "descend_05.png",
+      "cell": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        46,
+        63,
+        181,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "7b9f46914df1f554e1139f4a20acf0d40d74da8a03a14193b9f021840fe6873e"
+    },
+    {
+      "file": "descend_06.png",
+      "cell": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        48,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "c8290bd9898cf38c1262d9f47f7da2ddf4caef9a88c9a2ceeced0e511578b155"
+    },
+    {
+      "file": "descend_07.png",
+      "cell": [
+        1536,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        46,
+        64,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "bcdd60031160dd0faf07f1ae5f9c4acd6f0d78532fbdeda7010e76ac82cbba08"
+    },
+    {
+      "file": "descend_08.png",
+      "cell": [
+        0,
+        1024,
+        512,
+        512
+      ],
+      "bounds": [
+        50,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "cc5d2362e60640dfd344871518deb1574c8258442ba24f58cf4f4854714f2575"
+    },
+    {
+      "file": "descend_09.png",
+      "cell": [
+        512,
+        1024,
+        512,
+        512
+      ],
+      "bounds": [
+        53,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "63754c71c6fa66055189c053401faef02c7cbb1b5b2a0db7d140f3e2d49156e8"
+    },
+    {
+      "file": "descend_10.png",
+      "cell": [
+        1024,
+        1024,
+        512,
+        512
+      ],
+      "bounds": [
+        42,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "1381a32199975f4221675b11f5b4763266d66430ac95c19ae8500a6f724f7914"
+    },
+    {
+      "file": "descend_11.png",
+      "cell": [
+        1536,
+        1024,
+        512,
+        512
+      ],
+      "bounds": [
+        48,
+        63,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "572b3f6e051a4f12531e635b08e1e2ad1d10dc9f558c3bbda69f0a73097a44ab"
+    }
+  ],
+  "exit": [
+    {
+      "file": "exit_00.png",
+      "cell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        69,
+        46,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "f55898c5abfb6e62b8a6cf0c08c4d269ce3bae6fd1b1df74b494554474192116"
+    },
+    {
+      "file": "exit_01.png",
+      "cell": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "bounds": [
+        69,
+        52,
+        182,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "bbbbdc825cece77bcf64415b4bf0276f8ab0730770015031c4a6fdc85accde5a"
+    },
+    {
+      "file": "exit_02.png",
+      "cell": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        69,
+        63,
+        204,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "a505061ea4af673d78a7fc6d72cbf4b7ec2c181db82139ef11230ac1167dafde"
+    },
+    {
+      "file": "exit_03.png",
+      "cell": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "bounds": [
+        97,
+        63,
+        190,
+        352
+      ],
+      "hand_axis": 176,
+      "feet": 352,
+      "sha256": "c429ca95ff39a25b325c1d5607beb3acd299130ab310f4d11443ac59fbf4060a"
+    }
+  ]
+}

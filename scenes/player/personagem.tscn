@@ -13,6 +13,12 @@ script = ExtResource("1_motor")
 [node name="Body" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(-12, -48, 12, -48, 12, 0, -12, 0)
 
+[node name="Sprite" type="Sprite2D" parent="."]
+visible = false
+centered = false
+offset = Vector2(-12, -48)
+hframes = 5
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -24)
 shape = SubResource("RectangleShape2D_body")

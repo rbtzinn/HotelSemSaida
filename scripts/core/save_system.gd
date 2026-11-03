@@ -31,7 +31,8 @@ func save_game() -> bool:
 
 	var characters := {}
 	for motor in RoomManager.find_characters(scene):
-		characters[Era.character_name(motor.era)] = {"x": motor.position.x, "y": motor.position.y}
+		var saved_position := motor.get_save_position()
+		characters[Era.character_name(motor.era)] = {"x": saved_position.x, "y": saved_position.y}
 
 	var data := {
 		"version": SAVE_VERSION,

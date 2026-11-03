@@ -3,6 +3,7 @@ extends CanvasLayer
 ## Navegação por mouse, setas, direcional do controle; Enter/Espaço/A confirma.
 
 var _first_button: Button
+var _settings_open: bool = false
 
 
 func _ready() -> void:
@@ -26,17 +27,20 @@ func _ready() -> void:
 	var title := Label.new()
 	title.text = "Pausa"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 16)
+	title.add_theme_font_size_override("font_size", 14)
 	title.add_theme_color_override("font_color", Color("#E8E2D0"))
 	column.add_child(title)
 
 	_first_button = _add_button(column, "Continuar", close)
+	_add_button(column, "Configurações", _settings)
 	_add_button(column, "Salvar", _save)
 	_add_button(column, "Carregar", _load)
 	_add_button(column, "Sair do jogo", func() -> void: get_tree().quit())
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _settings_open:
+		return
 	if event.is_action_pressed("pause") or (visible and event.is_action_pressed("ui_cancel")):
 		get_viewport().set_input_as_handled()
 		if visible:
@@ -72,8 +76,17 @@ func _load() -> void:
 func _add_button(parent: Control, text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(120, 0)
-	button.add_theme_font_size_override("font_size", 10)
+	button.custom_minimum_size = Vector2(150, 24)
+	button.add_theme_font_size_override("font_size", 11)
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button
+
+
+func _settings() -> void:
+	_settings_open = true
+	var menu := preload("res://scripts/ui/settings_menu.gd").new()
+	menu.closed.connect(func() -> void:
+		_settings_open = false
+		_first_button.grab_focus())
+	get_tree().root.add_child(menu)

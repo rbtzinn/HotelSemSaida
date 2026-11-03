@@ -39,14 +39,21 @@ func _ready() -> void:
 	WorldState.flag_changed.connect(func(_key: String, _value: Variant) -> void: _update_prompt())
 
 	_prompt = Label.new()
-	_prompt.text = "[E] " + prompt_text
+	_prompt.text = "[" + Settings.binding_label("interact") + "] " + prompt_text
 	_prompt.position = prompt_position
-	_prompt.add_theme_font_size_override("font_size", 8)
+	_prompt.add_theme_font_size_override("font_size", 9)
 	_prompt.add_theme_color_override("font_color", Color("#E8E2D0"))
 	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
-	_prompt.add_theme_constant_override("outline_size", 2)
+	_prompt.add_theme_constant_override("outline_size", 1)
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_prompt)
+	var plate := StyleBoxFlat.new()
+	plate.bg_color = Color(0.035, 0.025, 0.04, 0.78)
+	plate.set_content_margin_all(1)
+	plate.content_margin_left = 2
+	plate.content_margin_right = 2
+	_prompt.add_theme_stylebox_override("normal", plate)
+	Settings.changed.connect(_update_prompt)
 	_update_prompt()
 
 
@@ -55,6 +62,8 @@ func has_body(body: PlayerMotor) -> bool:
 
 
 func can_interact(by: PlayerMotor) -> bool:
+	if by.is_traversing() or by.is_using_item():
+		return false
 	if not enabled:
 		return false
 	if required_flag != "" and not WorldState.is_set(required_flag):
@@ -93,7 +102,21 @@ func _on_body_exited(body: Node2D) -> void:
 		_update_prompt()
 
 
+## Centro da primeira forma de colisão; a personagem foca o objeto mais perto dele.
+func get_focus_point() -> Vector2:
+	for child in get_children():
+		if child is CollisionShape2D:
+			return child.global_position
+	return global_position
+
+
+func refresh_prompt() -> void:
+	_update_prompt()
+
+
+## O prompt só aparece no objeto em foco de alguma personagem.
 func _update_prompt() -> void:
 	if _prompt == null:
 		return
-	_prompt.visible = _bodies.any(func(b: PlayerMotor) -> bool: return can_interact(b))
+	_prompt.text = "[" + Settings.binding_label("interact") + "] " + prompt_text
+	_prompt.visible = _bodies.any(func(b: PlayerMotor) -> bool: return b.focused == self and can_interact(b))

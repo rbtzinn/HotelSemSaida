@@ -40,12 +40,12 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 6)
 	paper.add_child(column)
 
-	column.add_child(_make_label(_title, 12))
-	var body := _make_label(_text, 10)
+	column.add_child(_make_label(_title, 14))
+	var body := _make_label(_text, 12)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body.custom_minimum_size = Vector2(280, 0)
+	body.custom_minimum_size = Vector2(360, 0)
 	column.add_child(body)
-	var hint := _make_label("[E] Fechar", 8)
+	var hint := _make_label("[" + Settings.binding_label("interact") + "] Fechar", 10)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	column.add_child(hint)
 

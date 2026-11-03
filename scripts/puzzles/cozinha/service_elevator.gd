@@ -14,16 +14,14 @@ const JAMMED_FLAG: String = "cozinha.elevador.travado"
 
 var _moving: bool = false
 var _cabin_down_y: float
-var _lever_down_y: float
 
 @onready var _cabin: Node2D = $Cabine
-@onready var _lever_handle: ColorRect = $PainelAlavanca/Alca
-@onready var _brake_handle: ColorRect = $PainelFreio/Alca
+@onready var _lever_panel: TextureRect = $PainelAlavanca
+@onready var _brake_panel: TextureRect = $PainelFreio
 
 
 func _ready() -> void:
 	_cabin_down_y = _cabin.position.y
-	_lever_down_y = _lever_handle.position.y
 	$Alavanca.interacted.connect(_on_lever)
 	$Freio.interacted.connect(_on_brake)
 	# Estado salvo: aplica sem animação
@@ -65,10 +63,10 @@ func _update_jammed() -> void:
 	WorldState.set_flag(JAMMED_FLAG, WorldState.is_set(UP_FLAG) and WorldState.is_set(BRAKE_FLAG))
 
 
-## Alça da alavanca em cima quando a cabine está no alto; freio fica claro quando puxado.
+## Alavanca virada para baixo quando a cabine está no alto; freio virado para baixo quando puxado.
 func _refresh_controls() -> void:
-	_lever_handle.position.y = _lever_down_y - 14.0 if WorldState.is_set(UP_FLAG) else _lever_down_y
-	_brake_handle.color = Color("#F2D49B") if WorldState.is_set(BRAKE_FLAG) else Color("#6B1E2A")
+	_lever_panel.flip_v = WorldState.is_set(UP_FLAG)
+	_brake_panel.flip_v = WorldState.is_set(BRAKE_FLAG)
 
 
 func _say(text: String) -> void:

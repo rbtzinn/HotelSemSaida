@@ -43,7 +43,7 @@ func _ready() -> void:
 	column.add_theme_constant_override("separation", 8)
 	center.add_child(column)
 
-	column.add_child(_make_label("Cadeado", 12))
+	column.add_child(_make_label("Cadeado", 14))
 
 	var dials := HBoxContainer.new()
 	dials.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -56,7 +56,7 @@ func _ready() -> void:
 		style.set_content_margin_all(6)
 		var panel := PanelContainer.new()
 		panel.add_theme_stylebox_override("panel", style)
-		var label := _make_label("0", 16)
+		var label := _make_label("0", 20)
 		panel.add_child(label)
 		dials.add_child(panel)
 		_styles.append(style)
@@ -64,7 +64,7 @@ func _ready() -> void:
 
 	_status = _make_label(" ", 10)
 	column.add_child(_status)
-	column.add_child(_make_label("A/D escolher · W/S girar · E testar · Esc sair", 8))
+	column.add_child(_make_label("%s/%s escolher · %s/%s girar\n%s testar · Esc sair" % [Settings.binding_label("move_left"), Settings.binding_label("move_right"), Settings.binding_label("move_up"), Settings.binding_label("move_down"), Settings.binding_label("interact")], 10))
 	_refresh()
 
 
