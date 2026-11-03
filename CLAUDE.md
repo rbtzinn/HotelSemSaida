@@ -140,7 +140,7 @@ Cena `scenes/rooms/cozinha.tscn`: uma tela lateral em corte, com a Cozinha em ci
 - **C3. Massa que cresce**: fermento e forno; hoje, o forno petrificado vira degrau até a prateleira.
 - **C4. Elevador de serviço**: Helena trava o elevador no alto; hoje, Lia entra pela portinhola e desce pelos cabos.
 - **C5. Fogo e gelo**: corrente de ar no piso hoje, gelo de 1923 no ponto certo, piso apodrecido e fim do andar.
-  - A geladeira dá gelo sem limite. Helena deixa o bloco onde estiver parada (`IceDropZone`); só a até 12 px do ponto da fresta (x=376) o piso apodrece. Hoje, uma mancha de água marca onde ficou o último bloco.
+  - A geladeira dá gelo sem limite. Helena deixa o bloco 15 px à frente dos pés, onde as mãos o soltam no último quadro da animação (`IceDropZone.REACH`, `PlayerMotor.get_facing()`); só a até 12 px do ponto da fresta (x=376) o piso apodrece. Hoje, uma mancha de água marca onde ficou o último bloco.
   - O fim do andar ainda é provisório (tela "Fim da Cozinha" + flag `cozinha.concluida`): o GDD não define como o jogador percebe o fim de um andar nem para onde vai.
 
 ## Saguão (hub) — design no `GDD.md`
@@ -148,6 +148,7 @@ Cena `scenes/rooms/cozinha.tscn`: uma tela lateral em corte, com a Cozinha em ci
 Cena `scenes/rooms/saguao.tscn` (cena principal do projeto: o jogo começa aqui), vista de cima, uma tela. `LobbyRoom` (`scripts/puzzles/saguao/lobby_room.gd`, estende `PlaceholderRoom`) monta a mesma geometria nas duas épocas; `present = true` liga a versão em ruínas (lustre caído e sólido no centro, escada em escombros, entrada com tábuas).
 
 - **S1. Sala**: layout simétrico, porta de serviço na parede oeste levando à Cozinha (`Pontos/DoSaguao` em `cozinha.tscn`); entrada sul trancada nas duas épocas. Por enquanto a porta da Cozinha está sempre aberta; a S4 a liga a `saguao.porta_servico.livre`. Teste: `tools/test_saguao.gd` (`-- --capture` sem `--headless` salva capturas na pasta TEMP).
+- **Arte nova pedida ao ChatGPT** (03/11/2026): `art/prompts/PROMPTS.md` lista 15 imagens (cenários e objetos do Saguão, folhas de andar de frente, costas e lado da Lia e da Helena). Os guias vêm de `tools/capture_lobby_guides.gd` + `tools/make_art_guides.py`; as imagens chegam em `art/incoming/` (pastas com `.gdignore`, fora da importação do Godot).
 - Próximas: **S2** quadro de chaves e elevador, **S3** poço, **S4** cofre, porta com duas trancas e fim da Cozinha voltando ao Saguão.
 
 ## Referência
@@ -162,7 +163,7 @@ O design completo (história, capítulos, enigmas, minigames) está em **`GDD.md
 - Settings é um novo autoload justificado pela persistência entre salas. Preferências ficam em user://settings.cfg, separadas do save: vídeo, volume/mudo, teclas/botões do mouse e zona morta. Mudanças de modo/tamanho de vídeo exigem confirmação em 15 segundos.
 - Esc > Configurações abre a tela dividida entre passado e presente. Os prompts exibem o botão de interação realmente configurado.
 - As duas paredes discretas de art/source/paredes.png estão integradas em art/sprites/parede_1923.png e parede_hoje.png.
-- Arte desenhada do presente em art/future/: fontes ImageGen e recortes. Lia usa drawn_animations (SpriteFrames idle/walk, 4/16 quadros), com pés alinhados e tamanho físico preservado. É uma primeira passagem visual; não declarar a animação finalizada com acabamento cinematográfico.
+- Arte desenhada do presente em art/future/: fontes ImageGen e recortes. Lia usa drawn_animations (SpriteFrames idle/walk, 1/16 quadros; o idle de 4 quadros tremia, e os quadros foram alinhados pelo tronco com `tools/stabilize_lia_frames.py`, originais em `art/future/raw/`), com pés alinhados e tamanho físico preservado. É uma primeira passagem visual; não declarar a animação finalizada com acabamento cinematográfico.
 - Tests: Godot --headless --path . --fixed-fps 60 --script res://tools/test_settings.gd (não grava preferências reais), tools/test_visuals.gd e tools/test_stairway.gd. Com -- --capture nos testes visuais, capturas vão à pasta TEMP.
 
 

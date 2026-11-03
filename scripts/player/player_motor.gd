@@ -292,6 +292,11 @@ func get_held_item() -> String:
 	return str(WorldState.get_flag(_hand_key(), ""))
 
 
+## Lado para onde a personagem olha: 1 = direita, -1 = esquerda.
+func get_facing() -> float:
+	return -1.0 if _sprite.flip_h else 1.0
+
+
 func set_held_item(item_id: String) -> void:
 	WorldState.set_flag(_hand_key(), item_id)
 

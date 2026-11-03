@@ -84,8 +84,9 @@ func _run() -> void:
 	assert(state.is_set("cozinha.forno.massa"))
 	assert(helena.get_held_item() == "")
 	assert(not helena.is_using_item())
-	# O gelo é posto no ponto original somente ao concluir o gesto.
-	helena.position = Vector2(376,344)
+	# O gelo é posto à frente das mãos (15 px), somente ao concluir o gesto.
+	helena.position = Vector2(361,344)
+	helena.get_node("Sprite").flip_h = false
 	helena.velocity = Vector2.ZERO
 	helena.set_held_item("gelo")
 	var drop = room.get_node("World1923/PisoDespensa")

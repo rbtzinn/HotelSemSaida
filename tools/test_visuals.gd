@@ -10,7 +10,7 @@ func _run() -> void:
 	await physics_frame
 	var lia = room.get_node("Lia")
 	assert(lia.drawn_animations.get_frame_count("walk") == 16)
-	assert(lia.drawn_animations.get_frame_count("idle") == 4)
+	assert(lia.drawn_animations.get_frame_count("idle") == 1)
 	root.get_node("EraManager").set_era(1)
 	await physics_frame
 	await physics_frame
@@ -23,5 +23,5 @@ func _run() -> void:
 		await physics_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(OS.get_environment("TEMP").path_join("hotel-past.png"))
-	print("PASS: presente desenhado, 16 quadros walk, 4 idle, escala fisica preservada")
+	print("PASS: presente desenhado, 16 quadros walk, 1 idle parado, escala fisica preservada")
 	quit()

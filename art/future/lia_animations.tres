@@ -45,10 +45,7 @@
 [resource]
 animations = [{
 "frames": [
-{"duration": 1.0, "texture": ExtResource("f0")},
-{"duration": 1.0, "texture": ExtResource("f1")},
-{"duration": 1.0, "texture": ExtResource("f2")},
-{"duration": 1.0, "texture": ExtResource("f3")}
+{"duration": 1.0, "texture": ExtResource("f0")}
 ],
 "loop": true,
 "name": &"idle",

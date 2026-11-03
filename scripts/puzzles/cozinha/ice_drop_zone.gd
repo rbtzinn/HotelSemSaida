@@ -9,6 +9,9 @@ const X_FLAG: String = "cozinha.gelo.x"
 const PLACED_FLAG: String = "cozinha.gelo.posto"
 const ROT_FLAG: String = "cozinha.piso.apodrecido"
 
+## Distância, à frente dos pés, onde o bloco fica no último quadro da animação de uso.
+const REACH: float = 15.0
+
 @export var target_x: float = 376.0
 ## Distância máxima, em pixels, entre o gelo e o ponto certo.
 @export var tolerance: float = 12.0
@@ -32,7 +35,8 @@ func can_interact(by: PlayerMotor) -> bool:
 
 
 func _on_interact(by: PlayerMotor) -> void:
-	var x := roundi(by.global_position.x)
+	# O bloco fica onde as mãos o deixam, à frente dela, e não sob os pés
+	var x := roundi(by.global_position.x + REACH * by.get_facing())
 	if by.play_item_use(ITEM, _finish_drop.bind(by,x)):
 		return
 	_finish_drop(by,x)
