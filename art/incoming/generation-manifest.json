@@ -1,0 +1,1166 @@
+{
+  "date": "2026-11-03",
+  "mode": "built-in image_gen",
+  "prompt_source": "art/prompts/PROMPTS.md",
+  "stages": {
+    "cenarios": "gerado; integração pendente",
+    "objetos": "gerado; recorte pendente",
+    "lia": "gerado; recorte e reprodução pendentes",
+    "helena": "gerado; recorte e reprodução pendentes"
+  },
+  "assets": [
+    {
+      "id": "M1",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\saguao_1923.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-c8537cb3-3898-4a63-bb7e-b2c05b636103.png",
+      "request": {
+        "prompt": "Use the FIRST attached image as EXACT GAMEPLAY GEOMETRY and PLACEMENT reference, an edit target for architectural restyling. Use the SECOND attached image only as STYLE reference (same game, same pixel-art language). Output 1536x1024 landscape.\n\nView: classic 16-bit RPG interior seen from above at a 3/4 angle. The floor is seen from above; the back (north) wall is a vertical band seen frontally across the top; west and east walls are thin edges along the sides; the south wall is a thin strip at the bottom. Furniture shows its top and its front face. No vanishing point, no fisheye, no tilted camera.\n\nKeep every element exactly where the reference has it (image pixels):\n- North wall band: y 0..234 across the whole width. Walkable floor: x 38..1498, y 234..906. West/east wall edges: x 0..38 and x 1498..1536. South wall: y 906..1024.\n- Grand staircase going up out of the top of the image, northwest: x 115..346, y 118..349.\n- Reception counter: x 538..998, y 310..387, with an open guest register book on its top at the center (768, 349).\n- Four marble columns, footprints at (384, 502), (1152, 502), (384, 810), (1152, 810), about 40 px wide and 96 px tall.\n- Round rug under where the chandelier hangs: x 614..922, y 541..694. Do NOT paint the chandelier itself (it is on the ceiling, outside the view).\n- Black grand piano, lid closed: x 1200..1410, y 632..752.\n- Main entrance: revolving brass door in the south wall, x 691..845, y 906..944.\n- The four FLAT GRAY rectangles are reserved slots. Paint them as plain wall surface matching the surrounding wall (the three on the north wall) and as a plain dark recessed doorway with a thin frame (the one on the west edge, x 0..38, y 579..694). No elevator door, no key rack, no safe, no door leaf there: those objects are separate sprites.\n\n1923: the lobby of a working grand art-deco hotel at night. Authentic restrained 16-bit PIXEL ART: deliberate square pixels, dark 1-pixel outlines, limited flat shading, no blur, no smooth gradients. Palette: burgundy #3B1A1F walls, aged brass #C9973B trims, deep green #1F3A2E marble/carpet, dark wood, warm cream accents, warm lamp light #F2D49B pooling from wall sconces. Calm walls with shallow inset panels and wainscot, no busy wallpaper patterns. Patterned floor kept quiet so characters read clearly on it.\n\nNo characters, no text, no labels, no UI, no glowing game objects, no extra doors, rooms or stairs. Clear readable silhouettes, generous calm floor space.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\saguao_layout_1923.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\environment\\kitchen_1923.png"
+        ],
+        "transparent_background": false
+      },
+      "correction": {
+        "prompt": "Edit the attached pixel-art game lobby. Preserve the 1536x1024 canvas, room geometry, wall and floor positions, staircase, counter, four columns, reserved blank wall panels, doorway and all lighting exactly. Change ONLY these two props: (1) replace the rectangular central rug with a ROUND burgundy rug seen in top-down 3/4 projection, therefore an ellipse, fitting precisely x614..922 y541..694; (2) replace the upright piano on the right with a BLACK GRAND PIANO WITH ITS LID CLOSED, seen from above and the front in the same 3/4 RPG view, with a recognizable curved horizontal grand-piano body and keyboard, its entire silhouette fitting x1200..1410 y632..752. Keep all other pixels/composition and the restrained 16-bit pixel-art style. Do not add a bench, people, labels or new objects.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-ac6dbe76-14fd-40ca-b3c6-077a7d94e08e.png"
+        ],
+        "transparent_background": false
+      },
+      "review": "Tapete e piano corrigidos; alinhamento final com colisões ainda requer conferência na integração.",
+      "verification": {
+        "id": "M1",
+        "file": "saguao_1923.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1990394,
+        "sha256": "d7804b3d655216bef85aa6fd0ee236ea6412a927d1813c73b1a3791c1ab2bf7d"
+      }
+    },
+    {
+      "id": "M2",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\saguao_present.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-2f61c903-20ca-4233-aad0-d33eba9b6fe1.png",
+      "request": {
+        "prompt": "Use the FIRST attached image as EXACT GAMEPLAY GEOMETRY and PLACEMENT reference, an edit target for architectural restyling. Use the SECOND attached image only as STYLE reference. If a THIRD image is attached, it is the same lobby in 1923: keep exactly the same architecture, aged 100 years. Output 1536x1024 landscape.\n\nView: classic RPG interior seen from above at a 3/4 angle. Floor seen from above; north wall a vertical band across the top; west/east walls thin edges; south wall a thin strip at the bottom. Furniture shows top and front face. No vanishing point, no fisheye.\n\nKeep every element exactly where the reference has it (image pixels):\n- North wall band: y 0..234. Walkable floor: x 38..1498, y 234..906. West/east wall edges: x 0..38 and x 1498..1536. South wall: y 906..1024.\n- Collapsed staircase northwest, x 115..346, y 118..349: broken steps and rubble, impossible to climb.\n- Reception counter x 538..998, y 310..387, dusty and cracked, with a moldy open guest register at (768, 349).\n- Four columns at the same footprints (384, 502), (1152, 502), (384, 810), (1152, 810), stained and chipped.\n- The great chandelier has FALLEN onto the middle of the floor: a wrecked heap of bent brass arms, broken crystal drops and its big brass ceiling crown, x 614..922, y 541..694. The crown is on the lower front side of the heap and plainly visible, with an engraved band on it but NO legible letters or numbers.\n- Grand piano covered by a dusty tarp: x 1200..1410, y 632..752.\n- Main entrance in the south wall, x 691..845, y 906..944: boarded up with planks and a chain.\n- The four FLAT GRAY rectangles are reserved slots: paint the three on the north wall as plain damaged wall matching the surroundings, and the one on the west edge (x 0..38, y 579..694) as a plain dark recessed doorway with a thin frame. No elevator door, key rack, safe or door leaf there: those are separate sprites.\n\nToday: the same lobby after 100 years abandoned. REALISTIC HAND-DRAWN 2D adventure-game background, not pixel art, not 3D. Dark blue-gray #1C2630, weathered wood, rust, restrained moss #3E4A2F, cold diffuse light from cracks, dust in the air. Walls physically real: faded striped wallpaper in large calm fields, torn patches showing plaster, damp stains, fine cracks. Moody but readable, not black, floor kept clear enough for characters to read on it.\n\nNo characters, no text, no labels, no UI, no glowing objects, no extra doors, rooms or stairs.\nArchitecture consistency: the third image shows the approved intact layout; preserve its round rug placement beneath the chandelier debris, the same grand-piano silhouette under a tarp, the exact wall thickness, and the same four columns. The west service doorway must stay at x0..38 y579..694. No new openings.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\saguao_layout_present.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\environment\\kitchen_present.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\saguao_1923.png"
+        ],
+        "transparent_background": false
+      },
+      "review": "Cenário gerado; posição e área do lustre devem ser conferidas com as colisões na integração.",
+      "verification": {
+        "id": "M2",
+        "file": "saguao_present.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 2840083,
+        "sha256": "d3c86e52b37b3adb9e24e8cef01f101a3e16ea08d6f043a2d2c7b924fda84982"
+      }
+    },
+    {
+      "id": "O1",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\objetos_1923.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-d410d56a-0f4c-4027-bd02-ce37271d5a82.png",
+      "request": {
+        "prompt": "A sprite sheet of 8 separate game objects on a fully TRANSPARENT background, arranged in a 4x2 grid of equal 384x512 cells (image 1536x1024). One object per cell, horizontally centered, its bottom edge resting on y=480 of its cell. Every object uses the same scale: 4 image pixels per game pixel. Authentic restrained 16-bit PIXEL ART matching the attached style reference: square pixels, dark 1-pixel outlines, flat shading, no blur. Palette: burgundy #3B1A1F, aged brass #C9973B, deep green #1F3A2E, dark wood, cream. Seen from the front, as mounted on a wall in a 3/4 top-down RPG interior. No text, no letters, no numbers, no shadows outside the objects.\n\nCells, left to right, top row then bottom row:\n1. Art-deco passenger elevator, closed brass scissor gate, the lit cabin visible behind the gate. 208x200 px.\n2. The same elevator with the gate closed but NO cabin: dark empty shaft behind the gate, two hanging cables. 208x200 px.\n3. Small key board of dark wood with 12 identical brass room keys hanging on 12 hooks (two rows of six), every hook filled. 192x152 px.\n4. The same key board with exactly the same layout, but with all 12 hooks EMPTY. 192x152 px.\n5. Small black steel manager's safe set into the wall, door closed, brass dial in the middle. 176x168 px.\n6. The same safe with its door swung open, dark empty interior. 176x168 px.\n7. Elevator call panel: small brass plate with a keyhole and an arrow lamp. 64x96 px.\n8. Narrow service door seen edge-on in a side wall, closed, dark wood with brass handle. 64x192 px.\nSECOND attachment is only a placement grid: cells 384x512, baseline y480 local. Ignore the blue head-height lines. Do not draw any grid or guide lines. Keep each specified object small at its requested pixel dimensions within its cell, with wide transparent margins; do not enlarge objects to fill the cells. Pixel positions: centers x192,576,960,1344; bottom baselines y480 in row 1 and y992 in row 2. All state-pairs have identical outer frames and registration.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\environment\\kitchen_1923.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png"
+        ],
+        "transparent_background": true
+      },
+      "corrections": [
+        {
+          "prompt": "Clean sprite-sheet cutout edit of the attached image. Keep these SAME eight pixel-art objects in the SAME 4x2 order and keep their designs. REMOVE the entire cloudy brown/gray background, all atmospheric haze, all glows and ALL cast shadows outside the object silhouettes. The entire space between objects must be fully transparent alpha 0, with clean hard cutout edges. Object interiors opaque. Canvas 1536x1024. Register each object bottom exactly to y480 for top row and y992 for bottom row; center x192,576,960,1344. Reduce object sizes to fit these exact bounding boxes (width x height): elevator cell1 and2 208x200; key boards cells3 and4 192x152; safes cells5 and6 176x168; small call panel cell7 64x96; narrow service door cell8 64x192. Wide EMPTY TRANSPARENT padding is essential. No visible cell lines or floor or background. Do not draw translucent gray fog, checkerboard or drop shadows. Preserve pixel-art rendering and the two rows of six keys/hooks.",
+          "referenced_image_paths": [
+            "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-23028767-7a6f-43cb-b437-40f6e47df55a.png"
+          ],
+          "transparent_background": true
+        },
+        {
+          "prompt": "Replace ONLY the background of this sprite sheet with FLAT PURE #FF00FF MAGENTA, RGB(255,0,255), opaque and uniformly the same color at every non-object pixel. Erase ALL clouds, shadows, glow and gradients around the objects. Preserve each of the eight objects, its pixel art, and 4x2 placement. The background must be an absolutely flat bright magenta color with NO texture, NO haze, NO variation, NO lighting. Hard clean silhouette edges, no cast shadows. Output 1536x1024.",
+          "referenced_image_paths": [
+            "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-23028767-7a6f-43cb-b437-40f6e47df55a.png"
+          ],
+          "transparent_background": false
+        }
+      ],
+      "background": "magenta; recorte pendente",
+      "review": "8 objetos e estados presentes, 12 chaves/12 ganchos. Tamanhos gerados divergiram dos pedidos e precisam de normalização no recorte.",
+      "verification": {
+        "id": "O1",
+        "file": "objetos_1923.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1445060,
+        "sha256": "892833aefd89ed467601e85a33e71fcb04d1c010b62727ed8c7ebef4a1e54a77",
+        "foreground_bboxes_by_cell": [
+          [
+            62,
+            166,
+            323,
+            460
+          ],
+          [
+            62,
+            166,
+            323,
+            460
+          ],
+          [
+            72,
+            262,
+            313,
+            461
+          ],
+          [
+            71,
+            262,
+            313,
+            461
+          ],
+          [
+            69,
+            253,
+            315,
+            458
+          ],
+          [
+            69,
+            253,
+            315,
+            458
+          ],
+          [
+            144,
+            304,
+            240,
+            458
+          ],
+          [
+            142,
+            194,
+            240,
+            458
+          ]
+        ],
+        "corner_rgb": [
+          242,
+          14,
+          242
+        ]
+      }
+    },
+    {
+      "id": "O2",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\objetos_hoje.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-fe7e84ec-be64-4501-a109-696a0612b549.png",
+      "request": {
+        "prompt": "A sprite sheet of 8 separate game objects on a uniform FLAT PURE #FF00FF MAGENTA background (RGB 255,0,255), opaque chroma key, no background shading, arranged in a 4x2 grid of equal 384x512 cells (image 1536x1024). One object per cell, horizontally centered, its bottom edge resting on y=480 of its cell. Every object uses the same scale as the second attached image; keep the same shapes, 100 years older. REALISTIC HAND-DRAWN 2D painting matching the first attached style reference, not pixel art. Dark blue-gray, rust, rotten wood, dust, cold light. Seen from the front, as mounted on a wall in a 3/4 top-down interior. No text, no letters, no numbers, no shadows outside the objects.\n\nCells, left to right, top row then bottom row:\n1. The art-deco elevator 100 years later: rusted bent gate, and the rotten cabin floor sitting low in the doorway, blocking the shaft; a leather strap is caught under the cabin floor. 208x200 px.\n2. The same elevator with the doors forced half open and NO cabin: dark open shaft going down, frayed cables. 208x200 px.\n3. The key board 100 years later: rotten, all 12 hooks empty, paint peeled under each hook revealing a small blank pale name plate (12 plates, two rows of six, NO writing on them). 192x152 px.\n4. The guest-register book lying open, moldy pages, close view seen from above. 192x152 px.\n5. The manager's safe 100 years later, rusted, door closed. 176x168 px.\n6. The same safe rusted with the door hanging open, empty. 176x168 px.\n7. The narrow service door seen edge-on in a side wall, swollen dark wood, with a heavy 1970s padlock and hasp. 64x192 px.\n8. The same service door without the padlock, the old lock corroded, door ajar. 64x192 px.\nThe background of the second reference is magenta for extraction: keep this exact flat pure magenta everywhere outside objects, no cast shadows, haze or color variation. Keep eight separate objects in strict 4x2 cells. Object bottoms at y480/992, centers x192/576/960/1344. The guest book belongs in cell4. Do not copy the full/empty 1923 key-board pair: cell3 is the empty decayed key board, cell4 the open book. Door seen edge-on must be narrow. No labels or guide lines.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\environment\\kitchen_present.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\objetos_1923.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 objetos e estados presentes. Escala e baselines precisam de normalização no recorte.",
+      "verification": {
+        "id": "O2",
+        "file": "objetos_hoje.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1807276,
+        "sha256": "c2a53702e64dcaaebc91c6d111eeb93574f1f679f4bcf05321227c24a2762e5c",
+        "foreground_bboxes_by_cell": [
+          [
+            63,
+            166,
+            323,
+            501
+          ],
+          [
+            63,
+            166,
+            324,
+            498
+          ],
+          [
+            39,
+            261,
+            317,
+            497
+          ],
+          [
+            20,
+            288,
+            357,
+            499
+          ],
+          [
+            64,
+            250,
+            323,
+            490
+          ],
+          [
+            64,
+            250,
+            323,
+            491
+          ],
+          [
+            139,
+            180,
+            242,
+            493
+          ],
+          [
+            129,
+            179,
+            250,
+            499
+          ]
+        ],
+        "corner_rgb": [
+          241,
+          15,
+          241
+        ]
+      }
+    },
+    {
+      "id": "L1",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_lado_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-4119fa53-9721-4db8-a489-d93ef6cd99d5.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME young woman as the attached character reference (same face, ponytail, denim jacket, olive backpack, dark jeans, gray sneakers, flashlight in her right hand). REALISTIC HAND-DRAWN 2D style exactly like the reference, not pixel art, not 3D. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows outside silhouettes.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4 columns x 2 rows of 384x512 cells, one pose per cell, left to right then top to bottom. The guide lines are for placement only: do NOT draw them. In every cell: the supporting foot rests exactly on the red line (y=480), the top of the head is at the blue line (y=48, only a few pixels of natural up/down bob allowed), the torso stays centered on the dashed vertical line. The figure is EXACTLY the same size in all 8 cells: no zoom, no scale change, no shift.\n\nSide view, walking to the RIGHT, a calm investigative walk, 8-frame loop:\n1. contact: right leg forward, heel touching, left leg back on its toe; left arm forward.\n2. down: weight on the right leg, knee bent, body at its lowest.\n3. passing: left leg swings past the straight right leg, body upright.\n4. up: right leg pushes off on its toe, body at its highest.\n5. contact: left leg forward, heel touching, right leg back; right arm forward.\n6. down: weight on the left leg, body lowest.\n7. passing: right leg swings past the straight left leg.\n8. up: left leg pushes off, body highest; frame 8 leads smoothly back into frame 1.\nArms swing opposite to legs; the flashlight hand swings gently. Consistent lighting from the upper left.\nAttachment 1 is the CHARACTER IDENTITY reference. Attachment 2 is the LAYOUT grid only. Do not reproduce guide lines. Crisp fully isolated cutouts, no atmospheric halos. Eight distinct sequential walk phases, all SIDE PROFILE facing right, each centered in its own cell with supporting foot exactly at y480 and y992 respectively and crown at y48 and y560. Keep her original mature young-adult body proportions; do not turn her into a cartoon child. Preserve the black flashlight held low in her right hand and original backpack shape. Keep total body height432 px, camera/zoom constant.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_lia.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses laterais presentes; alinhamento de pés e continuidade temporal pendentes de recorte e reprodução.",
+      "verification": {
+        "id": "L1",
+        "file": "lia_lado_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1703107,
+        "sha256": "56a9fe9bbf49dac778aa84d47b0dc8af54a9bbe64cfda86f0dace3f7d07ae770",
+        "foreground_bboxes_by_cell": [
+          [
+            70,
+            40,
+            330,
+            487
+          ],
+          [
+            112,
+            43,
+            287,
+            489
+          ],
+          [
+            116,
+            40,
+            266,
+            489
+          ],
+          [
+            98,
+            33,
+            278,
+            488
+          ],
+          [
+            64,
+            36,
+            331,
+            488
+          ],
+          [
+            103,
+            44,
+            279,
+            490
+          ],
+          [
+            114,
+            38,
+            281,
+            490
+          ],
+          [
+            75,
+            33,
+            310,
+            487
+          ]
+        ],
+        "corner_rgb": [
+          243,
+          12,
+          241
+        ]
+      }
+    },
+    {
+      "id": "L2",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_frente_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-8852b701-fa6e-43e1-9f79-d5d6e22b5206.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME young woman as the attached character reference (same face, ponytail, denim jacket, olive backpack straps, dark jeans, gray sneakers, flashlight in her right hand). REALISTIC HAND-DRAWN 2D style exactly like the reference, not pixel art, not 3D. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no cast shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of head at the blue line (y=48) with only a slight natural bob, body centered on the dashed line, EXACTLY the same size in all cells.\n\nFRONT view: she walks TOWARD the camera, seen from slightly above (camera about 30 degrees high, as in a 3/4 top-down RPG), 8-frame loop:\n1. right foot forward and down, left foot back. 2. weight on right, lowest. 3. left foot passing. 4. rising on right toe.\n5. left foot forward and down, right foot back. 6. weight on left, lowest. 7. right foot passing. 8. rising on left toe, leading back into 1.\nArms swing opposite to legs, close to the body. Keep the face and outfit identical in every frame.\nInputs: image1 is character identity, image2 placement grid, image3 approved side-walk sheet for EXACT same woman, line style, clothing and full-body height. Same character, same size and line style as the attached sheet. All EIGHT frames must be FRONT views, facing camera at the same slight elevated angle, no side views. Flashlight stays in her anatomical RIGHT hand (on viewer LEFT) in every frame. Eight different walking phases, same head size and torso width. Feet baselines y480 and992; head tops y48 and560; x centers192,576,960,1344. Do not draw guide lines. Flat magenta everywhere outside silhouettes.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "Gerado; 8 quadros, conferir pés e continuidade na montagem da animação.",
+      "verification": {
+        "id": "L2",
+        "file": "lia_frente_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1648781,
+        "sha256": "ca403e0198b1c46f4a78bc193a6e0de27791742d4a53ad42a9bffb3018b879d6",
+        "foreground_bboxes_by_cell": [
+          [
+            117,
+            35,
+            271,
+            495
+          ],
+          [
+            117,
+            38,
+            270,
+            492
+          ],
+          [
+            118,
+            38,
+            277,
+            487
+          ],
+          [
+            119,
+            30,
+            269,
+            481
+          ],
+          [
+            118,
+            30,
+            263,
+            492
+          ],
+          [
+            119,
+            34,
+            266,
+            498
+          ],
+          [
+            119,
+            34,
+            272,
+            498
+          ],
+          [
+            120,
+            30,
+            269,
+            489
+          ]
+        ],
+        "corner_rgb": [
+          240,
+          13,
+          241
+        ]
+      }
+    },
+    {
+      "id": "L3",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_costas_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-1311d737-95cc-4275-a6e0-34dfef24700d.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME young woman as the attached character reference (same ponytail, denim jacket, olive backpack, dark jeans, gray sneakers, flashlight in her right hand). REALISTIC HAND-DRAWN 2D style exactly like the reference, not pixel art, not 3D. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no cast shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of head at the blue line (y=48) with only a slight natural bob, body centered on the dashed line, EXACTLY the same size in all cells.\n\nBACK view: she walks AWAY from the camera, seen from slightly above (camera about 30 degrees high), backpack clearly visible, 8-frame loop:\n1. right foot forward (away), left foot back toward camera. 2. weight on right, lowest. 3. left foot passing. 4. rising on right toe.\n5. left foot forward, right foot back. 6. weight on left, lowest. 7. right foot passing. 8. rising on left toe, leading back into 1.\nArms swing opposite to legs; ponytail sways slightly.\nInputs: image1 character identity; image2 layout grid; image3 same character and line style from approved side-walk. Same character, same size and line style as the attached sheet. Every frame must be a BACK view, no face visible. Flashlight in anatomical right hand (viewer RIGHT when seeing her back), ponytail, olive backpack, denim jacket, charcoal jeans, gray sneakers. Preserve original proportions and432px body height. All eight different walking phases with feet on y480/992 and heads near y48/560. No guide lines, no floor, no shadows, no halos, no cropped feet. Background completely flat magenta.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "Gerado; 8 quadros, conferir pés e continuidade na montagem da animação.",
+      "verification": {
+        "id": "L3",
+        "file": "lia_costas_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1674756,
+        "sha256": "8d05e598433f0c64b4faaebed1d38e579e20605cbef7c79ff9f22b48d65533b8",
+        "foreground_bboxes_by_cell": [
+          [
+            113,
+            40,
+            293,
+            491
+          ],
+          [
+            100,
+            43,
+            296,
+            473
+          ],
+          [
+            111,
+            39,
+            297,
+            489
+          ],
+          [
+            105,
+            34,
+            292,
+            490
+          ],
+          [
+            100,
+            36,
+            291,
+            490
+          ],
+          [
+            108,
+            40,
+            292,
+            488
+          ],
+          [
+            101,
+            39,
+            292,
+            488
+          ],
+          [
+            104,
+            35,
+            292,
+            488
+          ]
+        ],
+        "corner_rgb": [
+          240,
+          13,
+          242
+        ]
+      }
+    },
+    {
+      "id": "L4",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_parada.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-3bc8eccc-ab97-4bca-9b15-5335ac20f72f.png",
+      "request": {
+        "prompt": "Sprite sheet of the SAME young woman as the attached character reference, same outfit and flashlight. REALISTIC HAND-DRAWN 2D style exactly like the reference. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no cast shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of head at the blue line (y=48), body centered on the dashed line, EXACTLY the same size in all cells. The two poses of each pair must be nearly identical: only the chest rises a little (breathing); head, feet and outline stay in place.\n1. side view facing right, standing still, relaxed, breathing in.\n2. same as 1, breathing out (almost no change).\n3. front view toward the camera (camera 30 degrees high), standing still, breathing in.\n4. same as 3, breathing out.\n5. back view away from the camera, standing still, breathing in.\n6. same as 5, breathing out.\n7. side view facing right, reaching forward with the free left hand at chest height to touch or pick something.\n8. front view, crouching slightly and reaching down toward the floor in front of her.\nInputs: image1 character identity; image2 layout grid; image3 same character side sheet. Same character, same size and line style as the attached sheet. Poses1-6 are STILL STANDING, both feet planted; breathing pairs almost identical. Pose7 is SIDE facing RIGHT, her FREE LEFT hand reaches forward while flashlight remains in right hand. Pose8 FRONT, slight crouch and reaches down. Poses7-8 retain limb lengths and body scale; natural lowered head when crouched. Eight cells, order reading left-to-right then next row. Do not swap directions/order: top row side/side/front/front; bottom row back/back/side-reach/front-crouch. Clean flat magenta only outside figures, no guide lines or ground.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_lia.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "Gerado; conferir pares de respiração, tamanho corporal e gesto de interação ao recortar.",
+      "previous_source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-3b30cbc9-e4d5-4681-8c15-3f4f15b899be.png",
+      "correction": {
+        "prompt": "Edit ONLY cells3 and4 (top row third and fourth figures) of the FIRST image. Turn these two standing-idle figures to TRUE STRAIGHT FRONT VIEW facing the viewer, both shoulders and both shoes symmetric and parallel to picture plane, with BOTH FEET planted and legs straight, same slight high RPG camera as FRONT WALK sheet in SECOND image. No 3/4 sideways angle. Right hand (viewer left) holds the flashlight down; left hand relaxed. Keep these two poses nearly identical for a subtle breathing pair. Keep her face, clothing, size, baseline, and line style consistent with the second image. Preserve the other SIX figures of the first image, grid positions, full1536x1024 canvas and pure #FF00FF magenta background completely unchanged.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_parada.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\lia_frente_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "verification": {
+        "id": "L4",
+        "file": "lia_parada.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1661966,
+        "sha256": "99696d0c394a84c175bbe03eaf284d3da4ffa5d83035ae7ca855027f2a3bede8",
+        "foreground_bboxes_by_cell": [
+          [
+            117,
+            38,
+            249,
+            489
+          ],
+          [
+            116,
+            38,
+            249,
+            489
+          ],
+          [
+            121,
+            32,
+            263,
+            489
+          ],
+          [
+            121,
+            32,
+            263,
+            489
+          ],
+          [
+            124,
+            31,
+            262,
+            489
+          ],
+          [
+            124,
+            31,
+            262,
+            489
+          ],
+          [
+            68,
+            37,
+            332,
+            490
+          ],
+          [
+            93,
+            104,
+            298,
+            490
+          ]
+        ],
+        "corner_rgb": [
+          240,
+          22,
+          242
+        ]
+      }
+    },
+    {
+      "id": "H1",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-3f69b640-ec35-4064-b474-991a0d30cf7f.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME 1920s woman as the attached reference (Helena: burgundy dress, burgundy cloche hat, dark brown bob). Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color, so the character is at most 24 game pixels wide and 48 tall (192x384 image pixels). Dark 1-game-pixel outline, limited palette (burgundy #6B1E2A dress, aged brass #C9973B details, warm skin, dark brown bob hair), flat shading, no anti-aliasing, no blur, no gradients. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96) with at most one game pixel (8 px) of bob, body centered on the dashed line, EXACTLY the same size in all cells.\n\nSide view walking to the RIGHT, elegant 1920s walk, 8-frame loop:\n1. contact: right leg forward, left back. 2. down: weight on right, lowest. 3. passing: left leg passes. 4. up: rising on right toe.\n5. contact: left leg forward, right back. 6. down. 7. passing. 8. up, leading back into 1.\nArms swing opposite to legs; dress hem sways slightly.\nInput1 is the ORIGINAL GAME SPRITE, the sole character style/identity reference: keep this VERY LOW resolution, tiny plain face, simple dress, sparse large square pixels, not a detailed modern pixel illustration. Input2 is placement grid only. Eight distinct SIDE PROFILE walk poses facing RIGHT. Each sprite 48 logical pixels tall enlarged8x NEAREST-NEIGHBOR, no details smaller than8x8 image pixels, all pixel blocks align to the global8px grid. Burgundy cloche with brass band, dark brown bob, burgundy knee-length dress and dark burgundy low-heeled shoes. Do not redesign her. Heads y96/608, feet y480/992, centered x192/576/960/1344. Pure magenta everywhere between figures; do not render guide lines or numbers.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses; conferir grade estrita de blocos8x8, escala corporal e continuidade no recorte.",
+      "verification": {
+        "id": "H1",
+        "file": "helena_lado_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1348150,
+        "sha256": "0027aa66ab5ae0a08dd8734739ca462c9fa2c9500f4ca7ffde97b8ae8cdec360",
+        "foreground_bboxes_by_cell": [
+          [
+            109,
+            67,
+            285,
+            480
+          ],
+          [
+            117,
+            70,
+            254,
+            480
+          ],
+          [
+            124,
+            67,
+            257,
+            480
+          ],
+          [
+            132,
+            64,
+            256,
+            480
+          ],
+          [
+            102,
+            70,
+            285,
+            480
+          ],
+          [
+            113,
+            70,
+            255,
+            480
+          ],
+          [
+            124,
+            64,
+            257,
+            480
+          ],
+          [
+            127,
+            62,
+            256,
+            480
+          ]
+        ],
+        "corner_rgb": [
+          243,
+          12,
+          240
+        ]
+      }
+    },
+    {
+      "id": "H2",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_frente_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-2b475127-1cb7-4b31-ba27-b9fcc87bdd77.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME 1920s woman as the attached reference (Helena: burgundy dress, burgundy cloche hat, dark brown bob). Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color, character at most 24x48 game pixels (192x384 image pixels). Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing, no blur. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96), at most 8 px of bob, centered on the dashed line, EXACTLY the same size in all cells.\n\nFRONT view: walking TOWARD the camera, seen from slightly above (3/4 top-down RPG, camera about 30 degrees high), 8-frame loop:\n1. right foot forward. 2. weight on right, lowest. 3. left foot passing. 4. rising.\n5. left foot forward. 6. weight on left, lowest. 7. right foot passing. 8. rising, leading back into 1.\nInputs:1 original tiny game sprite,2 layout grid,3 same Helena side-walk sheet, sole character and pixel treatment references. Same character, same size and line style as the attached sheet. Keep simple low-resolution8x8 square blocks, same dark outline and burgundy dress/cloche/brass band, dark brown bob, warm skin. All8 frames TRUE FRONT view, shoulders facing camera, slightly elevated RPG view. Eight distinct chronological steps, alternating left/right feet; arms opposite legs. No side/3/4 side poses. All body sizes identical. Target height384px, head near y96/608 and supporting feet y480/992. Do not draw grid or numbers. Background flat magenta and no shadows.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses; conferir grade estrita de blocos8x8, escala corporal e continuidade no recorte.",
+      "verification": {
+        "id": "H2",
+        "file": "helena_frente_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1351034,
+        "sha256": "2e167dddd071f56aa1ffa9aad5321b472a60547721542b65321b4d2c1a6d0841",
+        "foreground_bboxes_by_cell": [
+          [
+            121,
+            70,
+            260,
+            481
+          ],
+          [
+            121,
+            70,
+            258,
+            481
+          ],
+          [
+            123,
+            70,
+            264,
+            481
+          ],
+          [
+            123,
+            70,
+            260,
+            481
+          ],
+          [
+            129,
+            70,
+            260,
+            480
+          ],
+          [
+            122,
+            70,
+            259,
+            480
+          ],
+          [
+            121,
+            70,
+            260,
+            481
+          ],
+          [
+            121,
+            70,
+            258,
+            481
+          ]
+        ],
+        "corner_rgb": [
+          241,
+          11,
+          240
+        ]
+      }
+    },
+    {
+      "id": "H3",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_costas_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-52080a9c-a26b-47f5-86af-75bed3d3a6de.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME 1920s woman as the attached reference (Helena: burgundy dress, burgundy cloche hat, dark brown bob). Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color, character at most 24x48 game pixels (192x384 image pixels). Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing, no blur. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96), at most 8 px of bob, centered on the dashed line, EXACTLY the same size in all cells.\n\nBACK view: walking AWAY from the camera, seen from slightly above (camera about 30 degrees high), 8-frame loop:\n1. right foot forward (away). 2. weight on right, lowest. 3. left foot passing. 4. rising.\n5. left foot forward. 6. weight on left, lowest. 7. right foot passing. 8. rising, leading back into 1.\nInputs:1 original tiny sprite,2 layout grid,3 generated side-walk for continuity. Same character, same size and line style as the attached sheet. All8 frames BACK view facing AWAY, back of the cloche hat and dark brown bob visible, NO face. Same burgundy knee-length dress, aged brass decorative band, bare arms/legs and dark burgundy low-heeled shoes. Simple large square pixel blocks8x8, sparse shading and dark outline, no realistic fine details. Eight consecutive phases with opposite arm/leg swing. Same body dimensions in every frame. Crown y96/608, foot baselines480/992. No guide lines, no numbers, no ground shadow, completely flat magenta.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses; conferir grade8x8, escala corporal e continuidade no recorte.",
+      "verification": {
+        "id": "H3",
+        "file": "helena_costas_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1318539,
+        "sha256": "42f3ee08b244da370755c796d09a1bf79a16db66ff009ce865e9304dda888010",
+        "foreground_bboxes_by_cell": [
+          [
+            119,
+            69,
+            253,
+            479
+          ],
+          [
+            127,
+            73,
+            256,
+            480
+          ],
+          [
+            121,
+            69,
+            256,
+            480
+          ],
+          [
+            119,
+            64,
+            252,
+            474
+          ],
+          [
+            132,
+            72,
+            259,
+            477
+          ],
+          [
+            132,
+            73,
+            261,
+            478
+          ],
+          [
+            129,
+            67,
+            260,
+            478
+          ],
+          [
+            134,
+            65,
+            260,
+            478
+          ]
+        ],
+        "corner_rgb": [
+          242,
+          12,
+          243
+        ]
+      }
+    },
+    {
+      "id": "H4",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_parada.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-eb3db18c-03ba-405e-9164-f6b99ea2492c.png",
+      "request": {
+        "prompt": "Sprite sheet of the SAME 1920s woman as the attached reference (Helena). Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color, character at most 24x48 game pixels (192x384 image pixels). Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing, no blur. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell, left to right then top to bottom. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96), centered on the dashed line, EXACTLY the same size in all cells. In each pair, the second pose differs from the first by ONE game pixel at most (breathing); outline, head and feet stay in place.\n1. side view facing right, standing still. 2. same, breathing (one pixel of chest change).\n3. front view (camera 30 degrees high), standing still. 4. same, breathing.\n5. back view, standing still. 6. same, breathing.\n7. side view facing right, reaching forward with one hand at chest height (to take a key from a hook or turn a key in a panel).\n8. front view, reaching down toward the floor in front of her.\nInputs:1 original tiny game sprite,2 placement grid,3 same Helena walking sheet for continuity. Same character, same size and line style as the attached sheet. Burgundy cloche with brass band, brown bob, burgundy/brass knee-length dress and low-heeled burgundy shoes. Low-res square8x8 blocks, sparse flat shading. Read order: top row SIDE RIGHT idle1/idle2, TRUE FRONT idle1/idle2; bottom row BACK idle1/idle2, SIDE RIGHT hand-reaching at chest level, TRUE FRONT reaching-down. Both feet planted in all six idle frames, no walking strides. Identical silhouettes per breathing pair, tiny chest change only. Keep body scale and foot baseline constant in gesture frames, head may lower naturally. No grid lines/labels, flat magenta outside every figure.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses; conferir pares de respiração, grade8x8 e escala no recorte.",
+      "verification": {
+        "id": "H4",
+        "file": "helena_parada.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1341122,
+        "sha256": "c58c95acf74e7bfbb00177faf4707e87606c2f674825023bc3ffa13b9eb1e6d5",
+        "foreground_bboxes_by_cell": [
+          [
+            132,
+            70,
+            253,
+            480
+          ],
+          [
+            132,
+            71,
+            253,
+            480
+          ],
+          [
+            132,
+            70,
+            254,
+            479
+          ],
+          [
+            132,
+            70,
+            254,
+            480
+          ],
+          [
+            132,
+            71,
+            253,
+            478
+          ],
+          [
+            132,
+            71,
+            253,
+            478
+          ],
+          [
+            131,
+            68,
+            296,
+            478
+          ],
+          [
+            132,
+            88,
+            253,
+            478
+          ]
+        ],
+        "corner_rgb": [
+          239,
+          12,
+          241
+        ]
+      }
+    },
+    {
+      "id": "H5",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_gelo_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-3b9663a2-8710-43cf-a8c9-193483fd6e88.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME 1920s woman as the first attached reference (Helena) carrying the block of ice from the second attached reference with both hands in front of her waist. Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color; the woman is at most 24x48 game pixels (192x384 image pixels), the ice block keeps exactly the reference size (12x10 game pixels). Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96), at most 8 px of bob, body centered on the dashed line, EXACTLY the same size in all cells.\n\nSide view walking to the RIGHT carrying the ice, slightly careful steps, 8-frame loop:\n1. contact, right leg forward. 2. down. 3. passing. 4. up. 5. contact, left leg forward. 6. down. 7. passing. 8. up, leading back into 1.\nThe ice stays held in front of her waist in every frame, moving only with the body bob.\nInputs:1 original Helena character,2 the EXACT12x10 game-pixel ice block design,3 layout grid,4 same Helena side walk for identity/pixel continuity. Same character, same size and line style as the attached sheet. Eight SIDE PROFILE RIGHT walking phases. Both hands cradle the rectangular PALE BLUE ICE BLOCK in front of her waist in ALL eight cells, no floating prop. Use the exact small simple ice reference, no realistic clear glass, no giant iceberg. Keep body48game pixels tall and ice12x10game pixels,8px blocks. Keep matching leg/foot phases from fourth image but replace arms with careful carrying poses. Heads y96/608, feet y480/992, same scale. Flat magenta, no guide lines, no shadow.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_gelo_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses com gelo; conferir escala corporal/do item e continuidade ao recortar.",
+      "verification": {
+        "id": "H5",
+        "file": "helena_gelo_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1359681,
+        "sha256": "5d97eeb51f000535dc2a99b45a2259b65ce1980a2da093cf035e4495c07e6e14",
+        "foreground_bboxes_by_cell": [
+          [
+            109,
+            67,
+            285,
+            480
+          ],
+          [
+            117,
+            71,
+            275,
+            480
+          ],
+          [
+            132,
+            67,
+            275,
+            480
+          ],
+          [
+            132,
+            64,
+            275,
+            480
+          ],
+          [
+            102,
+            70,
+            285,
+            480
+          ],
+          [
+            116,
+            70,
+            276,
+            480
+          ],
+          [
+            132,
+            65,
+            276,
+            480
+          ],
+          [
+            132,
+            61,
+            275,
+            480
+          ]
+        ],
+        "corner_rgb": [
+          241,
+          12,
+          241
+        ]
+      }
+    },
+    {
+      "id": "H6",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_fermento_andar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-ef179b76-eb63-43db-ace9-0e4aee81ee95.png",
+      "request": {
+        "prompt": "Animation sprite sheet of the SAME 1920s woman as the first attached reference (Helena) carrying the small yeast jar from the second attached reference in her right hand, held in front of her at waist height. Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color; the woman is at most 24x48 game pixels (192x384 image pixels), the jar keeps exactly the reference size (10x12 game pixels). Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell. Do NOT draw the guide lines. Feet on the red line (y=480), top of the hat at the blue line (y=96), at most 8 px of bob, body centered on the dashed line, EXACTLY the same size in all cells.\n\nSide view walking to the RIGHT, 8-frame loop:\n1. contact, right leg forward. 2. down. 3. passing. 4. up. 5. contact, left leg forward. 6. down. 7. passing. 8. up, leading back into 1.\nInputs:1 original Helena,2 exact small yeast jar design (brown/tan jar with burgundy lid),3 layout grid,4 same Helena side-walk sheet for body shape and pixel rendering. Same character, same size and line style as the attached sheet. Eight SIDE PROFILE RIGHT walking phases. In ALL cells the jar is in her right hand slightly forward at waist, held upright and close, never floating and never changing hands; left arm may swing gently. Jar10x12game pixels, woman48game pixels tall,8px square pixels. Keep her burgundy cloche/brass band, brown bob, burgundy dress and simple shoes. Uniform flat magenta outside silhouettes, no lines, labels, haze or ground shadows.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_fermento_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_lado_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses com fermento; conferir escala corporal/do item e continuidade ao recortar.",
+      "verification": {
+        "id": "H6",
+        "file": "helena_fermento_andar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1359877,
+        "sha256": "e56c137cf43c327ec2c9778e031991bf33de0d74c17774d7e9cb7781f1744825",
+        "foreground_bboxes_by_cell": [
+          [
+            109,
+            69,
+            285,
+            480
+          ],
+          [
+            117,
+            71,
+            268,
+            480
+          ],
+          [
+            127,
+            69,
+            268,
+            480
+          ],
+          [
+            132,
+            65,
+            267,
+            480
+          ],
+          [
+            102,
+            70,
+            285,
+            480
+          ],
+          [
+            114,
+            70,
+            268,
+            480
+          ],
+          [
+            125,
+            65,
+            267,
+            480
+          ],
+          [
+            128,
+            62,
+            267,
+            480
+          ]
+        ],
+        "corner_rgb": [
+          241,
+          11,
+          241
+        ]
+      }
+    },
+    {
+      "id": "H7",
+      "file": "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_usar.png",
+      "source": "C:\\Users\\roberto.gabriel\\.codex\\generated_images\\01a1a2c2-af8e-7e03-b3c5-f7fdab54d57e\\exec-f691d463-71f6-447c-bfb1-d5e97a94014c.png",
+      "request": {
+        "prompt": "Sprite sheet of the SAME 1920s woman as the first attached reference (Helena) using two objects from the other attached references. Authentic 16-bit PIXEL ART on a strict grid: every game pixel is an exact 8x8 block of one flat color; the woman is at most 24x48 game pixels (192x384 image pixels); the ice block (12x10 game pixels) and the yeast jar (10x12 game pixels) keep their reference sizes. Dark 1-game-pixel outline, limited palette, flat shading, no anti-aliasing. Uniform FLAT PURE #FF00FF MAGENTA background, RGB(255,0,255), no shadows.\n\nUse the attached grid as the EXACT layout: 1536x1024, 4x2 cells of 384x512, one pose per cell. Do NOT draw the guide lines. Feet on the red line (y=480), body centered on the dashed line, the same size in all cells. Side view, facing RIGHT.\nTop row, putting the ice block on the floor:\n1. standing, holding the ice at the waist. 2. bending the knees, ice lowering. 3. crouched, the ice touching the floor about 15 game pixels (120 image px) in front of her feet. 4. standing up again, hands empty, the ice left on the floor exactly where it touched in frame 3.\nBottom row, pouring the yeast into a bowl of dough at counter height in front of her (do not draw the bowl):\n5. holding the jar at the waist. 6. lifting the jar forward to chest height. 7. tilting the jar, pouring. 8. lowering the empty hand, jar gone (it stays in the bowl).\nInputs in exact order:1 Helena identity,2 small ice block,3 small yeast jar,4 layout grid,5 Helena carrying ice sheet for style/proportions. Same character, same size and line style as the attached sheet. ALL8 figures SIDE PROFILE facing RIGHT; all use identical body/limb lengths in sparse8px pixel blocks. In crouching frames head naturally lower, NO scaling down of character. Feet fixed to y480(top row)/992(bottom row) at cell local x192. Top row is4 steps of PUTTING DOWN ICE:1 stand carrying;2 bend knees lowering ice;3 crouch and place ice on ground to right (ice bottom y480, center cell-local x312);4 stand hands empty, ice stays on ground at exactly x312 y480. Bottom row4 steps using yeast:5 stand holding jar;6 lift jar forward to chest;7 tip jar mouth downward to right, a tiny stream of pale yeast;8 stand empty-handed, jar consumed. Do not draw bowl or countertop. Never omit the grounded ice in top-row frame4. No guide lines, text or shadows; flat pure magenta background.",
+        "referenced_image_paths": [
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_helena_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_gelo_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\ref_fermento_8x.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\prompts\\guides\\grade_helena.png",
+          "C:\\Users\\roberto.gabriel\\Documents\\Projetos\\HotelSemSaida\\art\\incoming\\helena_gelo_andar.png"
+        ],
+        "transparent_background": false
+      },
+      "background": "magenta; recorte pendente",
+      "review": "8 poses de uso; conferir alinhamento dos itens e momentos de consumo no recorte/integração.",
+      "verification": {
+        "id": "H7",
+        "file": "helena_usar.png",
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 1356579,
+        "sha256": "0a2ccb9d03cac770588677981449b81d49a7e7fc864024f868c2b99e3615c98a",
+        "foreground_bboxes_by_cell": [
+          [
+            132,
+            68,
+            263,
+            480
+          ],
+          [
+            120,
+            99,
+            274,
+            480
+          ],
+          [
+            98,
+            185,
+            331,
+            480
+          ],
+          [
+            132,
+            65,
+            331,
+            480
+          ],
+          [
+            132,
+            69,
+            261,
+            480
+          ],
+          [
+            131,
+            70,
+            308,
+            480
+          ],
+          [
+            132,
+            65,
+            330,
+            480
+          ],
+          [
+            132,
+            63,
+            255,
+            480
+          ]
+        ],
+        "corner_rgb": [
+          241,
+          12,
+          241
+        ]
+      }
+    }
+  ],
+  "generation_complete": true,
+  "integration_complete": false,
+  "verification_summary": "15 PNGs at 1536x1024; hashes match generated sources; 13 sheets have 8 occupied cells each, with no foreground touching cell edges by magenta-mask inspection. Body scale, pixel grid and animation timing still require normalization/review during integration."
+}
