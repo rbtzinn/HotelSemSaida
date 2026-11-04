@@ -13,3 +13,8 @@ func is_jump_just_pressed() -> bool:
 
 func is_interact_just_pressed() -> bool:
 	return false
+
+
+## Primeira pessoa: quanto girar o olhar neste quadro, em pixels de mouse.
+func get_look() -> Vector2:
+	return Vector2.ZERO

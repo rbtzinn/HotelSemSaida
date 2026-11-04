@@ -17,7 +17,7 @@ func _ready() -> void:
 func _apply(active_era: Era.Id) -> void:
 	var target := get_parent()
 	var is_active := active_era == era
-	if target is CanvasItem:
+	if target is CanvasItem or target is Node3D:
 		target.visible = is_active
 	# Desligar o processamento tira os corpos físicos da simulação
 	target.process_mode = Node.PROCESS_MODE_INHERIT if is_active else Node.PROCESS_MODE_DISABLED

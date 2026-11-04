@@ -3,8 +3,9 @@ extends Node
 ## Modo solo: entrega o input do jogador só à personagem da época ativa.
 ## A outra recebe o input vazio e fica parada onde foi deixada.
 
-@export var helena: PlayerMotor
-@export var lia: PlayerMotor
+## PlayerMotor (2D) ou FirstPersonMotor (3D): só precisa da propriedade `input`.
+@export var helena: Node
+@export var lia: Node
 
 var _player_input: CharacterInput = ActionCharacterInput.new()
 var _no_input: CharacterInput = CharacterInput.new()

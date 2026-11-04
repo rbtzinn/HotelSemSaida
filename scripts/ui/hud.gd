@@ -9,6 +9,9 @@ var _icon_style: StyleBoxFlat
 var _label: Label
 var _message: Label
 var _message_tween: Tween
+## Primeira pessoa: mira no centro e o aviso de interação logo abaixo dela.
+var _crosshair: ColorRect
+var _prompt: Label
 
 
 func _ready() -> void:
@@ -52,6 +55,25 @@ func _ready() -> void:
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_label)
 
+	_crosshair = ColorRect.new()
+	_crosshair.size = Vector2(2, 2)
+	_crosshair.position = Vector2(319, 179)
+	_crosshair.color = Color("#E8E2D0")
+	_crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_crosshair.visible = false
+	add_child(_crosshair)
+
+	_prompt = Label.new()
+	_prompt.position = Vector2(220, 188)
+	_prompt.size = Vector2(200, 14)
+	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_prompt.add_theme_font_size_override("font_size", 9)
+	_prompt.add_theme_color_override("font_color", Color("#E8E2D0"))
+	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
+	_prompt.add_theme_constant_override("outline_size", 1)
+	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_prompt)
+
 	EraManager.era_changed.connect(_refresh)
 	# O objeto na mão fica no WorldState
 	WorldState.flag_changed.connect(_on_flag_changed)
@@ -66,6 +88,15 @@ func show_message(text: String) -> void:
 	_message_tween = create_tween()
 	_message_tween.tween_interval(MESSAGE_DURATION)
 	_message_tween.tween_property(_message, "modulate:a", 0.0, 0.5)
+
+
+func set_first_person(enabled: bool) -> void:
+	_crosshair.visible = enabled
+
+
+## Aviso de interação no centro da tela ("" esconde).
+func show_prompt(text: String) -> void:
+	_prompt.text = text
 
 
 func _on_flag_changed(_key: String, _value: Variant) -> void:

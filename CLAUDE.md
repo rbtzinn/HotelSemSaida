@@ -151,6 +151,15 @@ Cena `scenes/rooms/saguao.tscn` (cena principal do projeto: o jogo começa aqui)
 - **Arte nova pedida ao ChatGPT** (03/11/2026): `art/prompts/PROMPTS.md` lista 15 imagens (cenários e objetos do Saguão, folhas de andar de frente, costas e lado da Lia e da Helena). Os guias vêm de `tools/capture_lobby_guides.gd` + `tools/make_art_guides.py`; as imagens chegam em `art/incoming/` (pastas com `.gdignore`, fora da importação do Godot).
 - Próximas: **S2** quadro de chaves e elevador, **S3** poço, **S4** cofre, porta com duas trancas e fim da Cozinha voltando ao Saguão.
 
+## Protótipo 3D em primeira pessoa (branch `prototipo-3d`, 04/11/2026)
+
+Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com cenário 3D. Decisões: o Tab leva aos olhos da outra personagem (cada uma continua onde foi deixada; a regra 3 vira "mesma geometria, uma câmera por personagem"); 1923 em low-poly retrô e hoje mais realista; tudo num branch, com o 2D intacto no `main`.
+
+- `FirstPersonMotor` (`scripts/player3d/`): `CharacterBody3D` com câmera nos olhos, mesmo `CharacterInput` do 2D (`get_look()` novo: mouse via `ActionCharacterInput.pending_mouse`, analógico direito pelas ações `look_*`). A câmera da época ativa vira a atual. Mira por `RayCast3D` (alcance 2,4 m) em `Interactable3D` (camada 4); o HUD mostra mira e aviso (`set_first_person`, `show_prompt`).
+- `Interactable3D`, `MessageInteractable3D`, `NoteInteractable3D` (`scripts/interaction3d/`): mesmas regras de época e flags do `Interactable` 2D.
+- `Room3D` prende o mouse e o solta na pausa. `LobbyRoom3D` monta o Saguão em blocos a partir da planta 2D (32 px = 1 m). Cena `scenes/rooms/saguao_3d.tscn` (principal no branch). Teste `tools/test_saguao_3d.gd`.
+- Falta: Cozinha 3D, visual PS1 de 1923, save/load e troca de sala em 3D, enigmas do Saguão.
+
 ## Referência
 
 O design completo (história, capítulos, enigmas, minigames) está em **`GDD.md`**, na raiz do projeto. Leia-o antes de trabalhar em qualquer capítulo ou enigma. Em conflito, este CLAUDE.md vale para o código e o GDD vale para o design. Se precisar de algo que não está em nenhum dos dois, pergunte.
