@@ -62,9 +62,9 @@ func _ready() -> void:
 		var light := SpotLight3D.new()
 		light.name = "Lanterna"
 		light.light_color = Color("#E8E2D0")
-		light.light_energy = 2.5
-		light.spot_range = 14.0
-		light.spot_angle = 24.0
+		light.light_energy = 4.0
+		light.spot_range = 16.0
+		light.spot_angle = 28.0
 		light.shadow_enabled = true
 		light.position = Vector3(0.18, -0.2, 0)
 		_camera.add_child(light)

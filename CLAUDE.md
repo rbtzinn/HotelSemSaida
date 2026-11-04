@@ -158,7 +158,13 @@ Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com 
 - `FirstPersonMotor` (`scripts/player3d/`): `CharacterBody3D` com câmera nos olhos, mesmo `CharacterInput` do 2D (`get_look()` novo: mouse via `ActionCharacterInput.pending_mouse`, analógico direito pelas ações `look_*`). A câmera da época ativa vira a atual. Mira por `RayCast3D` (alcance 2,4 m) em `Interactable3D` (camada 4); o HUD mostra mira e aviso (`set_first_person`, `show_prompt`).
 - `Interactable3D`, `MessageInteractable3D`, `NoteInteractable3D` (`scripts/interaction3d/`): mesmas regras de época e flags do `Interactable` 2D.
 - `Room3D` prende o mouse e o solta na pausa. `LobbyRoom3D` monta o Saguão em blocos a partir da planta 2D (32 px = 1 m). Cena `scenes/rooms/saguao_3d.tscn` (principal no branch). Teste `tools/test_saguao_3d.gd`.
-- Falta: Cozinha 3D, visual PS1 de 1923, save/load e troca de sala em 3D, enigmas do Saguão.
+- **Visual detalhado (04/11/2026, pedido "bem bonito", e o jogo passa a ser 3D em primeira pessoa):**
+  - `HotelBuilder3D` (`scripts/world3d/`): base das salas 3D. `_part`/`_block`/`_cylinder`/`_torus`/`_sphere`/`_extrude` desenham sem colisão; `_solid` cria a colisão invisível pela planta 2D. Ao terminar, `_merge_static_meshes` junta as peças por material (centenas de caixas viram ~40 malhas). `_cast_shadows = false` em peças que têm luz por dentro (lustre).
+  - `HotelMaterials`: catálogo por papel ("wallpaper", "floor", "brass", "velvet"...) e época, todos com o shader `shaders/spatial_env_hotel_surface.gdshader` (padrões procedurais em coordenadas do mundo; `age` envelhece 100 anos; `retro` dá o PS1 de 1923: texels grandes, cores reduzidas, vértices presos a uma grade). O shader escreve `POSITION` sempre: sem isso o presente sumia.
+  - `EraEnvironment` (no `WorldEnvironment`): 1923 quente com brilho e névoa leve; hoje frio com névoa volumétrica para o luar e a lanterna.
+  - Renderizador Forward+ (cai para Compatibility sem Vulkan), 3D a 60% da janela com FSR, SSAO e névoa volumétrica em qualidade baixa: ~35 FPS em 1080p numa Intel UHD 630. Uma opção de qualidade nas Configurações fica para depois.
+  - `tools/capture_saguao_3d.gd` tira 5 vistas por época (TEMP). Prévias em `art/previews/saguao3d-*.png`.
+- Falta: Cozinha 3D, save/load e troca de sala em 3D, enigmas do Saguão, opção de qualidade gráfica.
 
 ## Referência
 

@@ -30,7 +30,7 @@ func _run() -> void:
 	await physics_frame
 	assert(helena.get_camera().current, "Em 1923 a câmera é a dos olhos da Helena")
 	for world_name in ["World1923", "WorldToday"]:
-		for part in ["Floor", "WallNorth", "Counter", "Step" if world_name == "World1923" else "Rubble", "Piano", "Column"]:
+		for part in ["Floor", "WallNorth", "Counter", "Stairs", "Piano", "Column"]:
 			assert(room.get_node(world_name).find_child(part, false, false) != null or room.get_node(world_name).has_node(part), "%s sem %s" % [world_name, part])
 
 	var helena_input := TestInput.new()

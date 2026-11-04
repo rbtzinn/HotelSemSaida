@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="Script" path="res://scripts/interaction3d/message_interactable_3d.gd" id="7_message"]
 [ext_resource type="Script" path="res://scripts/interaction3d/note_interactable_3d.gd" id="8_note"]
+[ext_resource type="Script" path="res://scripts/world3d/era_environment.gd" id="9_env"]
 
 [sub_resource type="Environment" id="Environment_lobby"]
 background_mode = 1
@@ -31,6 +32,7 @@ script = ExtResource("1_room")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_lobby")
+script = ExtResource("9_env")
 
 [node name="World1923" type="Node3D" parent="."]
 script = ExtResource("2_lobby")
@@ -51,7 +53,7 @@ prompt_text = "Ler"
 shape = SubResource("BoxShape3D_book")
 
 [node name="Entrada" type="Area3D" parent="World1923"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 10.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 9.95)
 script = ExtResource("7_message")
 message = "A porta giratória está travada. Ninguém a destrava."
 prompt_text = "Examinar"
@@ -90,7 +92,7 @@ prompt_text = "Ler"
 shape = SubResource("BoxShape3D_book")
 
 [node name="Entrada" type="Area3D" parent="WorldToday"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 10.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 9.95)
 script = ExtResource("7_message")
 message = "Tábuas e correntes. Pregadas por dentro."
 prompt_text = "Examinar"
