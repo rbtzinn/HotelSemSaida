@@ -167,6 +167,40 @@ func _refresh_held_view() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Items.color(item)
 	match item:
+		"chave_biblioteca":
+			var key_mesh := BoxMesh.new()
+			key_mesh.size = Vector3(0.16, 0.02, 0.025)
+			instance.mesh = key_mesh
+			material.metallic = 0.8
+			var ring := MeshInstance3D.new()
+			var ring_mesh := TorusMesh.new()
+			ring_mesh.inner_radius = 0.02
+			ring_mesh.outer_radius = 0.03
+			ring.mesh = ring_mesh
+			ring.position.x = -0.1
+			ring.material_override = material
+			instance.add_child(ring)
+			var tooth := MeshInstance3D.new()
+			var tooth_mesh := BoxMesh.new()
+			tooth_mesh.size = Vector3(0.025,0.02,0.055)
+			tooth.mesh = tooth_mesh
+			tooth.position = Vector3(0.06,0,0.02)
+			tooth.material_override = material
+			instance.add_child(tooth)
+		"atlas":
+			var book_mesh := BoxMesh.new()
+			book_mesh.size = Vector3(0.2,0.045,0.28)
+			instance.mesh = book_mesh
+			material.roughness = 0.7
+			var pages := MeshInstance3D.new()
+			var pages_mesh := BoxMesh.new()
+			pages_mesh.size = Vector3(0.19,0.027,0.265)
+			pages.mesh = pages_mesh
+			pages.position.x = 0.008
+			var paper := StandardMaterial3D.new()
+			paper.albedo_color = Color("#E8DCC0")
+			pages.material_override = paper
+			instance.add_child(pages)
 		"gelo":
 			var box := BoxMesh.new()
 			box.size = Vector3(0.2, 0.16, 0.18)

@@ -1,17 +1,17 @@
 # Hotel Sem Saída — GDD
 
-Versão de 03/11/2026 · Roberto Miranda
+Versão de 04/11/2026 · Roberto Miranda
 
 ## Visão geral
 
-Hotel Sem Saída é um jogo de enigmas misterioso em pixel art 2D para PC, no qual você alterna entre duas mulheres da mesma família presas no mesmo hotel, separadas por 100 anos.
+Hotel Sem Saída é um jogo de enigmas misterioso em primeira pessoa 3D para PC, no qual você alterna entre duas mulheres da mesma família presas no mesmo hotel, separadas por 100 anos.
 
 | Item | Definição |
 | --- | --- |
 | Gênero | Puzzle/aventura com minigames, inspirado em It Takes Two e Split Fiction (versão enxuta) |
 | Plataforma | PC (Windows), distribuição via itch.io e Steam |
 | Engine | Godot 4 (GDScript) |
-| Visual | Pixel art 2D, câmera que muda por capítulo |
+| Visual | 3D em primeira pessoa; hotel quente e luxuoso em 1923, frio e em ruínas hoje |
 | Tom | Misterioso e sombrio |
 | Modo | Solo, alternando 2 personagens; arquitetura pronta para co-op no futuro (cada personagem = 1 jogador) |
 | Dificuldade | Enigmas difíceis, sem sistema de dicas: o jogador resolve sozinho |
@@ -48,23 +48,23 @@ Uma tecla troca entre Helena (1923) e Lia (hoje). As duas ocupam o mesmo espaço
 - **Passado → presente:** plantar uma semente vira uma árvore que quebra uma parede; um cofre trancado em 1923 aparece enferrujado e aberto hoje; um móvel arrastado libera uma passagem nas ruínas.
 - **Presente → conhecimento:** Lia acha jornais, registros e destroços que mostram o desfecho das coisas. O jogador usa essas pistas para resolver os enigmas de Helena (as personagens não sabem, mas o jogador sabe).
 - **Regra de ouro:** só o passado altera o presente, nunca o contrário. Isso mantém os enigmas lógicos.
-- **Ao trocar:** a câmera fica na mesma posição e o cenário "envelhece" ou "rejuvenesce" com uma transição curta. Cada personagem fica parada onde foi deixada.
+- **Ao trocar:** um fade leva aos olhos da outra personagem, na posição e sala em que foi deixada. Cada uma passa pelas portas individualmente; a outra não é transportada junto.
 - **Preparado para co-op:** cada personagem tem seu próprio controlador de input desde o início, para virar 2 jogadores (tela dividida) sem reescrever o jogo.
 
 ## Estrutura
 
-A primeira versão tem o saguão como hub e 3 andares, cada um com uma câmera e uma mecânica de destaque. O final fica em aberto nesta fase de testes.
+A primeira versão tem o saguão como hub e 3 andares, cada um com uma mecânica de destaque, todos em primeira pessoa. O final fica em aberto nesta fase de testes.
 
 | Local | Câmera | Mecânica de destaque | Minigame |
 | --- | --- | --- | --- |
-| Saguão (hub) | Vista de cima | Elevador que libera os andares; recepção e livro de hóspedes com nomes dos desaparecidos | Piano de cauda (melodias ao longo do jogo) |
-| Cozinha | Plataforma lateral | Causa e consequência física entre as épocas (fogão, elevador de serviço, despensa) | Fechaduras da despensa |
-| Biblioteca | Vista de cima | Cifras, livros fora do lugar, estantes que se movem | Fechaduras com código |
-| Casa das caldeiras | Plataforma lateral | Vapor, pressão e válvulas; em 1923 funciona, hoje está inundada | Mecanismos e engrenagens |
+| Saguão (hub) | Primeira pessoa 3D | Elevador que libera os andares; recepção e livro de hóspedes com nomes dos desaparecidos | Piano de cauda (melodias ao longo do jogo) |
+| Cozinha | Primeira pessoa 3D | Causa e consequência física entre as épocas (fogão, elevador de serviço, despensa) | Fechaduras da despensa |
+| Biblioteca | Primeira pessoa 3D | Cifras, livros fora do lugar, estantes que se movem | Fechaduras com código |
+| Casa das caldeiras | Primeira pessoa 3D | Vapor, pressão e válvulas; em 1923 funciona, hoje está inundada | Mecanismos e engrenagens |
 
 Ordem para jogar: o jogo começa no **Saguão**, depois Cozinha → Biblioteca → Caldeiras, subindo a dificuldade.
 
-**Fim de um andar (aprovado em 03/11/2026):** quando o último enigma abre a passagem (na Cozinha, Lia cai pelo piso apodrecido), um fade leva as duas ao Saguão, e hoje o livro de hóspedes mostra uma novidade sobre o desaparecido daquele andar.
+**Fim de um andar (atualizado em 04/11/2026):** o último enigma abre a continuação física do caminho. Na Cozinha, Lia desce pelo piso apodrecido à manutenção e segue pelo acesso de serviço da Biblioteca. O retorno ao Saguão é voluntário, pelas portas; o livro de hóspedes pode então revelar a novidade sobre o desaparecido. As personagens nunca são transportadas juntas automaticamente.
 
 ## Capítulos e enigmas
 
@@ -137,12 +137,27 @@ D                  ( * )         PIANO  #
 
 **Objeto na mão:** Helena segura um objeto por vez (o fermento ou o gelo). É uma mão, e não um inventário completo.
 
-### Biblioteca
+### Continuação da Cozinha em 3D — 04/11/2026
+
+O buraco no piso da despensa leva **fisicamente à manutenção sob a cozinha**, sem retorno automático ao Saguão. Lia encontra ali uma chave de 1951, identificada como duplicata da Biblioteca, e usa a escada/corredor de serviço para entrar na próxima fase. Pode voltar à despensa pela escada da manutenção.
+
+A porta pública da Biblioteca fica no Saguão. Em 1923 ela funciona normalmente para Helena; hoje está trancada, e Lia precisa da chave. A chave destranca apenas o presente: não atravessa o tempo e não modifica o passado. A conclusão da Cozinha libera a continuação. A passagem pelo buraco registra `cozinha.concluida`, mas a descoberta sobre Otília pode ser lida no Saguão quando o jogador voltar por vontade própria.
+
+Esta sequência substitui o antigo fade de volta ao Saguão ao terminar a Cozinha.
+
+### Biblioteca (quatro enigmas mantidos em 04/11/2026)
+
+**Espaço 3D:** salão de leitura com estantes altas, teto em caixotões, tapete vinho, mesas com luminárias verdes, nicho seco sob um peitoril e arquivo atrás de uma estante móvel. Hoje há livros ausentes, marcas de sol, umidade, janelas pregadas e luar frio. Uma porta retorna ao Saguão e outra ao corredor de serviço.
 
 1. **Estante fora de ordem:** a ordem certa dos livros em 1923 só aparece pelas manchas de sol que eles deixaram nas prateleiras hoje.
 2. **Cifra do bibliotecário:** notas cifradas espalhadas pelas duas épocas; a chave fica num carimbo de devolução.
 3. **Livro escondido:** Helena esconde um livro dentro de outro; hoje, Lia o encontra e lê uma página sobre um dos desaparecidos.
 4. **Sala secreta:** uma fechadura com código cuja resposta depende das três etapas anteriores.
+
+**Implementação jogável:** quatro livros (Atlas, Botânica, Crônicas e Diários) podem ser trocados aos pares com E em 1923. Hoje, os contornos desbotados revelam a ordem por altura. A ordem abre a gaveta com o bilhete cifrado; o carimbo preservado hoje explica o deslocamento alfabético. A frase identifica o Atlas. Helena o guarda dentro de um registro oco, sob o peitoril seco; assim ele sobrevive e recebe as anotações de Caio Ferraz em 1951. Lia encontra os algarismos correspondentes aos títulos; combinados com a ordem dos livros, abrem o arquivo em 1923. A passagem também fica aberta hoje. O dossiê de Caio no arquivo encerra o capítulo, sem teleportar ninguém.
+
+**Solução de produção (spoilers):** ordem Botânica → Diários → Atlas → Crônicas; cifra de três letras, `DEUD R DWODV` = `ABRA O ATLAS`; fichas Atlas=6, Botânica=7, Crônicas=4, Diários=2; combinação final 7264. Flags sob `biblioteca.*`, posição de cada volume salva individualmente. Tentativas ilimitadas, sem consumo de livro em erro. A porta destrancada permanece acessível após gastar a chave.
+
 
 ### Casa das caldeiras
 

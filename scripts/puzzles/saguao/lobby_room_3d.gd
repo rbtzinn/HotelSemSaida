@@ -44,6 +44,7 @@ func _build_room() -> void:
 	_build_chandelier()
 	_build_piano()
 	_build_kitchen_door()
+	_build_library_door()
 	_build_entrance()
 	_build_windows()
 	_build_furniture()
@@ -610,6 +611,20 @@ func _build_piano() -> void:
 
 
 # --- Portas e janelas --------------------------------------------------------------------
+
+func _build_library_door() -> void:
+	# A entrada pública de 1923; hoje, trancada até Lia achar a chave na manutenção.
+	var z0 := 4.25
+	var z1 := 5.55
+	_part(Vector3(WEST + 0.01, 0, z0), Vector3(WEST + 0.07, 2.4, z1), "mahogany" if not present else "plank")
+	for z: float in [z0-0.1,z1]:
+		_part(Vector3(WEST,0,z),Vector3(WEST+0.13,2.55,z+0.1),"brass")
+	_part(Vector3(WEST,2.4,z0-0.1),Vector3(WEST+0.13,2.57,z1+0.1),"brass")
+	for y: float in [0.2,1.2]:
+		_part(Vector3(WEST+0.07,y,z0+0.12),Vector3(WEST+0.09,y+0.85,z1-0.12),"panel")
+	_sphere(Vector3(WEST+0.12,1.05,z1-0.18),0.04,"brass")
+	_label("BIBLIOTECA",Vector3(WEST+0.14,2.18,4.9),0.10,Color("#C9973B"),90)
+
 
 func _build_kitchen_door() -> void:
 	var z0 := KITCHEN_DOOR.x

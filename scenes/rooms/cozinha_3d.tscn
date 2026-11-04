@@ -431,9 +431,9 @@ kind = "hole"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
 script = ExtResource("20_end")
 flag_key = "cozinha.concluida"
-target_scene = "res://scenes/rooms/saguao_3d.tscn"
-target_spawn = "DaCozinha"
-message = "Lia desce pelo buraco no piso apodrecido."
+target_scene = "res://scenes/rooms/manutencao_3d.tscn"
+target_spawn = "DaDespensa"
+message = "Sob o piso, uma antiga sala de manutenção."
 prompt_text = "Descer pelo buraco"
 available_in = 1
 
@@ -463,6 +463,9 @@ shape = SubResource("BoxShape3D_lobby_door")
 
 [node name="DoSaguao" type="Marker3D" parent="Pontos"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.5, 5.2)
+
+[node name="DaManutencao" type="Marker3D" parent="Pontos"]
+position = Vector3(11.75, 0, 4.25)
 
 [node name="Helena" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 4.5, 5.1)

@@ -3,6 +3,8 @@ extends RefCounted
 ## Catálogo dos objetos que uma personagem pode segurar na mão.
 
 const DATA: Dictionary = {
+	"chave_biblioteca": {"name": "Chave da Biblioteca", "color": Color("#C9973B")},
+	"atlas": {"name": "Atlas do Aurora", "color": Color("#5A1E16")},
 	"fermento": {"name": "Fermento", "color": Color("#E8D9B0")},
 	"gelo": {"name": "Bloco de gelo", "color": Color("#BFE3F0")},
 }

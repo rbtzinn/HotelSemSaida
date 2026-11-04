@@ -1,7 +1,7 @@
 extends SceneTree
 ## Cozinha 3D, do começo ao fim: porta trancada, escada, fermento no forno, elevador travado,
 ## gelo no ponto da fresta e, hoje, a Lia subindo no forno petrificado, descendo pelos cabos
-## e saindo pelo buraco de volta ao Saguão.
+## e saindo pelo buraco até a manutenção.
 ## Rodar: Godot_console.exe --headless --path . --fixed-fps 60 --script res://tools/test_cozinha_3d.gd
 ## Com -- --capture (sem --headless), salva capturas das duas épocas na pasta TEMP.
 
@@ -190,16 +190,16 @@ func _run() -> void:
 		await _capture(lia, Vector3(2.0, K, 5.4), Vector3(14.0, K + 1.0, 1.0), "cozinha3d-hoje-cozinha")
 		await _capture(lia, Vector3(16.5, 0, 5.0), Vector3(11.0, 0.0, 3.0), "cozinha3d-hoje-despensa")
 
-	# O buraco no piso leva de volta ao Saguão
+	# O buraco no piso leva à sala de manutenção sob a despensa
 	lia.position = Vector3(11.75, 0, 4.1)
 	assert(await _aim(lia, Vector3(11.75, 0.1, 3.2)) == room.get_node("WorldToday/Buraco/Descer"), "Mira o buraco")
 	await _press(lia, lia_input)
 	assert(world_state.is_set("cozinha.concluida"), "Andar concluído")
 	for tick in 120:
 		await process_frame
-	assert(current_scene.scene_file_path == "res://scenes/rooms/saguao_3d.tscn", "Voltou ao Saguão: %s" % current_scene.scene_file_path)
+	assert(current_scene.scene_file_path == "res://scenes/rooms/manutencao_3d.tscn", "Chegou à manutenção: %s" % current_scene.scene_file_path)
 	var arrived = current_scene.get_node("Lia")
-	assert(arrived.position.distance_to(Vector3(1.4, 0, 7.25)) < 0.3, "Chega pela porta da Cozinha: %s" % arrived.position)
+	assert(arrived.position.distance_to(Vector3(2.6, 0, 6.3)) < 0.3, "Pousa na manutenção: %s" % arrived.position)
 	print("PASS: cozinha 3D completa (porta, escada, fermento, elevador, gelo, prateleira, cabos, buraco)")
 	quit()
 
