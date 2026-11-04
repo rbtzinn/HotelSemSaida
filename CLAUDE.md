@@ -54,7 +54,7 @@ res://
 - **`WorldState`** (autoload): dicionário de flags (`String → bool/int`), por exemplo `"cozinha.elevador.travado"`. É a memória do que Helena mudou. Exporta e importa as flags (`to_dict` / `load_dict`) para o `SaveSystem`.
 - **`SaveSystem`** (autoload): salva e carrega em `user://save.json` as flags, a época ativa, a sala atual e a posição das duas personagens. Ao carregar, define flags e época e **recarrega a sala do zero**, para que todo objeto leia as flags no `_ready`. Por isso, objetos que dependem de flags devem aplicá-las no `_ready`.
 - **`Room`**: script da raiz de cada sala. Declara `camera_mode` e o repassa às personagens.
-- **`RoomManager`** (autoload): troca de sala com fade. **Helena e Lia sempre mudam de sala juntas** e aparecem num ponto de entrada (`Marker2D` da sala de destino). O `SaveSystem` também carrega salas por ele.
+- **`RoomManager`** (autoload): troca de sala com fade. No 2D, **Helena e Lia mudam de sala juntas** e aparecem num ponto de entrada (`Marker2D` da sala de destino). No 3D, só a ativa passa (ver "Protótipo 3D"). O `SaveSystem` também carrega salas por ele.
 - **`Door`**: `Interactable` que leva à sala `target_scene`, no ponto de entrada `target_spawn`. Usa-se com E.
 - **Menu de pausa** (`scripts/ui/pause_menu.gd`, dentro de `hud.tscn`): Esc/Start pausa o jogo, com Continuar, Salvar, Carregar e Sair.
 - **`Interactable`** aceita `required_flag` (só funciona com a flag ligada) e `done_flag` (para de funcionar quando a flag liga). Subclasses prontas: `Door`, `Passage`, `MessageInteractable`, `NoteInteractable` (abre a tela de leitura `NoteUI`), `CodeLockInteractable` (abre o minigame `CodeLockUI`) e `ItemPickup`.
@@ -164,7 +164,16 @@ Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com 
   - `EraEnvironment` (no `WorldEnvironment`): 1923 quente com brilho e névoa leve; hoje frio com névoa volumétrica para o luar e a lanterna.
   - Renderizador Forward+ (cai para Compatibility sem Vulkan), 3D a 60% da janela com FSR, SSAO e névoa volumétrica em qualidade baixa: ~35 FPS em 1080p numa Intel UHD 630. Uma opção de qualidade nas Configurações fica para depois.
   - `tools/capture_saguao_3d.gd` tira 5 vistas por época (TEMP). Prévias em `art/previews/saguao3d-*.png`.
-- Falta: Cozinha 3D, save/load e troca de sala em 3D, enigmas do Saguão, opção de qualidade gráfica.
+- **Cozinha 3D (04/11/2026)**: `scenes/rooms/cozinha_3d.tscn`, mesmos enigmas e flags da Cozinha 2D. `KitchenRoom3D` (`scripts/puzzles/cozinha/`) monta o cenário fixo: Cozinha em cima (piso y = 4,5), Despensa embaixo (y = 0), escada de 1923 com rampa invisível (hoje desabada), poço do elevador atrás da parede leste. O que muda com os enigmas são `KitchenProp3D` (`kind`: porta, massa, forno desabado/petrificado, cabine, cabos, fermento, gelo, fresta, buraco, papéis) dentro de `EraLinked3D`.
+  - Novos: `ItemPickup3D`, `ItemUse3D`, `CodeLock3D`, `Passage3D` (percurso por `Marker3D`, sem física; save volta ao ponto de partida), `Door3D`, `ChapterEnd3D`, `ServiceElevator3D`, `IceDrop3D` (zona de proximidade; o gelo cai 0,6 m à frente dos pés, flags `cozinha.gelo.x`/`.z` em metros, tolerância 0,4 m da fresta em (11,75; 3,2), entre os dois pilares) e `IceStain3D`.
+  - `Interactable3D.min_feet_height`: a portinhola só funciona com a Lia em cima da prateleira (forno petrificado → prateleira, pulo de 0,76 m). Objeto na mão aparece no canto da tela (`FirstPersonMotor.set_held_item`).
+  - Regra pedida pelo Roberto: **o que se vê é o que colide.** Nada que pareça sólido pode ser atravessado, e por onde se passa não pode haver nada. A portinhola tem altura de uma pessoa; a grade sanfonada (sólida) a fecha em 1923 e, hoje, até o elevador ficar travado, quando aparece arrancada no chão. Os percursos pelos cabos não cruzam peças. Tampo do forno petrificado e monte do forno desabado têm a altura exata da colisão.
+  - `HotelBuilder3D._is_generated` para em outro `HotelBuilder3D`: sem isso a sala fundia as peças móveis (porta, alavancas, cabine) na malha fixa, e elas não se mexiam nem sumiam.
+  - `Room3D` não roda mais com o jogo pausado (as personagens herdavam isso e andavam com bilhete ou cadeado abertos); o mouse é conferido pelo sinal `process_frame`.
+  - Porta de serviço do Saguão 3D leva a `DoSaguao`; o buraco do piso e a porta da Cozinha voltam a `Pontos/DaCozinha`. Com `cozinha.concluida`, o livro de hoje mostra o nome de Otília.
+  - Teste `tools/test_cozinha_3d.gd` (percurso completo; `-- --capture` sem `--headless` salva 4 vistas). Prévias em `art/previews/cozinha3d-*.png`.
+- **Só a ativa passa pela porta (decisão do Roberto, 04/11/2026)**: em 3D, `Door3D` e `ChapterEnd3D` usam `RoomManager.change_room_alone`; a outra fica onde foi deixada, na sala dela (`RoomManager._away`: sala, posição e direção do olhar). O Tab, com a outra em outra sala, abre a sala dela (`switch_to_away`, chamado pelo `EraManager`). O save guarda quem está fora em `"away"`. Cada cena continua com os dois nós de personagem; o da que está fora fica parado (época inativa) até ela voltar. Teste `tools/test_rooms_alone_3d.gd` (preserva o save real).
+- Falta: enigmas do Saguão em 3D (S2–S4), opção de qualidade gráfica.
 
 ## Referência
 

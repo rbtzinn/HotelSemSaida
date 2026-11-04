@@ -1,0 +1,489 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/room_3d.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/kitchen_room_3d.gd" id="2_kitchen"]
+[ext_resource type="Script" path="res://scripts/era/era_visibility.gd" id="3_vis"]
+[ext_resource type="Script" path="res://scripts/player3d/first_person_motor.gd" id="4_motor"]
+[ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="5_router"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
+[ext_resource type="Script" path="res://scripts/interaction3d/message_interactable_3d.gd" id="7_message"]
+[ext_resource type="Script" path="res://scripts/interaction3d/note_interactable_3d.gd" id="8_note"]
+[ext_resource type="Script" path="res://scripts/world3d/era_environment.gd" id="9_env"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/kitchen_prop_3d.gd" id="10_prop"]
+[ext_resource type="Script" path="res://scripts/world3d/era_linked_3d.gd" id="11_linked"]
+[ext_resource type="Script" path="res://scripts/interaction3d/code_lock_3d.gd" id="12_lock"]
+[ext_resource type="Script" path="res://scripts/interaction3d/item_use_3d.gd" id="13_use"]
+[ext_resource type="Script" path="res://scripts/interaction3d/item_pickup_3d.gd" id="14_pickup"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/service_elevator_3d.gd" id="15_elevator"]
+[ext_resource type="Script" path="res://scripts/interaction3d/interactable_3d.gd" id="16_interactable"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/ice_drop_3d.gd" id="17_ice"]
+[ext_resource type="Script" path="res://scripts/interaction3d/door_3d.gd" id="18_door"]
+[ext_resource type="Script" path="res://scripts/interaction3d/passage_3d.gd" id="19_passage"]
+[ext_resource type="Script" path="res://scripts/interaction3d/chapter_end_3d.gd" id="20_end"]
+[ext_resource type="Script" path="res://scripts/puzzles/cozinha/ice_stain_3d.gd" id="21_stain"]
+
+[sub_resource type="Environment" id="Environment_kitchen"]
+background_mode = 1
+background_color = Color(0.02, 0.02, 0.03, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.5, 0.5, 1)
+ambient_light_energy = 0.25
+tonemap_mode = 2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
+size = Vector3(0.45, 0.5, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_door"]
+size = Vector3(1, 2.2, 0.25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oven"]
+size = Vector3(0.9, 0.6, 0.35)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_control"]
+size = Vector3(0.2, 0.5, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jar"]
+size = Vector3(0.3, 0.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_icebox"]
+size = Vector3(1.2, 1.4, 0.15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pantry_floor"]
+size = Vector3(16, 1.2, 5.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lobby_door"]
+size = Vector3(1.2, 2.3, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hatch"]
+size = Vector3(0.3, 1.8, 1.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_shaft_bottom"]
+size = Vector3(0.6, 2.4, 1.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_crack"]
+size = Vector3(1.1, 0.25, 0.7)
+
+[node name="Cozinha3D" type="Node3D"]
+script = ExtResource("1_room")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_kitchen")
+script = ExtResource("9_env")
+
+[node name="World1923" type="Node3D" parent="."]
+script = ExtResource("2_kitchen")
+
+[node name="EraVisibility" type="Node" parent="World1923"]
+script = ExtResource("3_vis")
+
+[node name="Cardapio" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 6.1, 1.56)
+script = ExtResource("10_prop")
+kind = "menu_1923"
+
+[node name="Ler" type="Area3D" parent="World1923/Cardapio"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
+script = ExtResource("8_note")
+title = "Grand Hotel Aurora — Cardápio do dia"
+text = "Consommé de faisão
+Linguado ao molho de manteiga
+Pato com laranja
+
+No pé da página, a lápis: \"despensa 3 8\"
+O resto da folha foi rasgado."
+prompt_text = "Ler"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Cardapio/Ler"]
+shape = SubResource("BoxShape3D_note")
+
+[node name="PortaFechada" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 4.5, 1.475)
+script = ExtResource("11_linked")
+flag_key = "cozinha.despensa.aberta"
+visible_when_set = false
+update_immediately = true
+
+[node name="Folha" type="Node3D" parent="World1923/PortaFechada"]
+script = ExtResource("10_prop")
+kind = "door_locked"
+
+[node name="Cadeado" type="Area3D" parent="World1923/PortaFechada"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0.15)
+script = ExtResource("12_lock")
+code = "3815"
+flag_key = "cozinha.despensa.aberta"
+prompt_text = "Cadeado"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/PortaFechada/Cadeado"]
+shape = SubResource("BoxShape3D_door")
+
+[node name="PortaAberta" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 4.5, 1.475)
+script = ExtResource("11_linked")
+flag_key = "cozinha.despensa.aberta"
+update_immediately = true
+
+[node name="Folha" type="Node3D" parent="World1923/PortaAberta"]
+script = ExtResource("10_prop")
+kind = "door_open"
+
+[node name="Forno" type="Area3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 4.9, 1.1)
+script = ExtResource("13_use")
+accepted_item = "fermento"
+result_flag = "cozinha.forno.massa"
+success_message = "A massa de pão ficou no forno, fermentando."
+idle_message = "Um forno a lenha, ainda quente."
+prompt_text = "Forno"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Forno"]
+shape = SubResource("BoxShape3D_oven")
+
+[node name="Massa" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 4.72, 0.92)
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+update_immediately = true
+
+[node name="Pao" type="Node3D" parent="World1923/Massa"]
+script = ExtResource("10_prop")
+kind = "dough"
+
+[node name="Elevador" type="Node3D" parent="World1923"]
+script = ExtResource("15_elevator")
+
+[node name="Cabine" type="Node3D" parent="World1923/Elevador"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.3, 3.57, 1)
+script = ExtResource("10_prop")
+kind = "cabin_1923"
+
+[node name="Grade" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.98, 6.1, 0.9)
+script = ExtResource("10_prop")
+kind = "hatch_gate"
+
+[node name="AlavancaPega" type="Node3D" parent="World1923/Elevador"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.9, 5.7, 2.4)
+script = ExtResource("10_prop")
+kind = "lever_handle"
+
+[node name="FreioPega" type="Node3D" parent="World1923/Elevador"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.9, 5.7, 2.95)
+script = ExtResource("10_prop")
+kind = "lever_handle"
+
+[node name="Alavanca" type="Area3D" parent="World1923/Elevador"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.9, 5.8, 2.4)
+script = ExtResource("16_interactable")
+prompt_text = "Alavanca"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Elevador/Alavanca"]
+shape = SubResource("BoxShape3D_control")
+
+[node name="Freio" type="Area3D" parent="World1923/Elevador"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.9, 5.8, 2.95)
+script = ExtResource("16_interactable")
+prompt_text = "Freio"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Elevador/Freio"]
+shape = SubResource("BoxShape3D_control")
+
+[node name="Fermento" type="Node3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2, 1.14, 0.3)
+script = ExtResource("11_linked")
+flag_key = "cozinha.fermento.pego"
+visible_when_set = false
+update_immediately = true
+
+[node name="Pote" type="Node3D" parent="World1923/Fermento"]
+script = ExtResource("10_prop")
+kind = "yeast_jar"
+
+[node name="Pegar" type="Area3D" parent="World1923/Fermento"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+script = ExtResource("14_pickup")
+item_id = "fermento"
+taken_flag = "cozinha.fermento.pego"
+prompt_text = "Pegar"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Fermento/Pegar"]
+shape = SubResource("BoxShape3D_jar")
+
+[node name="Gelo" type="Area3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 0.9, 0.97)
+script = ExtResource("14_pickup")
+item_id = "gelo"
+infinite = true
+prompt_text = "Pegar gelo"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Gelo"]
+shape = SubResource("BoxShape3D_icebox")
+
+[node name="PisoDespensa" type="Area3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0.5, 3.2)
+script = ExtResource("17_ice")
+prompt_text = "Deixar o gelo"
+available_in = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/PisoDespensa"]
+shape = SubResource("BoxShape3D_pantry_floor")
+
+[node name="Bloco" type="Node3D" parent="World1923/PisoDespensa"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+visible = false
+script = ExtResource("10_prop")
+kind = "ice_block"
+
+[node name="PortaSaguao" type="Area3D" parent="World1923"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 5.65, 5.95)
+script = ExtResource("18_door")
+target_scene = "res://scenes/rooms/saguao_3d.tscn"
+target_spawn = "DaCozinha"
+prompt_text = "Saguão"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/PortaSaguao"]
+shape = SubResource("BoxShape3D_lobby_door")
+
+[node name="WorldToday" type="Node3D" parent="."]
+visible = false
+script = ExtResource("2_kitchen")
+present = true
+
+[node name="EraVisibility" type="Node" parent="WorldToday"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="Papel" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.25, 6.1, 0.03)
+script = ExtResource("10_prop")
+present = true
+kind = "paper_present"
+
+[node name="Ler" type="Area3D" parent="WorldToday/Papel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.05)
+script = ExtResource("8_note")
+title = "Um pedaço de papel amarelado"
+text = "A tinta quase sumiu.
+
+...pudim de pão
+...café e licores
+
+No pé, a lápis: \"1 5\""
+prompt_text = "Ler"
+available_in = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Papel/Ler"]
+shape = SubResource("BoxShape3D_note")
+
+[node name="FornoDesabado" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 4.5, 0.5)
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+visible_when_set = false
+
+[node name="Fogao" type="Node3D" parent="WorldToday/FornoDesabado"]
+script = ExtResource("10_prop")
+present = true
+kind = "oven_crumbled"
+
+[node name="FornoPetrificado" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 4.5, 0.5)
+script = ExtResource("11_linked")
+flag_key = "cozinha.forno.massa"
+
+[node name="Fogao" type="Node3D" parent="WorldToday/FornoPetrificado"]
+script = ExtResource("10_prop")
+present = true
+kind = "oven_petrified"
+
+[node name="CabineBaixa" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.3, 6.05, 1)
+script = ExtResource("11_linked")
+flag_key = "cozinha.elevador.travado"
+visible_when_set = false
+
+[node name="Teto" type="Node3D" parent="WorldToday/CabineBaixa"]
+script = ExtResource("10_prop")
+present = true
+kind = "cabin_present_low"
+
+[node name="Grade" type="Node3D" parent="WorldToday/CabineBaixa"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.32, 0.05, -0.1)
+script = ExtResource("10_prop")
+present = true
+kind = "hatch_gate"
+
+[node name="Portinhola" type="Area3D" parent="WorldToday/CabineBaixa"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 0.95, -0.1)
+script = ExtResource("7_message")
+message = "Logo abaixo da portinhola, o teto enferrujado da cabine tapa o poço."
+prompt_text = "Portinhola"
+available_in = 1
+min_feet_height = 5.7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/CabineBaixa/Portinhola"]
+shape = SubResource("BoxShape3D_hatch")
+
+[node name="PocoAberto" type="Node3D" parent="WorldToday"]
+script = ExtResource("11_linked")
+flag_key = "cozinha.elevador.travado"
+
+[node name="Cabos" type="Node3D" parent="WorldToday/PocoAberto"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.3, 0, 1)
+script = ExtResource("10_prop")
+present = true
+kind = "shaft_open"
+
+[node name="GradeCaida" type="Node3D" parent="WorldToday/PocoAberto"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.9, 4.5, 2.4)
+script = ExtResource("10_prop")
+present = true
+kind = "hatch_gate_torn"
+
+[node name="DescerCabos" type="Area3D" parent="WorldToday/PocoAberto"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.85, 6.95, 0.9)
+script = ExtResource("19_passage")
+path_root = NodePath("../CaminhoDescer")
+prompt_text = "Descer pelos cabos"
+available_in = 1
+min_feet_height = 5.7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/PocoAberto/DescerCabos"]
+shape = SubResource("BoxShape3D_hatch")
+
+[node name="CaminhoDescer" type="Node3D" parent="WorldToday/PocoAberto"]
+
+[node name="P1" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoDescer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.15, 6.1, 0.9)
+
+[node name="P2" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoDescer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.95, 6.1, 1)
+
+[node name="P3" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoDescer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.95, 0.15, 1)
+
+[node name="P4" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoDescer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 0, 1)
+
+[node name="SubirCabos" type="Area3D" parent="WorldToday/PocoAberto"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.6, 1.2, 1)
+script = ExtResource("19_passage")
+path_root = NodePath("../CaminhoSubir")
+prompt_text = "Subir pelos cabos"
+available_in = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/PocoAberto/SubirCabos"]
+shape = SubResource("BoxShape3D_shaft_bottom")
+
+[node name="CaminhoSubir" type="Node3D" parent="WorldToday/PocoAberto"]
+
+[node name="P1" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoSubir"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.95, 0.15, 1)
+
+[node name="P2" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoSubir"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.95, 6.1, 1)
+
+[node name="P3" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoSubir"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.15, 6.1, 0.9)
+
+[node name="P4" type="Marker3D" parent="WorldToday/PocoAberto/CaminhoSubir"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.3, 6.1, 0.3)
+
+[node name="Fresta" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.75, 0, 3.2)
+script = ExtResource("11_linked")
+flag_key = "cozinha.piso.apodrecido"
+visible_when_set = false
+
+[node name="Tabuas" type="Node3D" parent="WorldToday/Fresta"]
+script = ExtResource("10_prop")
+present = true
+kind = "crack"
+
+[node name="Examinar" type="Area3D" parent="WorldToday/Fresta"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+script = ExtResource("7_message")
+message = "Uma corrente de ar frio sobe por uma fresta entre as tábuas."
+prompt_text = "Fresta"
+available_in = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Fresta/Examinar"]
+shape = SubResource("BoxShape3D_crack")
+
+[node name="Buraco" type="Node3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.75, 0, 3.2)
+script = ExtResource("11_linked")
+flag_key = "cozinha.piso.apodrecido"
+
+[node name="Piso" type="Node3D" parent="WorldToday/Buraco"]
+script = ExtResource("10_prop")
+present = true
+kind = "hole"
+
+[node name="Descer" type="Area3D" parent="WorldToday/Buraco"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+script = ExtResource("20_end")
+flag_key = "cozinha.concluida"
+target_scene = "res://scenes/rooms/saguao_3d.tscn"
+target_spawn = "DaCozinha"
+message = "Lia desce pelo buraco no piso apodrecido."
+prompt_text = "Descer pelo buraco"
+available_in = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Buraco/Descer"]
+shape = SubResource("BoxShape3D_crack")
+
+[node name="Mancha" type="Node3D" parent="WorldToday"]
+script = ExtResource("21_stain")
+flag_key = "cozinha.gelo.posto"
+
+[node name="Agua" type="Node3D" parent="WorldToday/Mancha"]
+script = ExtResource("10_prop")
+present = true
+kind = "stain"
+
+[node name="PortaSaguao" type="Area3D" parent="WorldToday"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 5.65, 5.95)
+script = ExtResource("18_door")
+target_scene = "res://scenes/rooms/saguao_3d.tscn"
+target_spawn = "DaCozinha"
+prompt_text = "Saguão"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/PortaSaguao"]
+shape = SubResource("BoxShape3D_lobby_door")
+
+[node name="Pontos" type="Node3D" parent="."]
+
+[node name="DoSaguao" type="Marker3D" parent="Pontos"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.5, 5.2)
+
+[node name="Helena" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 4.5, 5.1)
+script = ExtResource("4_motor")
+
+[node name="EraVisibility" type="Node" parent="Helena"]
+script = ExtResource("3_vis")
+
+[node name="Lia" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 4.5, 5.1)
+script = ExtResource("4_motor")
+era = 1
+flashlight = true
+
+[node name="EraVisibility" type="Node" parent="Lia"]
+script = ExtResource("3_vis")
+era = 1
+
+[node name="SoloInputRouter" type="Node" parent="." node_paths=PackedStringArray("helena", "lia")]
+script = ExtResource("5_router")
+helena = NodePath("../Helena")
+lia = NodePath("../Lia")
+
+[node name="HUD" parent="." instance=ExtResource("6_hud")]

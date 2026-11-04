@@ -37,6 +37,20 @@ const PAST := {
 	"plank": [Pattern.WOOD, "#5A4A38", "#3E3226", "#000000", 1.2, 0.9, 0.0],
 	"tarp": [Pattern.CLOTH, "#6E7A84", "#4C565E", "#000000", 1.2, 0.95, 0.0],
 	"dark": [Pattern.PLAIN, "#050608", "#000000", "#000000", 1.0, 1.0, 0.0],
+	# Cozinha e despensa
+	"tile": [Pattern.MARBLE_TILES, "#E9E3D3", "#E1DACA", "#8E887C", 0.15, 0.25, 0.0],
+	"kitchen_floor": [Pattern.MARBLE_TILES, "#1B1B1B", "#D8D2C2", "#2A2A2A", 0.3, 0.35, 0.0],
+	"plaster_cream": [Pattern.PLASTER, "#D6CDB4", "#000000", "#000000", 1.0, 0.9, 0.0],
+	"stone": [Pattern.MARBLE_TILES, "#5E5448", "#564C40", "#2E2822", 0.45, 0.95, 0.0],
+	"floorboards": [Pattern.WOOD, "#6A4A30", "#4E3420", "#000000", 0.8, 0.75, 0.0],
+	"enamel": [Pattern.PLAIN, "#EDEBE2", "#000000", "#000000", 1.0, 0.25, 0.0],
+	"copper": [Pattern.METAL, "#B8703C", "#000000", "#3F6B5A", 0.4, 0.3, 0.9],
+	"cast_iron": [Pattern.METAL, "#1E1C1B", "#000000", "#5A3A22", 0.5, 0.55, 0.7],
+	"dough": [Pattern.PLAIN, "#E6CF98", "#000000", "#000000", 1.0, 0.8, 0.0],
+	"petrified": [Pattern.PLASTER, "#8E826C", "#000000", "#000000", 1.0, 1.0, 0.0],
+	"flour": [Pattern.CLOTH, "#D9D0B8", "#B8AE96", "#000000", 0.5, 0.95, 0.0],
+	"ham": [Pattern.PLAIN, "#7A3A2A", "#000000", "#000000", 1.0, 0.6, 0.0],
+	"oak": [Pattern.WOOD, "#7A5230", "#5A3A1E", "#000000", 0.7, 0.55, 0.0],
 }
 
 ## Hoje: as mesmas peças envelhecidas; alguns papéis ganham cor própria (lona, escombros).
@@ -54,6 +68,14 @@ const PRESENT_COLORS := {
 	"marble": ["#77746A", "#6E6B62", "#5E5B54"],
 	"column": ["#26342E", "#202C27", "#26342E"],
 	"ivory": ["#8E8A7C", "#000000", "#000000"],
+	"tile": ["#8E8B80", "#86837A", "#3A3A34"],
+	"kitchen_floor": ["#161816", "#6A675E", "#121412"],
+	"plaster_cream": ["#5E5A50", "#000000", "#000000"],
+	"enamel": ["#7E7C72", "#000000", "#000000"],
+	"copper": ["#5A4A30", "#000000", "#3F6B5A"],
+	"dough": ["#8A7E66", "#000000", "#000000"],
+	"flour": ["#6E685A", "#5A5448", "#000000"],
+	"ham": ["#3A2A22", "#000000", "#000000"],
 }
 
 static var _cache: Dictionary = {}
@@ -73,6 +95,11 @@ static func get_material(role: String, present: bool) -> Material:
 			material = _emissive(Color("#8FA6C8"), 0.6)
 		"street":
 			material = _emissive(Color("#F2C27A"), 3.0)
+		"ice":
+			var ice := _glass(false)
+			ice.albedo_color = Color(0.8, 0.92, 0.98, 0.7)
+			ice.roughness = 0.1
+			material = ice
 		_:
 			material = _surface(role, present)
 	_cache[key] = material

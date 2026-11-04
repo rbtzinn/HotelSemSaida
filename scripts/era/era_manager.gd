@@ -35,6 +35,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func switch_era() -> void:
 	if _is_switching or RoomManager.is_changing():
 		return
+	# Em 3D cada uma pode estar numa sala: aí a troca abre a sala da outra
+	var target := Era.other(current_era)
+	if RoomManager.is_away(target):
+		RoomManager.switch_to_away(target)
+		return
 	_is_switching = true
 
 	var tween := create_tween()

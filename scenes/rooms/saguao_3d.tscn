@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/interaction3d/message_interactable_3d.gd" id="7_message"]
 [ext_resource type="Script" path="res://scripts/interaction3d/note_interactable_3d.gd" id="8_note"]
 [ext_resource type="Script" path="res://scripts/world3d/era_environment.gd" id="9_env"]
+[ext_resource type="Script" path="res://scripts/interaction3d/door_3d.gd" id="10_door"]
 
 [sub_resource type="Environment" id="Environment_lobby"]
 background_mode = 1
@@ -63,8 +64,9 @@ shape = SubResource("BoxShape3D_entrance")
 
 [node name="PortaCozinha" type="Area3D" parent="World1923"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.2, 7.25)
-script = ExtResource("7_message")
-message = "A Cozinha ainda não foi montada em 3D."
+script = ExtResource("10_door")
+target_scene = "res://scenes/rooms/cozinha_3d.tscn"
+target_spawn = "DoSaguao"
 prompt_text = "Cozinha"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/PortaCozinha"]
@@ -87,6 +89,10 @@ text = "O livro está mofado. Na coluna \"Saída\", várias linhas em branco.
 
 A última linha tem a data de hoje, e a tinta ainda está úmida. Uma assinatura recente. A letra parece familiar."
 prompt_text = "Ler"
+extra_flag = "cozinha.concluida"
+extra_text = "Mais acima, um nome que você não tinha notado: Otília, cozinheira. A coluna \"Saída\" está vazia.
+
+A letra é a mesma do lápis no cardápio: \"3 8\"."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Livro"]
 shape = SubResource("BoxShape3D_book")
@@ -102,12 +108,18 @@ shape = SubResource("BoxShape3D_entrance")
 
 [node name="PortaCozinha" type="Area3D" parent="WorldToday"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.2, 7.25)
-script = ExtResource("7_message")
-message = "A Cozinha ainda não foi montada em 3D."
+script = ExtResource("10_door")
+target_scene = "res://scenes/rooms/cozinha_3d.tscn"
+target_spawn = "DoSaguao"
 prompt_text = "Cozinha"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/PortaCozinha"]
 shape = SubResource("BoxShape3D_kitchen_door")
+
+[node name="Pontos" type="Node3D" parent="."]
+
+[node name="DaCozinha" type="Marker3D" parent="Pontos"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.4, 0, 7.25)
 
 [node name="Helena" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 9)

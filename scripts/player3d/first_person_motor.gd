@@ -3,7 +3,8 @@ extends CharacterBody3D
 ## Personagem em primeira pessoa. Pede comandos a um CharacterInput (como o PlayerMotor 2D),
 ## então o mesmo roteador solo serve aqui e cada uma pode ter o próprio jogador no co-op.
 ## A câmera fica nos olhos; quando a época desta personagem fica ativa, ela vira a câmera atual.
-## Mira com um raio: o Interactable3D no centro da tela recebe o E.
+## Mira com um raio: o Interactable3D no centro da tela recebe o E. Zonas de proximidade
+## (ex.: o piso da despensa para deixar o gelo) valem quando nada está na mira.
 
 @export var era: Era.Id = Era.Id.PAST_1923
 @export var move_speed: float = 3.2
@@ -16,10 +17,13 @@ extends CharacterBody3D
 @export var reach: float = 2.4
 ## Lanterna presa à câmera (a Lia, hoje).
 @export var flashlight: bool = false
+## Velocidade nos percursos guiados (descer pelos cabos), em m/s.
+@export var traversal_speed: float = 1.4
 
 const BODY_RADIUS: float = 0.3
 const BODY_HEIGHT: float = 1.7
-## Camada de colisão dos Interactable3D (camada 4).
+## Camada das personagens (como no 2D) e dos Interactable3D (camada 4).
+const CHARACTER_LAYER: int = 1 << 1
 const INTERACT_LAYER: int = 1 << 3
 
 var input: CharacterInput = CharacterInput.new()
@@ -29,10 +33,17 @@ var focused: Interactable3D = null
 var _head: Node3D
 var _camera: Camera3D
 var _ray: RayCast3D
+var _held_view: Node3D
+var _traversal: PackedVector3Array = PackedVector3Array()
+var _traversal_origin: Vector3
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 
 func _ready() -> void:
+	collision_layer = CHARACTER_LAYER
+	collision_mask = 1
+	# Gruda no chão ao descer a escada, em vez de sair voando a cada degrau
+	floor_snap_length = 0.4
 	var shape := CapsuleShape3D.new()
 	shape.radius = BODY_RADIUS
 	shape.height = BODY_HEIGHT
@@ -69,12 +80,26 @@ func _ready() -> void:
 		light.position = Vector3(0.18, -0.2, 0)
 		_camera.add_child(light)
 
+	_held_view = Node3D.new()
+	_held_view.name = "HeldItem"
+	_held_view.position = Vector3(0.26, -0.27, -0.5)
+	_camera.add_child(_held_view)
+	WorldState.flag_changed.connect(_on_flag_changed)
+	_refresh_held_view()
+
 	EraManager.era_changed.connect(_on_era_changed)
 	_on_era_changed(EraManager.current_era)
 
 
 func get_camera() -> Camera3D:
 	return _camera
+
+
+## Direção para onde ela olha, no plano do chão.
+func get_forward() -> Vector3:
+	var forward := -global_transform.basis.z
+	forward.y = 0.0
+	return forward.normalized()
 
 
 func _on_era_changed(active_era: Era.Id) -> void:
@@ -89,6 +114,10 @@ func _physics_process(delta: float) -> void:
 	var look := input.get_look()
 	rotate_y(-look.x * look_sensitivity)
 	_head.rotation.x = clampf(_head.rotation.x - look.y * look_sensitivity, deg_to_rad(-85.0), deg_to_rad(85.0))
+
+	if is_traversing():
+		_advance_traversal(delta)
+		return
 
 	var move := input.get_move()
 	var direction := (transform.basis * Vector3(move.x, 0, move.y)).normalized() * minf(move.length(), 1.0)
@@ -107,12 +136,117 @@ func _physics_process(delta: float) -> void:
 		focused.interact(self)
 
 
+# --- Objeto na mão ---------------------------------------------------------------------
+
+## Objeto na mão ("" = mãos vazias). Fica no WorldState, então entra no save.
+func get_held_item() -> String:
+	return str(WorldState.get_flag(_hand_key(), ""))
+
+
+func set_held_item(item_id: String) -> void:
+	WorldState.set_flag(_hand_key(), item_id)
+
+
+func _hand_key() -> String:
+	return "%s.mao" % Era.character_name(era).to_lower()
+
+
+func _on_flag_changed(key: String, _value: Variant) -> void:
+	if key == _hand_key():
+		_refresh_held_view()
+
+
+## O objeto aparece na mão, no canto de baixo da tela.
+func _refresh_held_view() -> void:
+	for child in _held_view.get_children():
+		child.queue_free()
+	var item := get_held_item()
+	if item == "":
+		return
+	var instance := MeshInstance3D.new()
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Items.color(item)
+	match item:
+		"gelo":
+			var box := BoxMesh.new()
+			box.size = Vector3(0.2, 0.16, 0.18)
+			instance.mesh = box
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			material.albedo_color = Color(0.78, 0.9, 0.97, 0.75)
+			material.roughness = 0.08
+			instance.rotation_degrees = Vector3(8, 25, 4)
+		"fermento":
+			var jar := CylinderMesh.new()
+			jar.top_radius = 0.05
+			jar.bottom_radius = 0.055
+			jar.height = 0.12
+			instance.mesh = jar
+			material.roughness = 0.4
+			var lid := MeshInstance3D.new()
+			var lid_mesh := CylinderMesh.new()
+			lid_mesh.top_radius = 0.058
+			lid_mesh.bottom_radius = 0.058
+			lid_mesh.height = 0.025
+			lid.mesh = lid_mesh
+			lid.position.y = 0.07
+			var lid_material := StandardMaterial3D.new()
+			lid_material.albedo_color = Color("#8A5A2A")
+			lid.material_override = lid_material
+			instance.add_child(lid)
+		_:
+			var other := BoxMesh.new()
+			other.size = Vector3(0.1, 0.1, 0.1)
+			instance.mesh = other
+	instance.material_override = material
+	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_held_view.add_child(instance)
+
+
+# --- Percursos guiados (descer pelos cabos) ---------------------------------------------
+
+## Leva a personagem por uma sequência de pontos, sem física e sem comandos.
+## Trocar de época ou pausar congela o percurso junto com a personagem.
+func begin_traversal(points: PackedVector3Array) -> void:
+	if is_traversing() or points.is_empty():
+		return
+	_traversal_origin = global_position
+	_traversal = points.duplicate()
+	velocity = Vector3.ZERO
+	_set_focus(null)
+
+
+func is_traversing() -> bool:
+	return not _traversal.is_empty()
+
+
+## Um save no meio dos cabos volta ao ponto de partida, nunca ao meio do poço.
+func get_save_position() -> Vector3:
+	return _traversal_origin if is_traversing() else global_position
+
+
+func _advance_traversal(delta: float) -> void:
+	var destination: Vector3 = _traversal[0]
+	global_position = global_position.move_toward(destination, traversal_speed * delta)
+	if global_position.is_equal_approx(destination):
+		_traversal.remove_at(0)
+		velocity = Vector3.ZERO
+
+
+# --- Mira e interação --------------------------------------------------------------------
+
 func _update_focus() -> void:
 	_ray.force_raycast_update()
 	var hit := _ray.get_collider()
 	var target: Interactable3D = hit if hit is Interactable3D else null
 	if target and not target.can_interact(self):
 		target = null
+	if target == null:
+		# Nada na mira: vale uma zona de proximidade onde ela esteja
+		for zone in get_tree().get_nodes_in_group(Interactable3D.PROXIMITY_GROUP):
+			var candidate := zone as Interactable3D
+			if candidate.contains(self) and candidate.can_interact(self):
+				target = candidate
+				break
 	_set_focus(target)
 
 

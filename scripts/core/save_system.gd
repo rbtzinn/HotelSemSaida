@@ -31,8 +31,15 @@ func save_game() -> bool:
 
 	var characters := {}
 	for motor in RoomManager.find_characters(scene):
-		var saved_position := motor.get_save_position()
-		characters[Era.character_name(motor.era)] = {"x": saved_position.x, "y": saved_position.y}
+		# Quem está em outra sala vai em "away", com a sala dela
+		if RoomManager.is_away(motor.era):
+			continue
+		var saved_position: Variant = motor.get_save_position()
+		var entry := {"x": saved_position.x, "y": saved_position.y}
+		if motor is FirstPersonMotor:
+			entry["z"] = saved_position.z
+			entry["yaw"] = motor.rotation.y
+		characters[Era.character_name(motor.era)] = entry
 
 	var data := {
 		"version": SAVE_VERSION,
@@ -40,6 +47,7 @@ func save_game() -> bool:
 		"era": EraManager.current_era,
 		"world_state": WorldState.to_dict(),
 		"characters": characters,
+		"away": RoomManager.away_to_dict(),
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -67,11 +75,19 @@ func load_game() -> bool:
 	WorldState.load_dict(data["world_state"])
 	EraManager.set_era(int(data["era"]))
 	var characters: Dictionary = data["characters"]
+	RoomManager.load_away(data.get("away", {}))
 	var place_characters := func(room: Node) -> void:
 		for motor in RoomManager.find_characters(room):
 			var key := Era.character_name(motor.era)
-			if characters.has(key):
-				motor.position = Vector2(characters[key]["x"], characters[key]["y"])
+			if not characters.has(key) or RoomManager.is_away(motor.era):
+				continue
+			var entry: Dictionary = characters[key]
+			if motor is FirstPersonMotor:
+				motor.position = Vector3(entry["x"], entry["y"], entry.get("z", 0.0))
+				motor.rotation.y = entry.get("yaw", 0.0)
+				motor.velocity = Vector3.ZERO
+			else:
+				motor.position = Vector2(entry["x"], entry["y"])
 				motor.velocity = Vector2.ZERO
 	await RoomManager.go_to(data["scene"], place_characters)
 	_notify("Jogo carregado.")

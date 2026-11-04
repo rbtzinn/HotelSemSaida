@@ -272,12 +272,18 @@ func _merge_static_meshes() -> void:
 		_add(merged)
 
 
+## Peça criada por esta sala. Para em outra sala/peça montada por código dentro dela
+## (ex.: a porta ou a alavanca da Cozinha): essas se movem e somem com os enigmas,
+## então não podem virar parte da malha fixa.
 func _is_generated(node: Node) -> bool:
+	var generated := false
 	while node and node != self:
+		if node is HotelBuilder3D:
+			return false
 		if node.has_meta("generated"):
-			return true
+			generated = true
 		node = node.get_parent()
-	return false
+	return generated
 
 
 ## Transformação de uma peça em relação a esta sala, sem depender da árvore.
