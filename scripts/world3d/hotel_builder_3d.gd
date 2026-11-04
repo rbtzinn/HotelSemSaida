@@ -93,20 +93,28 @@ func _extrude(points: PackedVector2Array, y0: float, y1: float, origin: Vector3,
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var triangles := Geometry2D.triangulate_polygon(points)
-	# Faces nos dois sentidos: o contorno pode vir em qualquer ordem e nada some pelo avesso
+	# Faces fechadas com normais explícitas e uma única orientação por face.
 	for i in range(0, triangles.size(), 3):
-		for height: float in [y0, y1]:
-			for order: Array in [[0, 1, 2], [0, 2, 1]]:
-				for k: int in order:
-					var point := points[triangles[i + k]]
-					tool.add_vertex(Vector3(point.x, height, point.y))
+		for cap in [0, 1]:
+			tool.set_normal(Vector3.UP if cap == 1 else Vector3.DOWN)
+			var order := [0, 1, 2] if cap == 1 else [2, 1, 0]
+			for k: int in order:
+				var point := points[triangles[i + k]]
+				tool.add_vertex(Vector3(point.x, y1 if cap == 1 else y0, point.y))
+	var clockwise := Geometry2D.is_polygon_clockwise(points)
 	for i in points.size():
 		var a := points[i]
 		var b := points[(i + 1) % points.size()]
+		var edge := b - a
+		var outward := Vector3(edge.y, 0, -edge.x).normalized()
+		tool.set_normal(-outward if clockwise else outward)
 		var quad := [Vector3(a.x, y0, a.y), Vector3(b.x, y0, b.y), Vector3(b.x, y1, b.y), Vector3(a.x, y1, a.y)]
-		for k: int in [0, 2, 1, 0, 3, 2, 0, 1, 2, 0, 2, 3]:
+		var order := [0, 1, 2, 0, 2, 3] if clockwise else [0, 2, 1, 0, 3, 2]
+		for k: int in order:
 			tool.add_vertex(quad[k])
-	tool.generate_normals()
+	# Todas as peças unidas usam índices; sem eles o append_from descartava as faces
+	# deste prisma quando o material já continha caixas indexadas.
+	tool.index()
 	var instance := MeshInstance3D.new()
 	instance.mesh = tool.commit()
 	instance.position = origin

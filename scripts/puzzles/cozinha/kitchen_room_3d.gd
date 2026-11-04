@@ -10,7 +10,7 @@ extends HotelBuilder3D
 ## Piso da Cozinha e fundo da laje (teto da Despensa).
 const K: float = 4.5
 const SLAB_BOTTOM: float = 4.1
-const TOP: float = 8.0
+const TOP: float = 8.6
 const WIDTH: float = 18.0
 const DEPTH: float = 6.0
 const WALL: float = 0.3
@@ -334,12 +334,14 @@ func _build_counter() -> void:
 
 ## Coifa de cobre e chaminé sobre o fogão (resistem nas duas épocas, fora do alcance).
 func _build_stove_hood() -> void:
-	var y0 := K + 1.95
+	var y0 := K + 3.4
 	_part(Vector3(STOVE.x - 0.15, y0, 0), Vector3(STOVE.y + 0.15, y0 + 0.12, 1.1), "copper")
 	_part(Vector3(STOVE.x + 0.1, y0 + 0.12, 0), Vector3(STOVE.y - 0.1, y0 + 0.45, 0.8), "copper")
 	_part(Vector3(STOVE.x + 0.5, y0 + 0.45, 0), Vector3(STOVE.y - 0.5, y0 + 0.62, 0.5), "copper")
 	_cylinder(Vector3((STOVE.x + STOVE.y) / 2.0, y0 + 0.62, 0.25), 0.16, 0.16, TOP - y0 - 0.62, "cast_iron", Vector3.ZERO, 12)
 	_part(Vector3(STOVE.x - 0.15, y0 - 0.03, 1.06), Vector3(STOVE.y + 0.15, y0, 1.1), "brass")
+	_solid(Vector3(STOVE.x - 0.15, y0, 0), Vector3(STOVE.y + 0.15, y0 + 0.12, 1.1), "HoodRim")
+	_solid(Vector3(STOVE.x + 0.1, y0 + 0.12, 0), Vector3(STOVE.y - 0.1, y0 + 0.45, 0.8), "HoodBody")
 	# Azulejo atrás do fogão
 	_part(Vector3(STOVE.x - 0.1, K, 0.02), Vector3(STOVE.y + 0.1, y0, 0.04), "tile")
 

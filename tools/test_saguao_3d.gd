@@ -39,6 +39,10 @@ func _run() -> void:
 	var stopped: Vector3 = await _walk(helena, helena_input, Vector3(10, 0, 9.5), Vector2.UP, 240)
 	assert(stopped.z > 4.0 and stopped.z < 5.0, "Helena para no balcão: z=%s" % stopped.z)
 
+	# A tampa do piano fica acima do corpo e também bloqueia a personagem.
+	var lid = room.get_node("World1923").find_child("PianoLid", false, false)
+	assert(lid != null and lid.get_child(0).shape != null, "Tampa do piano tem colisão")
+
 	# Mirar no livro, de frente para o balcão e olhando um pouco para baixo
 	helena.position = Vector3(10, 0, 4.6)
 	helena.rotation = Vector3.ZERO

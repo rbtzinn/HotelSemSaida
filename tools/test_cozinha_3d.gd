@@ -136,6 +136,26 @@ func _run() -> void:
 	lia.position = Vector3(17.6, K, 1.0)
 	assert(await _aim(lia, Vector3(17.85, K + 2.45, 0.9)) == null, "Do chão a Lia não alcança a portinhola")
 
+	# Coifa sólida e acima da cabeça mesmo durante a subida para a prateleira.
+	var hood = room.get_node("WorldToday").find_child("HoodRim", false, false)
+	assert(hood != null, "Coifa tem colisão")
+	var underside: float = hood.position.y - hood.get_child(0).shape.size.y / 2.0
+	assert(underside > K + 1.6 + lia.BODY_HEIGHT, "Há espaço para a cabeça na rota")
+	# Sobe no forno por física, começando no chão (sem posicionar sobre o tampo).
+	lia.position = Vector3(15.0, K, 1.9)
+	lia.velocity = Vector3.ZERO
+	lia.rotation.y = 0.0
+	for tick in 5:
+		await physics_frame
+	lia_input.direction = Vector2.UP
+	lia_input.jump = true
+	for tick in 24:
+		await physics_frame
+	lia_input.direction = Vector2.ZERO
+	for tick in 30:
+		await physics_frame
+	assert(lia.position.y > K + 0.8, "Salta do chão e pousa sobre o forno: %s" % lia.position)
+
 	# Sobe no forno petrificado e pula para a prateleira
 	lia.position = Vector3(15.0, K + 0.85, 0.5)
 	lia.rotation.y = -PI / 2.0

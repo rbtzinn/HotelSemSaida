@@ -575,6 +575,14 @@ func _build_piano() -> void:
 		lid.append(point + Vector2(0, 0.75))
 	var lid_mesh := _extrude(lid, 0.0, 0.025, p + Vector3(0, 1.02, -0.75), 0, "lacquer")
 	lid_mesh.rotation_degrees = Vector3(-36, 0, 0)
+	# A tampa aberta fica acima do corpo: também precisa impedir a cabeça de atravessar.
+	var lid_body := StaticBody3D.new()
+	lid_body.name = "PianoLid"
+	lid_body.transform = lid_mesh.transform
+	var lid_collision := CollisionShape3D.new()
+	lid_collision.shape = lid_mesh.mesh.create_convex_shape()
+	lid_body.add_child(lid_collision)
+	_add(lid_body)
 	_block(p + Vector3(0.3, 1.32, -0.25), Vector3(0.02, 0.62, 0.02), "brass", Vector3(-22, 0, 0))
 	# Teclado
 	_part(p + Vector3(-1.48, 0.72, -0.72), p + Vector3(-1.25, 0.88, 0.72), "lacquer")
