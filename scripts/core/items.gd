@@ -8,6 +8,9 @@ const DATA: Dictionary = {
 	"coroa_f2": {"name": "Coroa da F-2", "color": Color("#B59966")},
 	"chave_biblioteca": {"name": "Chave da Biblioteca", "color": Color("#C9973B")},
 	"atlas": {"name": "Atlas do Aurora", "color": Color("#5A1E16")},
+	"livro_botanica": {"name": "Botânica", "color": Color("#2A5A42")},
+	"livro_cronicas": {"name": "Crônicas", "color": Color("#7A5230")},
+	"livro_diarios": {"name": "Diários", "color": Color("#7A2230")},
 	"fermento": {"name": "Fermento", "color": Color("#E8D9B0")},
 	"gelo": {"name": "Bloco de gelo", "color": Color("#BFE3F0")},
 }

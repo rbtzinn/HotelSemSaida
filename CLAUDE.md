@@ -1,6 +1,14 @@
-# Hotel Sem Saída — instruções para o Claude Code
+# Hotel Sem Saída — instruções para as IAs do projeto
 
-Jogo de enigmas em pixel art 2D para PC (Windows), feito no **Godot 4** por Roberto com o Claude Code. Este arquivo é a fonte de verdade sobre o projeto: leia-o inteiro antes de qualquer tarefa.
+Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 4.7** por Roberto com o Claude Code e o Codex (GPT). Este arquivo é a **única** fonte de verdade sobre o projeto (o `AGENTS.md` do Codex só aponta para cá): leia-o inteiro antes de qualquer tarefa e atualize-o ao terminar uma etapa.
+
+## Estado atual (05/11/2026)
+
+- **Jogo 3D em primeira pessoa** é o jogo de verdade. O 2D (pixel art) continua no repositório como histórico e referência dos enigmas da Cozinha; não é mais desenvolvido. As seções sobre 2D mais abaixo valem só para os arquivos 2D.
+- Cena principal: `scenes/ui/entrada.tscn` (recepção: jogar solo, continuar solo, ou dupla online).
+- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d` (pasta `scenes/rooms/`).
+- Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
+- Falta: cofre da gerência (S4), etapa seguinte do Saguão, final do jogo, opção de qualidade gráfica.
 
 ## O jogo em uma frase
 
@@ -10,17 +18,20 @@ O Grand Hotel Aurora existe em duas épocas, 1923 e hoje. O jogador alterna com 
 
 1. **Só o passado altera o presente.** Nunca o contrário. Lia descobre informações; Helena muda o mundo.
 2. **As duas personagens não se comunicam.** A única ligação é a consequência física.
-3. **Mesmo espaço, mesma câmera.** As duas épocas ocupam a mesma geometria da sala. Ao trocar, a câmera fica parada e só o cenário muda.
-4. **Cada personagem fica onde foi deixada.** Trocar de época não move ninguém.
+3. **Mesma geometria, uma câmera por personagem.** As duas épocas ocupam a mesma planta da sala. O Tab leva aos olhos da outra personagem, onde ela estiver.
+4. **Cada personagem fica onde foi deixada.** Trocar de época não move ninguém, e só a personagem ativa passa por uma porta (a outra fica na sala dela).
 5. **Sem sistema de dicas.** Enigmas difíceis, resolvidos só com observação.
-6. **Preparado para co-op.** No futuro, cada personagem será um jogador (tela dividida). Por isso, o input de cada personagem é independente desde o início.
+6. **Co-op.** O input de cada personagem é independente. Já existe a dupla online (dois PCs, cada um com uma época); ver "Dupla online".
+7. **O que se vê é o que colide.** Nada que pareça sólido pode ser atravessado, e por onde se passa não pode haver nada (pedido do Roberto).
 
 ## Stack e configuração
 
 - **Godot 4** (última versão 4.x estável), edição **padrão** (não a .NET). Roda sem instalação e sem acesso de administrador.
 - Linguagem: **GDScript** com tipagem estática (`var speed: float = 80.0`, `func get_move() -> Vector2:`).
 - Nomes de código (classes, funções, variáveis, sinais, nós) em inglês, seguindo o estilo do Godot: `snake_case` para funções e variáveis, `PascalCase` para `class_name` e nós. Comentários e textos de interface em português.
-- Resolução de referência: **640×360**. Em `project.godot`: stretch mode `canvas_items` (texto e arte do presente em resolução da janela; ver "Atualização visual"). Filtro de textura padrão: `Nearest`.
+- 3D: Forward+ (cai para Compatibility), 3D a 60% com FSR, SSAO e névoa em qualidade baixa (ver "Protótipo 3D"). HUD e telas em close usam a resolução de referência abaixo.
+- Estilo de código: tipagem estática, espaço depois de vírgula, linhas até ~120 colunas (dicionários de propriedades longos, uma chave por linha), constantes nomeadas para flags e caminhos.
+- (2D, histórico) Resolução de referência: **640×360**. Em `project.godot`: stretch mode `canvas_items` (texto e arte do presente em resolução da janela; ver "Atualização visual"). Filtro de textura padrão: `Nearest`.
 - Unidade = pixel. Grade de **16 px**. Personagens têm **24×48 px**.
 - Uma `Camera2D` fixa por sala.
 - Luzes 2D: `PointLight2D` e `CanvasModulate`.
@@ -173,7 +184,26 @@ Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com 
   - Porta de serviço do Saguão 3D leva a `DoSaguao`; o buraco do piso e a porta da Cozinha voltam a `Pontos/DaCozinha`. Com `cozinha.concluida`, o livro de hoje mostra o nome de Otília.
   - Teste `tools/test_cozinha_3d.gd` (percurso completo; `-- --capture` sem `--headless` salva 4 vistas). Prévias em `art/previews/cozinha3d-*.png`.
 - **Só a ativa passa pela porta (decisão do Roberto, 04/11/2026)**: em 3D, `Door3D` e `ChapterEnd3D` usam `RoomManager.change_room_alone`; a outra fica onde foi deixada, na sala dela (`RoomManager._away`: sala, posição e direção do olhar). O Tab, com a outra em outra sala, abre a sala dela (`switch_to_away`, chamado pelo `EraManager`). O save guarda quem está fora em `"away"`. Cada cena continua com os dois nós de personagem; o da que está fora fica parado (época inativa) até ela voltar. Teste `tools/test_rooms_alone_3d.gd` (preserva o save real).
-- Falta: enigmas do Saguão em 3D (S2–S4), opção de qualidade gráfica.
+- Falta: cofre da gerência (S4), opção de qualidade gráfica.
+
+## Capítulos 3D feitos depois da Cozinha (04–05/11/2026; design no `GDD.md`)
+
+Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d.gd`: `make_world`, `area`, `box`, `label`, `marker`, `key_visual`). O cenário fixo de cada sala é um `HotelBuilder3D`; interações, peças móveis e marcadores são criados pelo script de nível.
+
+- **Saguão** (`lobby_routes_3d.gd`, `lobby_lift_puzzle_3d.gd`): porta pública da Biblioteca (em 1923 livre; hoje `KeyDoor3D`, exige a chave de 1951). Quadro de 12 ganchos: Helena tira uma chave por vez (`saguao.quadro.gancho`), a do Bento (nome achado por Lia sob a tinta; "Bento, o ascensorista" no livro de 1923) sobe a cabine (`saguao.elevador.no_alto`); hoje Lia desce pela escada do poço até a bolsa de Marta.
+- **Manutenção** (`scripts/puzzles/cozinha/maintenance_*`): o buraco da despensa (`ChapterEnd3D` com `descent`) leva Lia para lá. Chave de 1951 na bancada; relógio de ponto com a ficha de Otília (entradas sem saída).
+- **Biblioteca** (`scripts/puzzles/biblioteca/`): 1. volumes trocados aos pares (ordem pelas silhuetas de sol de hoje); 2. cifra de César (carimbo mostra só "A → D") identifica o atlas; **qualquer** livro da mesa pode ser levado e guardado no registro oco (`biblioteca.registro`, 0..4) e retirado de novo; só o atlas recebe as anotações de Caio; 3. Lia lê os algarismos; 4. fechadura `7264` abre o arquivo e a porta das Caldeiras. Solução no `GDD.md`.
+- **Caldeiras** (`scripts/puzzles/caldeiras/`): partida com três volantes na ordem dos talhos que Lia vê hoje. A ordem só é conferida no terceiro volante (`caldeiras.pressao.abertos` bitmask, `caldeiras.pressao.erro`); erro rompe a união e alaga o presente; o registro de alimentação rearma. Depois: drenagem (ramais), engrenagens F-2 (Helena guarda as peças no alto, Lia monta), tiragem e caixa de limpeza com o caderno de Tomás.
+
+## Dupla online (05/11/2026)
+
+- `NetSession` (autoload, `scripts/online/net_session.gd`): ENet UDP 7777; o anfitrião escolhe a época e o visitante fica com a outra. Cada máquina simula só a própria personagem; portas, leitura e pausa são locais. Roteiro do Playit em `JOGAR-ONLINE.md`.
+- Só as flags mudam pela rede, e só as que `scripts/online/coop_progress.gd` permite para cada época (passado: mecanismos; presente: leituras e progresso). **Toda flag nova de enigma precisa entrar lá**; `tools/test_coop_flags.gd` falha se alguma ficar de fora, e em modo debug o jogo avisa (`push_warning`).
+- Save da dupla separado do solo (`user://dupla.save`, só o anfitrião salva). Online, o Tab e o save solo ficam desligados; `EraLinked3D` reage a flags na hora.
+
+## Testes
+
+`tools/test_*.gd`, cada um com `Godot_console.exe --headless --path . --fixed-fps 60 --script res://tools/<teste>.gd`. A dupla online roda em dois processos: `tools/run_dupla_online.sh` (Git Bash). Rodados sozinhos, os testes que precisam de argumentos imprimem `SKIP`.
 
 ## Referência
 

@@ -97,23 +97,23 @@ func _walk(motor, input: TestInput, start: Vector3, direction: Vector2, ticks: i
 func _test_lift() -> void:
 	var state := root.get_node("WorldState")
 	var eras := root.get_node("EraManager")
-	var desk := Vector3(7.77,0,2.59)
-	var sill := Vector3(16.29,0,3.18)
-	var lock := Vector3(17.51,0,3.18)
+	var desk := Vector3(7.77, 0, 2.59)
+	var sill := Vector3(16.29, 0, 3.18)
+	var lock := Vector3(17.51, 0, 3.18)
 	state.set_flag("caldeiras.concluida")
-	await _use("Lia","WorldToday/OlharGrade",sill)
-	await _use("Lia","WorldToday/Chapa9",desk)
+	await _use("Lia", "WorldToday/OlharGrade", sill)
+	await _use("Lia", "WorldToday/Chapa9", desk)
 	assert(paused and not state.is_set("saguao.elevador.no_alto"))
 	await _close_note()
 	eras.set_era(0)
-	await _use("Helena","World1923/Gancho2",desk)
-	await _use("Helena","World1923/PainelElevador",lock)
+	await _use("Helena", "World1923/Gancho2", desk)
+	await _use("Helena", "World1923/PainelElevador", lock)
 	assert(not state.is_set("saguao.elevador.no_alto") and state.get_flag("helena.mao") == "chave_quadro")
 	await _reload_flags()
-	await _use("Helena","World1923/Gancho2",desk)
+	await _use("Helena", "World1923/Gancho2", desk)
 	assert(state.get_flag("helena.mao") == "")
-	await _use("Helena","World1923/Gancho9",desk)
-	await _use("Helena","World1923/PainelElevador",lock)
+	await _use("Helena", "World1923/Gancho9", desk)
+	await _use("Helena", "World1923/PainelElevador", lock)
 	assert(state.is_set("saguao.elevador.no_alto") and state.get_flag("helena.mao") == "")
 	for i in 108:
 		await physics_frame
@@ -122,18 +122,18 @@ func _test_lift() -> void:
 	eras.set_era(1)
 	assert(current_scene.get_node("WorldToday/Cabin").position.y > 3.5)
 	var lia = current_scene.get_node("Lia")
-	await _use("Lia","WorldToday/DescerPoco",sill)
+	await _use("Lia", "WorldToday/DescerPoco", sill)
 	assert(lia.is_traversing() and lia.get_save_position().distance_to(sill)<0.05)
 	for i in 340:
 		await physics_frame
 	assert(not lia.is_traversing() and lia.is_on_floor() and absf(lia.position.y+2.65)<0.03)
-	await _use("Lia","WorldToday/BolsaMarta",lia.position)
+	await _use("Lia", "WorldToday/BolsaMarta", lia.position)
 	assert(paused and state.is_set("saguao.bolsa.marta"))
 	await _close_note()
-	await _use("Lia","WorldToday/SubirPoco",lia.position)
+	await _use("Lia", "WorldToday/SubirPoco", lia.position)
 	for i in 340:
 		await physics_frame
-	assert(lia.is_on_floor() and lia.position.distance_to(Vector3(16.48,0,2.55)) < 0.04)
+	assert(lia.is_on_floor() and lia.position.distance_to(Vector3(16.48, 0, 2.55)) < 0.04)
 	assert(state.is_set("caldeiras.concluida"))
 
 
@@ -145,8 +145,8 @@ func _use(character: String, path: String, at: Vector3) -> void:
 	motor.position = at
 	motor.velocity = Vector3.ZERO
 	var aim: Vector3 = target.global_position - motor.get_camera().global_position
-	motor.rotation.y = atan2(-aim.x,-aim.z)
-	motor.get_node("Head").rotation.x = atan2(aim.y,Vector2(aim.x,aim.z).length())
+	motor.rotation.y = atan2(-aim.x, -aim.z)
+	motor.get_node("Head").rotation.x = atan2(aim.y, Vector2(aim.x, aim.z).length())
 	for i in 4:
 		await physics_frame
 	assert(motor.focused == target, "Alvo fora de alcance: " + path)

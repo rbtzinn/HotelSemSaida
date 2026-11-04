@@ -36,14 +36,14 @@ func _ready() -> void:
 	if NetSession.phase == NetSession.Phase.PLAYING:
 		title.text = "Pausa · sua tela"
 		if NetSession.is_host:
-			_add_button(column,"Salvar a dupla",func() -> void:
+			_add_button(column, "Salvar a dupla", func() -> void:
 				await close()
 				NetSession.save_duo())
-		_add_button(column,"Sair da sala",func() -> void: NetSession.leave("Você saiu da sala."))
+		_add_button(column, "Sair da sala", func() -> void: NetSession.leave("Você saiu da sala."))
 	else:
 		_add_button(column, "Salvar", _save)
 		_add_button(column, "Carregar", _load)
-		_add_button(column, "Voltar à recepção",func() -> void:
+		_add_button(column, "Voltar à recepção", func() -> void:
 			get_tree().paused = false
 			get_tree().change_scene_to_file(NetSession.LOBBY))
 	_add_button(column, "Sair do jogo", func() -> void: get_tree().quit())

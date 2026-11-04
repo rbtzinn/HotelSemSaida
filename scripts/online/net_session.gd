@@ -5,12 +5,15 @@ signal lobby_changed
 enum Phase { OFF, HOSTING, JOINING, WAITING, PLAYING }
 const RULES := preload("res://scripts/online/coop_progress.gd")
 const PORT := 7777
-const PROTOCOL := 1
+## Suba a cada mudança nas regras de flags: versões diferentes não podem jogar juntas.
+const PROTOCOL := 2
 const LOBBY := "res://scenes/ui/entrada.tscn"
 const HOTEL := "res://scenes/rooms/saguao_3d.tscn"
-const ROOMS := [HOTEL,"res://scenes/rooms/cozinha_3d.tscn","res://scenes/rooms/manutencao_3d.tscn",
-	"res://scenes/rooms/biblioteca_3d.tscn","res://scenes/rooms/caldeiras_3d.tscn"]
+const ROOMS := [HOTEL, "res://scenes/rooms/cozinha_3d.tscn", "res://scenes/rooms/manutencao_3d.tscn",
+	"res://scenes/rooms/biblioteca_3d.tscn", "res://scenes/rooms/caldeiras_3d.tscn"]
 const SAVE := "user://dupla.save"
+## Teto contra arquivo adulterado; o jogo completo usa bem menos.
+const MAX_SAVED_FLAGS := 1000
 var phase := Phase.OFF
 var local_era := Era.Id.PAST_1923
 var partner := 0
@@ -24,8 +27,8 @@ var _returning := false
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	multiplayer.connected_to_server.connect(_connected)
-	multiplayer.connection_failed.connect(func() -> void: leave.call_deferred("Não foi possível conectar. Confira o endereço e a porta.",false))
-	multiplayer.server_disconnected.connect(func() -> void: leave.call_deferred("O anfitrião encerrou a conexão.",false))
+	multiplayer.connection_failed.connect(func() -> void: leave.call_deferred("Não foi possível conectar. Confira o endereço e a porta.", false))
+	multiplayer.server_disconnected.connect(func() -> void: leave.call_deferred("O anfitrião encerrou a conexão.", false))
 	multiplayer.peer_disconnected.connect(_lost_peer)
 	WorldState.flag_changed.connect(_publish)
 
@@ -34,7 +37,7 @@ func host(era: Era.Id, port: int = PORT) -> void:
 		return
 	var peer := ENetMultiplayerPeer.new()
 	peer.set_bind_ip("0.0.0.0")
-	if peer.create_server(port,1) != OK:
+	if peer.create_server(port, 1) != OK:
 		_message("Porta UDP %d indisponível. Confira se já existe uma sala aberta." % port)
 		return
 	local_era = era
@@ -59,7 +62,7 @@ func join(address: String) -> void:
 		return
 	var peer := ENetMultiplayerPeer.new()
 	peer.set_bind_ip("0.0.0.0")
-	if peer.create_client(hostname,port) != OK:
+	if peer.create_client(hostname, port) != OK:
 		_message("Não foi possível abrir a conexão com esse endereço.")
 		return
 	phase = Phase.JOINING
@@ -69,9 +72,9 @@ func join(address: String) -> void:
 
 func _connected() -> void:
 	if phase == Phase.JOINING:
-		_check_in.rpc_id(1,PROTOCOL)
+		_check_in.rpc_id(1, PROTOCOL)
 
-@rpc("any_peer","call_remote","reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func _check_in(version: int) -> void:
 	var guest := multiplayer.get_remote_sender_id()
 	if not is_host or phase != Phase.HOSTING or guest <= 1:
@@ -81,16 +84,16 @@ func _check_in(version: int) -> void:
 		return
 	partner = guest
 	phase = Phase.WAITING
-	_welcome.rpc_id(guest,Era.other(local_era))
+	_welcome.rpc_id(guest, Era.other(local_era))
 	_message("Dupla completa. Você joga com %s." % Era.character_name(local_era))
 
-@rpc("authority","call_remote","reliable")
+@rpc("authority", "call_remote", "reliable")
 func _refuse() -> void:
-	leave.call_deferred("As versões dos jogos são diferentes.",false)
+	leave.call_deferred("As versões dos jogos são diferentes.", false)
 
-@rpc("authority","call_remote","reliable")
+@rpc("authority", "call_remote", "reliable")
 func _welcome(era: int) -> void:
-	if phase != Phase.JOINING or era not in [0,1]:
+	if phase != Phase.JOINING or era not in [0, 1]:
 		return
 	local_era = era as Era.Id
 	partner = 1
@@ -103,25 +106,25 @@ func start(resume: bool = false) -> void:
 		return
 	var data := {}
 	if resume:
-		var file := FileAccess.open(SAVE,FileAccess.READ)
+		var file := FileAccess.open(SAVE, FileAccess.READ)
 		var saved: Variant = file.get_var(false) if file else null
 		if not saved is Dictionary or not _valid_save(saved):
 			_message("Não foi possível ler o save da dupla.")
 			return
 		data = saved
-	_begin.rpc_id(partner,data)
+	_begin.rpc_id(partner, data)
 	_begin(data)
 
-@rpc("authority","call_remote","reliable")
+@rpc("authority", "call_remote", "reliable")
 func _begin(data: Dictionary) -> void:
 	if phase != Phase.WAITING or (not data.is_empty() and not _valid_save(data)):
 		return
 	phase = Phase.PLAYING
 	RoomManager.clear_away()
-	WorldState.load_dict(data.get("flags",{}))
+	WorldState.load_dict(data.get("flags", {}))
 	EraManager.set_era(local_era)
-	var spot: Dictionary = data.get(Era.character_name(local_era),{})
-	get_tree().change_scene_to_file(spot.get("room",HOTEL))
+	var spot: Dictionary = data.get(Era.character_name(local_era), {})
+	get_tree().change_scene_to_file(spot.get("room", HOTEL))
 	await get_tree().scene_changed
 	if phase == Phase.PLAYING and not spot.is_empty():
 		var motor := get_tree().current_scene.get_node(Era.character_name(local_era)) as FirstPersonMotor
@@ -130,16 +133,21 @@ func _begin(data: Dictionary) -> void:
 		motor.get_node("Head").rotation.x = spot.pitch
 
 func _publish(key: String, value: Variant) -> void:
-	if phase == Phase.PLAYING and not _receiving and RULES.allowed(local_era,key,value):
-		_receive_flag.rpc_id(partner,key,value)
+	if phase != Phase.PLAYING or _receiving:
+		return
+	if RULES.allowed(local_era, key, value):
+		_receive_flag.rpc_id(partner, key, value)
+	elif OS.is_debug_build() and not RULES.allowed(Era.other(local_era), key, value):
+		# Flag nova esquecida em coop_progress.gd: não chega ao outro jogador
+		push_warning("NetSession: flag '%s' fora das regras do online" % key)
 
-@rpc("any_peer","call_remote","reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func _receive_flag(key: String, value: Variant) -> void:
 	if phase != Phase.PLAYING or multiplayer.get_remote_sender_id() != partner:
 		return
-	if RULES.allowed(Era.other(local_era),key,value):
+	if RULES.allowed(Era.other(local_era), key, value):
 		_receiving = true
-		WorldState.set_flag(key,value)
+		WorldState.set_flag(key, value)
 		_receiving = false
 
 func _spot() -> Dictionary:
@@ -147,22 +155,23 @@ func _spot() -> Dictionary:
 	if RoomManager.is_changing() or not room or room.scene_file_path not in ROOMS:
 		return {}
 	var motor := room.get_node(Era.character_name(local_era)) as FirstPersonMotor
-	return {"room":room.scene_file_path,"position":motor.get_save_position(),
-		"yaw":motor.rotation.y,"pitch":motor.get_node("Head").rotation.x}
+	return {"room":room.scene_file_path, "position":motor.get_save_position(),
+		"yaw":motor.rotation.y, "pitch":motor.get_node("Head").rotation.x}
 
 static func _valid_spot(spot: Variant) -> bool:
-	return spot is Dictionary and spot.get("room","") in ROOMS and spot.get("position") is Vector3 \
+	return spot is Dictionary and spot.get("room", "") in ROOMS and spot.get("position") is Vector3 \
 		and spot.position.is_finite() and spot.get("yaw") is float and is_finite(spot.yaw) \
 		and spot.get("pitch") is float and is_finite(spot.pitch)
 
 static func _valid_save(data: Dictionary) -> bool:
-	if data.get("version") != PROTOCOL or not _valid_spot(data.get("Lia")) or not _valid_spot(data.get("Helena")):
+	# Saves da versão 1 só têm flags que a versão atual também aceita
+	if data.get("version") not in [1, PROTOCOL] or not _valid_spot(data.get("Lia")) or not _valid_spot(data.get("Helena")):
 		return false
 	var flags: Variant = data.get("flags")
-	if not flags is Dictionary or flags.size() > 100:
+	if not flags is Dictionary or flags.size() > MAX_SAVED_FLAGS:
 		return false
 	for key: Variant in flags:
-		if not key is String or not (RULES.allowed(0,key,flags[key]) or RULES.allowed(1,key,flags[key])):
+		if not key is String or not (RULES.allowed(0, key, flags[key]) or RULES.allowed(1, key, flags[key])):
 			return false
 	return true
 
@@ -172,22 +181,22 @@ func save_duo() -> void:
 	_saving = true
 	_ask_spot.rpc_id(partner)
 
-@rpc("authority","call_remote","reliable")
+@rpc("authority", "call_remote", "reliable")
 func _ask_spot() -> void:
 	if phase == Phase.PLAYING:
-		_save_with.rpc_id(1,_spot())
+		_save_with.rpc_id(1, _spot())
 
-@rpc("any_peer","call_remote","reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func _save_with(guest: Dictionary) -> void:
 	if not is_host or not _saving or multiplayer.get_remote_sender_id() != partner:
 		return
 	_saving = false
-	var data := {"version":PROTOCOL,"flags":WorldState.to_dict()}
+	var data := {"version":PROTOCOL, "flags":WorldState.to_dict()}
 	data[Era.character_name(local_era)] = _spot()
 	data[Era.character_name(Era.other(local_era))] = guest
 	var message := "Aguarde os dois terminarem a travessia e salve de novo."
 	if _valid_save(data):
-		var file := FileAccess.open(SAVE+".tmp",FileAccess.WRITE)
+		var file := FileAccess.open(SAVE+".tmp", FileAccess.WRITE)
 		var saved := false
 		if file:
 			file.store_var(data)
@@ -195,9 +204,9 @@ func _save_with(guest: Dictionary) -> void:
 			saved = file.get_error() == OK
 			file.close()
 		if saved:
-			saved = DirAccess.rename_absolute(SAVE+".tmp",SAVE) == OK
+			saved = DirAccess.rename_absolute(SAVE+".tmp", SAVE) == OK
 		message = "Progresso da dupla salvo." if saved else "Não foi possível gravar o save da dupla."
-	get_tree().call_group("hud","show_message",message)
+	get_tree().call_group("hud", "show_message", message)
 
 func _lost_peer(id: int) -> void:
 	if id != partner:
@@ -207,7 +216,7 @@ func _lost_peer(id: int) -> void:
 		phase = Phase.HOSTING
 		_message("O visitante saiu. Aguardando outra conexão.")
 	elif phase == Phase.PLAYING:
-		leave.call_deferred("A outra pessoa saiu da partida.",false)
+		leave.call_deferred("A outra pessoa saiu da partida.", false)
 
 func leave(reason: String = "", notify_partner: bool = true) -> void:
 	if phase == Phase.OFF:
@@ -227,7 +236,7 @@ func leave(reason: String = "", notify_partner: bool = true) -> void:
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	if in_game:
 		_returning = true
-		get_tree().call_group("room_overlay","queue_free")
+		get_tree().call_group("room_overlay", "queue_free")
 		get_tree().paused = false
 		while RoomManager.is_changing():
 			await get_tree().process_frame
@@ -236,13 +245,13 @@ func leave(reason: String = "", notify_partner: bool = true) -> void:
 		_returning = false
 	_message(reason)
 
-@rpc("any_peer","call_remote","reliable")
+@rpc("any_peer", "call_remote", "reliable")
 func _goodbye() -> void:
 	if multiplayer.get_remote_sender_id() == partner:
 		if is_host and phase == Phase.WAITING:
 			_lost_peer(partner)
 		else:
-			leave.call_deferred("A outra pessoa saiu da sala.",false)
+			leave.call_deferred("A outra pessoa saiu da sala.", false)
 
 func _process(_delta: float) -> void:
 	if phase == Phase.JOINING and Time.get_ticks_msec() >= _deadline:

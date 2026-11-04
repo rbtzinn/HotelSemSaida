@@ -104,16 +104,16 @@ func _slab_rects() -> Array:
 func _build_shell() -> void:
 	var east := WIDTH
 	# Despensa: piso de tábuas (passa por baixo do poço)
-	var floor_rects: Array[Rect2] = [Rect2(-1,-1,SHAFT_X.y+2,DEPTH+2)]
+	var floor_rects: Array[Rect2] = [Rect2(-1, -1, SHAFT_X.y+2, DEPTH+2)]
 	if present:
 		# A fresta e a boca da escada ocupam o mesmo recorte, conforme a época do piso.
-		floor_rects = [Rect2(-1,-1,SHAFT_X.y+2,3.6),Rect2(-1,3.8,SHAFT_X.y+2,DEPTH+1-3.8),
-			Rect2(-1,2.6,12.2,1.2),Rect2(12.3,2.6,SHAFT_X.y+1-12.3,1.2)]
+		floor_rects = [Rect2(-1, -1, SHAFT_X.y+2, 3.6), Rect2(-1, 3.8, SHAFT_X.y+2, DEPTH+1-3.8),
+			Rect2(-1, 2.6, 12.2, 1.2), Rect2(12.3, 2.6, SHAFT_X.y+1-12.3, 1.2)]
 	for rect in floor_rects:
-		var low := Vector3(rect.position.x,-0.2,rect.position.y)
-		var high := Vector3(rect.end.x,0,rect.end.y)
-		_part(low,high,"floorboards")
-		_solid(low,high,"Floor")
+		var low := Vector3(rect.position.x, -0.2, rect.position.y)
+		var high := Vector3(rect.end.x, 0, rect.end.y)
+		_part(low, high, "floorboards")
+		_solid(low, high, "Floor")
 
 	for rect: Array in _slab_rects():
 		_part(Vector3(rect[0], SLAB_BOTTOM, rect[1]), Vector3(rect[2], K - 0.02, rect[3]), "plaster_cream")

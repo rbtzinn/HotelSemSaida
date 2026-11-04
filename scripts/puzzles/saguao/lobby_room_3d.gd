@@ -336,7 +336,7 @@ func _build_elevator() -> void:
 	var car := preload("res://scripts/puzzles/saguao/lobby_lift_car_3d.gd").new()
 	car.name = "Cabin"
 	car.width = x1-x0
-	car.position = Vector3(center_x,0,face)
+	car.position = Vector3(center_x, 0, face)
 	car.present = present
 	_add(car)
 	_build_lift_pit()
@@ -367,20 +367,20 @@ func _build_lift_pit() -> void:
 	var x0 := ELEVATOR.x
 	var x1 := ELEVATOR.y
 	for corners: Array in [
-		[Vector3(x0-0.14,PIT_FLOOR,-0.45),Vector3(x0,HEIGHT,NORTH)],
-		[Vector3(x1,PIT_FLOOR,-0.45),Vector3(x1+0.14,HEIGHT,NORTH)],
-		[Vector3(x0,PIT_FLOOR,-0.45),Vector3(x1,HEIGHT,-0.3)],
-		[Vector3(x0,PIT_FLOOR,NORTH),Vector3(x1,0,NORTH+0.14)],
-		[Vector3(x0,PIT_FLOOR-0.18,-0.45),Vector3(x1,PIT_FLOOR,NORTH)]]:
+		[Vector3(x0-0.14, PIT_FLOOR, -0.45), Vector3(x0, HEIGHT, NORTH)],
+		[Vector3(x1, PIT_FLOOR, -0.45), Vector3(x1+0.14, HEIGHT, NORTH)],
+		[Vector3(x0, PIT_FLOOR, -0.45), Vector3(x1, HEIGHT, -0.3)],
+		[Vector3(x0, PIT_FLOOR, NORTH), Vector3(x1, 0, NORTH+0.14)],
+		[Vector3(x0, PIT_FLOOR-0.18, -0.45), Vector3(x1, PIT_FLOOR, NORTH)]]:
 		_part(corners[0], corners[1], "stone")
 		_solid(corners[0], corners[1], "ShaftWall")
 	# Guias da cabine e escada de manutenção na parede lateral.
-	for x: float in [x0+0.08,x1-0.08]:
-		_block(Vector3(x,1.6,-0.24), Vector3(0.075,8.5,0.10), "cast_iron")
-	for z: float in [1.21,1.73]:
-		_block(Vector3(x1-0.11,-0.8,z), Vector3(0.045,3.7,0.045), "iron")
+	for x: float in [x0+0.08, x1-0.08]:
+		_block(Vector3(x, 1.6, -0.24), Vector3(0.075, 8.5, 0.10), "cast_iron")
+	for z: float in [1.21, 1.73]:
+		_block(Vector3(x1-0.11, -0.8, z), Vector3(0.045, 3.7, 0.045), "iron")
 	for rung in 12:
-		_block(Vector3(x1-0.11,PIT_FLOOR+0.22+rung*0.30,1.47), Vector3(0.055,0.045,0.56), "iron")
+		_block(Vector3(x1-0.11, PIT_FLOOR+0.22+rung*0.30, 1.47), Vector3(0.055, 0.045, 0.56), "iron")
 
 
 # --- Recepção -----------------------------------------------------------------------
@@ -637,13 +637,13 @@ func _build_library_door() -> void:
 	var z0 := 4.25
 	var z1 := 5.55
 	_part(Vector3(WEST + 0.01, 0, z0), Vector3(WEST + 0.07, 2.4, z1), "mahogany" if not present else "plank")
-	for z: float in [z0-0.1,z1]:
-		_part(Vector3(WEST,0,z),Vector3(WEST+0.13,2.55,z+0.1),"brass")
-	_part(Vector3(WEST,2.4,z0-0.1),Vector3(WEST+0.13,2.57,z1+0.1),"brass")
-	for y: float in [0.2,1.2]:
-		_part(Vector3(WEST+0.07,y,z0+0.12),Vector3(WEST+0.09,y+0.85,z1-0.12),"panel")
-	_sphere(Vector3(WEST+0.12,1.05,z1-0.18),0.04,"brass")
-	_label("BIBLIOTECA",Vector3(WEST+0.14,2.18,4.9),0.10,Color("#C9973B"),90)
+	for z: float in [z0-0.1, z1]:
+		_part(Vector3(WEST, 0, z), Vector3(WEST+0.13, 2.55, z+0.1), "brass")
+	_part(Vector3(WEST, 2.4, z0-0.1), Vector3(WEST+0.13, 2.57, z1+0.1), "brass")
+	for y: float in [0.2, 1.2]:
+		_part(Vector3(WEST+0.07, y, z0+0.12), Vector3(WEST+0.09, y+0.85, z1-0.12), "panel")
+	_sphere(Vector3(WEST+0.12, 1.05, z1-0.18), 0.04, "brass")
+	_label("BIBLIOTECA", Vector3(WEST+0.14, 2.18, 4.9), 0.10, Color("#C9973B"), 90)
 
 
 func _build_kitchen_door() -> void:

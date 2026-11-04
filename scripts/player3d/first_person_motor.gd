@@ -170,7 +170,7 @@ func _refresh_held_view() -> void:
 		"pinhao_f2", "coroa_f2":
 			instance.mesh = preload("res://scripts/puzzles/caldeiras/gear_model_3d.gd").mesh_for(item)
 			instance.scale = Vector3.ONE * 0.42
-			instance.rotation_degrees = Vector3(12,-22,9)
+			instance.rotation_degrees = Vector3(12, -22, 9)
 			material.metallic = 0.55
 		"chave_biblioteca", "chave_quadro":
 			var key_mesh := BoxMesh.new()
@@ -188,20 +188,20 @@ func _refresh_held_view() -> void:
 			instance.add_child(ring)
 			var tooth := MeshInstance3D.new()
 			var tooth_mesh := BoxMesh.new()
-			tooth_mesh.size = Vector3(0.025,0.02,0.055)
+			tooth_mesh.size = Vector3(0.025, 0.02, 0.055)
 			tooth.mesh = tooth_mesh
-			tooth.position = Vector3(0.06,0,0.02)
+			tooth.position = Vector3(0.06, 0, 0.02)
 			tooth.material_override = material
 			tooth.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			instance.add_child(tooth)
-		"atlas":
+		"atlas", "livro_botanica", "livro_cronicas", "livro_diarios":
 			var book_mesh := BoxMesh.new()
-			book_mesh.size = Vector3(0.2,0.045,0.28)
+			book_mesh.size = Vector3(0.2, 0.045, 0.28)
 			instance.mesh = book_mesh
 			material.roughness = 0.7
 			var pages := MeshInstance3D.new()
 			var pages_mesh := BoxMesh.new()
-			pages_mesh.size = Vector3(0.19,0.027,0.265)
+			pages_mesh.size = Vector3(0.19, 0.027, 0.265)
 			pages.mesh = pages_mesh
 			pages.position.x = 0.008
 			var paper := StandardMaterial3D.new()

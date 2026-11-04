@@ -191,8 +191,8 @@ func _stain() -> void:
 
 ## Fresta entre as tábuas, por onde sobe uma corrente de ar.
 func _crack() -> void:
-	_part(Vector3(-0.55,-0.2,-0.60),Vector3(0.55,0,0.60),"floorboards")
-	_solid(Vector3(-0.55,-0.2,-0.60),Vector3(0.55,0,0.60),"Planks")
+	_part(Vector3(-0.55, -0.2, -0.60), Vector3(0.55, 0, 0.60), "floorboards")
+	_solid(Vector3(-0.55, -0.2, -0.60), Vector3(0.55, 0, 0.60), "Planks")
 	_part(Vector3(-0.45, 0.001, -0.03), Vector3(0.45, 0.006, 0.03), "dark", Vector3(0, 12, 0))
 	_part(Vector3(-0.2, 0.001, 0.02), Vector3(0.25, 0.006, 0.05), "dark", Vector3(0, -20, 0))
 	var draft := CPUParticles3D.new()
@@ -219,16 +219,16 @@ func _crack() -> void:
 ## O piso apodrecido cedeu: um buraco escuro com tábuas partidas em volta.
 func _hole() -> void:
 	# Primeiro patamar e escada de ferro, reconhecíveis dos dois lados do alçapão.
-	for x: float in [-0.55,0.55]:
-		_block(Vector3(x,-0.44,0),Vector3(0.055,0.9,1.2),"oak")
-	for z: float in [-0.60,0.60]:
-		_block(Vector3(0,-0.44,z),Vector3(1.1,0.9,0.055),"plank")
-	for x: float in [-0.35,0.35]:
-		_cylinder(Vector3(x,-0.75,-0.37),0.035,0.035,1.17,"iron")
+	for x: float in [-0.55, 0.55]:
+		_block(Vector3(x, -0.44, 0), Vector3(0.055, 0.9, 1.2), "oak")
+	for z: float in [-0.60, 0.60]:
+		_block(Vector3(0, -0.44, z), Vector3(1.1, 0.9, 0.055), "plank")
+	for x: float in [-0.35, 0.35]:
+		_cylinder(Vector3(x, -0.75, -0.37), 0.035, 0.035, 1.17, "iron")
 	for i in 4:
-		_cylinder(Vector3(-0.35,-0.62+i*0.28,-0.37),0.022,0.022,0.70,"iron",Vector3(0,0,-90),8)
-	_part(Vector3(-0.55,-0.77,-0.6),Vector3(0.55,-0.67,0.6),"stone")
-	_solid(Vector3(-0.55,-0.77,-0.6),Vector3(0.55,-0.67,0.6),"Landing")
+		_cylinder(Vector3(-0.35, -0.62+i*0.28, -0.37), 0.022, 0.022, 0.70, "iron", Vector3(0, 0, -90), 8)
+	_part(Vector3(-0.55, -0.77, -0.6), Vector3(0.55, -0.67, 0.6), "stone")
+	_solid(Vector3(-0.55, -0.77, -0.6), Vector3(0.55, -0.67, 0.6), "Landing")
 	for i in 8:
 		var angle := TAU * i / 8.0 + _random(i) * 0.4
 		var at := Vector3(cos(angle), 0, sin(angle)) * 0.62

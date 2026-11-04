@@ -4,7 +4,7 @@ extends Room3D
 func make_world(scene_script: Script, present: bool) -> Node3D:
 	var world: Node3D = scene_script.new()
 	world.name = "WorldToday" if present else "World1923"
-	world.set("present",present)
+	world.set("present", present)
 	var visibility := EraVisibility.new()
 	visibility.era = Era.Id.PRESENT if present else Era.Id.PAST_1923
 	world.add_child(visibility)
@@ -16,7 +16,7 @@ func area(scene_script: Script, parent: Node3D, node_name: String, at: Vector3, 
 	result.name = node_name
 	result.position = at
 	for key: String in properties:
-		result.set(key,properties[key])
+		result.set(key, properties[key])
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
 	shape.size = size
@@ -31,7 +31,7 @@ func box(parent: Node3D, at: Vector3, size: Vector3, role: String, present: bool
 	mesh.size = size
 	result.mesh = mesh
 	result.position = at
-	result.material_override = HotelMaterials.get_material(role,present)
+	result.material_override = HotelMaterials.get_material(role, present)
 	parent.add_child(result)
 	return result
 
@@ -61,7 +61,7 @@ func key_visual(parent: Node3D, at: Vector3, present: bool) -> Node3D:
 	var holder := Node3D.new()
 	holder.position = at
 	parent.add_child(holder)
-	box(holder,Vector3.ZERO,Vector3(0.18,0.02,0.025),"brass",present)
+	box(holder, Vector3.ZERO, Vector3(0.18, 0.02, 0.025), "brass", present)
 	var bow := MeshInstance3D.new()
 	var ring := TorusMesh.new()
 	ring.inner_radius = 0.023
@@ -70,9 +70,9 @@ func key_visual(parent: Node3D, at: Vector3, present: bool) -> Node3D:
 	ring.ring_segments = 8
 	bow.mesh = ring
 	bow.position.x = -0.112
-	bow.material_override = HotelMaterials.get_material("brass",present)
+	bow.material_override = HotelMaterials.get_material("brass", present)
 	holder.add_child(bow)
-	box(holder,Vector3(0.07,0,0.025),Vector3(0.025,0.025,0.04),"brass",present)
+	box(holder, Vector3(0.07, 0, 0.025), Vector3(0.025, 0.025, 0.04), "brass", present)
 	for part: MeshInstance3D in holder.get_children():
 		part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return holder
