@@ -3,8 +3,8 @@
 // reboco, lona, tela de quadro) é escolhido por uniform, e as coordenadas vêm da posição no
 // mundo (projeção pelos três eixos), então qualquer caixa repete o padrão sem emendas.
 // `age` envelhece a mesma superfície em 100 anos (manchas, mofo, rasgos, rachaduras, ferrugem);
-// `retro` dá o ar de PS1 de 1923 (padrão em texels grandes, cores reduzidas, vértices presos
-// a uma grade de tela).
+// `retro` dá o ar de 1923 com cores levemente reduzidas (os texels grandes e o tremido de
+// vértices do PS1 foram retirados: em primeira pessoa faziam o cenário piscar).
 // Alvo: Forward+ (cai para Compatibility sem mudanças). Orçamento: até ~2 fbm e 1 Voronoi por
 // pixel, sem texturas. O `if` sobre `pattern` é uniforme por material (todos os pixels seguem o
 // mesmo caminho), então não diverge.
@@ -49,10 +49,8 @@ group_uniforms;
 
 group_uniforms retro;
 uniform bool retro = false;
-// Texels por metro do padrão no modo retrô (blocos visíveis).
-uniform float retro_texels_per_meter = 24.0;
 // Níveis por canal de cor no modo retrô.
-uniform float retro_color_steps = 24.0;
+uniform float retro_color_steps = 40.0;
 // Grade de tela em que os vértices encaixam (0 = desliga). Desligado por padrão:
 // em primeira pessoa o "tremido" fazia o cenário de 1923 piscar a cada passo.
 uniform vec2 retro_snap_resolution = vec2(0.0, 0.0);
@@ -87,15 +85,22 @@ vec2 planar_uv(vec3 position, vec3 normal) {
 	return vec2(position.x, -position.y);
 }
 
+// Borda suave na largura de um pixel: degraus duros cintilam quando a câmera anda.
+float soft_band(float x, float start, float end, float pixel) {
+	return smoothstep(start - pixel, start + pixel, x) * (1.0 - smoothstep(end - pixel, end + pixel, x));
+}
+
 vec3 wallpaper(vec2 uv, float fade) {
 	vec2 p = uv / pattern_scale;
+	float pixel = fwidth(p.x);
 	// Faixa larga, faixa estreita e filete fino, como um listrado art déco
 	float band = fract(p.x);
-	float wide = smoothstep(0.0, 0.02, band) * (1.0 - smoothstep(0.46, 0.48, band));
-	float pin = smoothstep(0.62, 0.63, band) * (1.0 - smoothstep(0.65, 0.66, band));
+	float wide = soft_band(band, 0.01, 0.47, pixel);
+	float pin = soft_band(band, 0.625, 0.655, pixel);
 	// Losangos discretos dentro da faixa larga
 	vec2 cell = fract(vec2(p.x * 2.0, p.y * 2.4)) - 0.5;
-	float diamond = 1.0 - smoothstep(0.28, 0.31, abs(cell.x) + abs(cell.y));
+	float diamond_pixel = fwidth(p.x * 2.0) + fwidth(p.y * 2.4);
+	float diamond = 1.0 - smoothstep(0.29 - diamond_pixel, 0.29 + diamond_pixel, abs(cell.x) + abs(cell.y));
 	vec3 base = mix(color_b.rgb, color_a.rgb, wide);
 	base = mix(base, color_c.rgb, pin * 0.85 * (1.0 - fade));
 	base = mix(base, mix(base, color_c.rgb, 0.35), diamond * wide * 0.5 * (1.0 - fade));
@@ -106,15 +111,19 @@ vec3 marble_tiles(vec2 uv, float fade, out float grout) {
 	vec2 p = uv / pattern_scale;
 	vec2 tile = floor(p);
 	vec2 local = fract(p);
-	float checker = mod(tile.x + tile.y, 2.0);
+	// Xadrez filtrado (média exata do padrão dentro do pixel): sem serrilhado nas bordas
+	vec2 pixel = fwidth(p) + 0.0001;
+	vec2 integral = 2.0 * (abs(fract((p - 0.5 * pixel) * 0.5) - 0.5) - abs(fract((p + 0.5 * pixel) * 0.5) - 0.5)) / pixel;
+	float checker = 0.5 - 0.5 * integral.x * integral.y;
 	vec3 base = mix(color_a.rgb, color_b.rgb, checker);
 	// Veios: senoide deformada por fbm, fina e clara
 	float veins = abs(sin((p.x + p.y) * 2.2 + fbm(p * 1.7 + tile * 3.1 + seed) * 7.0));
 	base = mix(base, mix(base, vec3(1.0), 0.35), (1.0 - smoothstep(0.0, 0.07, veins)) * 0.8 * (1.0 - fade));
-	base *= 0.92 + 0.12 * fbm(p * 5.0 + seed);
+	base *= mix(0.92 + 0.12 * fbm(p * 5.0 + seed), 0.98, fade);
 	// Rejunte: faixa estreita nas bordas de cada ladrilho
 	vec2 edge = min(local, 1.0 - local);
-	grout = (1.0 - smoothstep(0.0, 0.018, min(edge.x, edge.y))) * (1.0 - fade);
+	float grout_pixel = max(pixel.x, pixel.y);
+	grout = (1.0 - smoothstep(0.018 - grout_pixel, 0.018 + grout_pixel, min(edge.x, edge.y))) * (1.0 - fade);
 	return mix(base, color_c.rgb, grout);
 }
 
@@ -127,28 +136,31 @@ vec3 wood(vec2 uv, float fade) {
 	float grain = fract(p.y * 4.0 * 6.0 + fbm(vec2(along * 0.6, p.y * 14.0)) * 2.5);
 	float ring = smoothstep(0.35, 0.5, grain) * (1.0 - smoothstep(0.5, 0.65, grain));
 	vec3 base = mix(color_a.rgb, color_b.rgb, mix(ring * 0.7, 0.35, fade) + fbm(vec2(along * 2.0, row)) * 0.3);
-	float seam = 1.0 - smoothstep(0.0, 0.03, min(fract(p.y * 4.0), 1.0 - fract(p.y * 4.0)));
+	float seam_pixel = fwidth(p.y * 4.0);
+	float seam = 1.0 - smoothstep(0.03 - seam_pixel, 0.03 + seam_pixel, min(fract(p.y * 4.0), 1.0 - fract(p.y * 4.0)));
 	return mix(base, base * 0.45, seam * (1.0 - fade));
 }
 
-vec3 metal(vec2 uv) {
+vec3 metal(vec2 uv, float fade) {
 	vec2 p = uv / pattern_scale;
-	float brushed = value_noise(vec2(p.x * 40.0, p.y * 2.0));
+	float brushed = mix(value_noise(vec2(p.x * 40.0, p.y * 2.0)), 0.5, fade);
 	return color_a.rgb * (0.85 + 0.25 * brushed);
 }
 
 vec3 rug(vec2 world_xz) {
 	vec2 local = (world_xz - rug_center) / rug_half_size;
 	vec2 border = abs(local);
-	float frame = step(0.86, max(border.x, border.y)) - step(0.96, max(border.x, border.y));
+	float box = max(border.x, border.y);
+	float frame = soft_band(box, 0.86, 0.96, fwidth(box));
 	float radius = length(local * vec2(1.0, rug_half_size.y / rug_half_size.x));
-	float rings = smoothstep(0.02, 0.0, abs(fract(radius * 4.0) - 0.5) - 0.42);
-	float medallion = 1.0 - smoothstep(0.30, 0.33, radius);
-	float petals = step(0.5, fract(atan(local.y, local.x) / 6.2832 * 12.0)) * medallion;
+	float ring_pixel = fwidth(radius * 4.0);
+	float rings = 1.0 - smoothstep(0.42 - ring_pixel, 0.42 + ring_pixel, abs(fract(radius * 4.0) - 0.5));
+	float medallion = 1.0 - smoothstep(0.31 - fwidth(radius), 0.31 + fwidth(radius), radius);
+	float sector = fract(atan(local.y, local.x) / 6.2832 * 12.0);
+	float petals = soft_band(sector, 0.5, 1.0, 0.04) * medallion;
 	vec3 base = color_a.rgb;
 	base = mix(base, color_b.rgb, max(rings * (1.0 - medallion), petals));
 	base = mix(base, color_c.rgb, frame);
-	base *= 0.9 + 0.15 * value_noise(world_xz * 60.0);
 	return base;
 }
 
@@ -179,13 +191,8 @@ void fragment() {
 	float footprint = max(length(dFdx(uv)), length(dFdy(uv)));
 	// Os traços finos medem ~3% da repetição: some quando ficam menores que um pixel
 	float detail_fade = smoothstep(0.6, 1.6, footprint / (pattern_scale * 0.03));
-	float retro_fade = smoothstep(0.6, 1.4, footprint * retro_texels_per_meter);
-	if (retro) {
-		// Padrão em blocos grandes, como uma textura de baixa resolução sem filtro.
-		// Onde um bloco fica menor que um pixel, volta à coordenada contínua (não cintila).
-		uv = mix(floor(uv * retro_texels_per_meter) / retro_texels_per_meter, uv, retro_fade);
-		rug_xz = mix(floor(rug_xz * retro_texels_per_meter) / retro_texels_per_meter, rug_xz, retro_fade);
-	}
+	// O padrão em blocos (texels grandes sem filtro) foi retirado: em primeira pessoa
+	// os blocos "nadavam" a cada movimento da câmera. 1923 fica retrô só pelas cores.
 
 	vec3 albedo = color_a.rgb;
 	float roughness = roughness_value;
@@ -199,7 +206,7 @@ void fragment() {
 	} else if (pattern == PATTERN_WOOD) {
 		albedo = wood(uv, detail_fade);
 	} else if (pattern == PATTERN_METAL) {
-		albedo = metal(uv);
+		albedo = metal(uv, detail_fade);
 	} else if (pattern == PATTERN_RUG) {
 		albedo = rug(rug_xz);
 	} else if (pattern == PATTERN_PLASTER) {
