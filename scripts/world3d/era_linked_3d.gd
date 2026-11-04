@@ -14,11 +14,14 @@ func _ready() -> void:
 	EraManager.era_changed.connect(func(era: Era.Id) -> void:
 		if era == Era.Id.PRESENT:
 			_apply())
-	if update_immediately:
+	if update_immediately or NetSession.phase == NetSession.Phase.PLAYING:
 		WorldState.flag_changed.connect(func(key: String, _value: Variant) -> void:
-			if key == flag_key:
+			if key == flag_key or _also_refreshes(key):
 				_apply())
 	_apply()
+
+func _also_refreshes(_key: String) -> bool:
+	return false
 
 
 func _apply() -> void:

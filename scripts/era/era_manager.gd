@@ -33,6 +33,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Troca para a outra época com fade. Ignora pedidos durante uma troca em andamento.
 func switch_era() -> void:
+	var scene := get_tree().current_scene
+	if NetSession.phase != NetSession.Phase.OFF or (scene and scene.scene_file_path == NetSession.LOBBY):
+		return
 	if _is_switching or RoomManager.is_changing():
 		return
 	# Em 3D cada uma pode estar numa sala: aí a troca abre a sala da outra

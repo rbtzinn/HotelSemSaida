@@ -24,6 +24,7 @@ static func open(tree: SceneTree, code: String) -> CodeLockUI:
 
 
 func _ready() -> void:
+	add_to_group("room_overlay")
 	layer = 60
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true

@@ -18,6 +18,7 @@ static func open(tree: SceneTree, title: String, text: String, photo: Texture2D 
 
 
 func _ready() -> void:
+	add_to_group("room_overlay")
 	layer = 60
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true

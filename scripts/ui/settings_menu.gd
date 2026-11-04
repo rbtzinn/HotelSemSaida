@@ -14,6 +14,7 @@ var pending_video: bool = false
 var _panel: PanelContainer
 
 func _ready() -> void:
+	add_to_group("room_overlay")
 	layer = 70
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	previous = Settings.data.duplicate(true)

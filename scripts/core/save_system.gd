@@ -8,6 +8,11 @@ const SAVE_VERSION: int = 1
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if NetSession.phase != NetSession.Phase.OFF:
+		if event.is_action_pressed("quick_save"):
+			get_viewport().set_input_as_handled()
+			NetSession.save_duo()
+		return
 	if event.is_action_pressed("quick_save"):
 		get_viewport().set_input_as_handled()
 		save_game()
@@ -21,6 +26,8 @@ func has_save() -> bool:
 
 
 func save_game() -> bool:
+	if NetSession.phase != NetSession.Phase.OFF or (get_tree().current_scene and get_tree().current_scene.scene_file_path == NetSession.LOBBY):
+		return false
 	# No meio de um fade a época ou a sala ainda vão mudar; espera terminar
 	if EraManager.is_switching() or RoomManager.is_changing():
 		return false
@@ -61,6 +68,8 @@ func save_game() -> bool:
 
 ## Recarrega a sala salva do zero (via RoomManager), para que todo objeto leia as flags no _ready.
 func load_game() -> bool:
+	if NetSession.phase != NetSession.Phase.OFF:
+		return false
 	if EraManager.is_switching() or RoomManager.is_changing():
 		return false
 	if not has_save():

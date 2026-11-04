@@ -13,7 +13,7 @@ Hotel Sem Saída é um jogo de enigmas misterioso em primeira pessoa 3D para PC,
 | Engine | Godot 4 (GDScript) |
 | Visual | 3D em primeira pessoa; hotel quente e luxuoso em 1923, frio e em ruínas hoje |
 | Tom | Misterioso e sombrio |
-| Modo | Solo, alternando 2 personagens; arquitetura pronta para co-op no futuro (cada personagem = 1 jogador) |
+| Modo | Solo com troca de personagem ou dupla online em dois PCs, cada um com sua tela |
 | Dificuldade | Enigmas difíceis, sem sistema de dicas: o jogador resolve sozinho |
 | Equipe | Roberto + Claude (Claude Design e Claude Code) |
 
@@ -49,7 +49,7 @@ Uma tecla troca entre Helena (1923) e Lia (hoje). As duas ocupam o mesmo espaço
 - **Presente → conhecimento:** Lia acha jornais, registros e destroços que mostram o desfecho das coisas. O jogador usa essas pistas para resolver os enigmas de Helena (as personagens não sabem, mas o jogador sabe).
 - **Regra de ouro:** só o passado altera o presente, nunca o contrário. Isso mantém os enigmas lógicos.
 - **Ao trocar:** um fade leva aos olhos da outra personagem, na posição e sala em que foi deixada. Cada uma passa pelas portas individualmente; a outra não é transportada junto.
-- **Preparado para co-op:** cada personagem tem seu próprio controlador de input desde o início, para virar 2 jogadores (tela dividida) sem reescrever o jogo.
+- **Dupla online.** Na recepção, quem cria a sala escolhe Helena ou Lia. O visitante controla a outra personagem. Cada jogador explora a própria época, com posição, câmera, sala e leitura independentes. Os vestígios dos enigmas são compartilhados. O anfitrião pode salvar e retomar o progresso da dupla.
 
 ## Estrutura
 

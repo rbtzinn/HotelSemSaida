@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Hotel Sem Saída"
-run/main_scene="res://scenes/rooms/saguao_3d.tscn"
+run/main_scene="res://scenes/ui/entrada.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]
@@ -21,6 +21,7 @@ EraManager="*res://scripts/era/era_manager.gd"
 WorldState="*res://scripts/world/world_state.gd"
 SaveSystem="*res://scripts/core/save_system.gd"
 RoomManager="*res://scripts/core/room_manager.gd"
+NetSession="*res://scripts/online/net_session.gd"
 
 [display]
 
