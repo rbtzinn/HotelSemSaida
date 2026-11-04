@@ -53,8 +53,9 @@ uniform bool retro = false;
 uniform float retro_texels_per_meter = 24.0;
 // Níveis por canal de cor no modo retrô.
 uniform float retro_color_steps = 24.0;
-// Grade de tela em que os vértices encaixam (0 = desliga).
-uniform vec2 retro_snap_resolution = vec2(320.0, 180.0);
+// Grade de tela em que os vértices encaixam (0 = desliga). Desligado por padrão:
+// em primeira pessoa o "tremido" fazia o cenário de 1923 piscar a cada passo.
+uniform vec2 retro_snap_resolution = vec2(0.0, 0.0);
 group_uniforms;
 
 varying vec3 world_position;
@@ -86,7 +87,7 @@ vec2 planar_uv(vec3 position, vec3 normal) {
 	return vec2(position.x, -position.y);
 }
 
-vec3 wallpaper(vec2 uv) {
+vec3 wallpaper(vec2 uv, float fade) {
 	vec2 p = uv / pattern_scale;
 	// Faixa larga, faixa estreita e filete fino, como um listrado art déco
 	float band = fract(p.x);
@@ -96,12 +97,12 @@ vec3 wallpaper(vec2 uv) {
 	vec2 cell = fract(vec2(p.x * 2.0, p.y * 2.4)) - 0.5;
 	float diamond = 1.0 - smoothstep(0.28, 0.31, abs(cell.x) + abs(cell.y));
 	vec3 base = mix(color_b.rgb, color_a.rgb, wide);
-	base = mix(base, color_c.rgb, pin * 0.85);
-	base = mix(base, mix(base, color_c.rgb, 0.35), diamond * wide * 0.5);
+	base = mix(base, color_c.rgb, pin * 0.85 * (1.0 - fade));
+	base = mix(base, mix(base, color_c.rgb, 0.35), diamond * wide * 0.5 * (1.0 - fade));
 	return base;
 }
 
-vec3 marble_tiles(vec2 uv, out float grout) {
+vec3 marble_tiles(vec2 uv, float fade, out float grout) {
 	vec2 p = uv / pattern_scale;
 	vec2 tile = floor(p);
 	vec2 local = fract(p);
@@ -109,15 +110,15 @@ vec3 marble_tiles(vec2 uv, out float grout) {
 	vec3 base = mix(color_a.rgb, color_b.rgb, checker);
 	// Veios: senoide deformada por fbm, fina e clara
 	float veins = abs(sin((p.x + p.y) * 2.2 + fbm(p * 1.7 + tile * 3.1 + seed) * 7.0));
-	base = mix(base, mix(base, vec3(1.0), 0.35), (1.0 - smoothstep(0.0, 0.07, veins)) * 0.8);
+	base = mix(base, mix(base, vec3(1.0), 0.35), (1.0 - smoothstep(0.0, 0.07, veins)) * 0.8 * (1.0 - fade));
 	base *= 0.92 + 0.12 * fbm(p * 5.0 + seed);
 	// Rejunte: faixa estreita nas bordas de cada ladrilho
 	vec2 edge = min(local, 1.0 - local);
-	grout = 1.0 - smoothstep(0.0, 0.018, min(edge.x, edge.y));
+	grout = (1.0 - smoothstep(0.0, 0.018, min(edge.x, edge.y))) * (1.0 - fade);
 	return mix(base, color_c.rgb, grout);
 }
 
-vec3 wood(vec2 uv) {
+vec3 wood(vec2 uv, float fade) {
 	vec2 p = uv / pattern_scale;
 	// Tábuas na direção u, cada fileira deslocada
 	float row = floor(p.y * 4.0);
@@ -125,9 +126,9 @@ vec3 wood(vec2 uv) {
 	float along = p.x + plank_shift;
 	float grain = fract(p.y * 4.0 * 6.0 + fbm(vec2(along * 0.6, p.y * 14.0)) * 2.5);
 	float ring = smoothstep(0.35, 0.5, grain) * (1.0 - smoothstep(0.5, 0.65, grain));
-	vec3 base = mix(color_a.rgb, color_b.rgb, ring * 0.7 + fbm(vec2(along * 2.0, row)) * 0.3);
+	vec3 base = mix(color_a.rgb, color_b.rgb, mix(ring * 0.7, 0.35, fade) + fbm(vec2(along * 2.0, row)) * 0.3);
 	float seam = 1.0 - smoothstep(0.0, 0.03, min(fract(p.y * 4.0), 1.0 - fract(p.y * 4.0)));
-	return mix(base, base * 0.45, seam);
+	return mix(base, base * 0.45, seam * (1.0 - fade));
 }
 
 vec3 metal(vec2 uv) {
@@ -172,10 +173,18 @@ vec3 painting(vec2 uv) {
 void fragment() {
 	vec2 uv = planar_uv(world_position, world_normal);
 	vec2 rug_xz = world_position.xz;
+	// Quanto do padrão cabe num pixel da tela. Longe, os detalhes finos (filetes, veios,
+	// rejunte, blocos do modo retrô) ficam menores que um pixel e cintilam ao andar;
+	// nesse caso o padrão se dissolve na cor média.
+	float footprint = max(length(dFdx(uv)), length(dFdy(uv)));
+	// Os traços finos medem ~3% da repetição: some quando ficam menores que um pixel
+	float detail_fade = smoothstep(0.6, 1.6, footprint / (pattern_scale * 0.03));
+	float retro_fade = smoothstep(0.6, 1.4, footprint * retro_texels_per_meter);
 	if (retro) {
-		// Padrão em blocos grandes, como uma textura de baixa resolução sem filtro
-		uv = floor(uv * retro_texels_per_meter) / retro_texels_per_meter;
-		rug_xz = floor(rug_xz * retro_texels_per_meter) / retro_texels_per_meter;
+		// Padrão em blocos grandes, como uma textura de baixa resolução sem filtro.
+		// Onde um bloco fica menor que um pixel, volta à coordenada contínua (não cintila).
+		uv = mix(floor(uv * retro_texels_per_meter) / retro_texels_per_meter, uv, retro_fade);
+		rug_xz = mix(floor(rug_xz * retro_texels_per_meter) / retro_texels_per_meter, rug_xz, retro_fade);
 	}
 
 	vec3 albedo = color_a.rgb;
@@ -183,12 +192,12 @@ void fragment() {
 	float metallic = metallic_value;
 	float grout = 0.0;
 	if (pattern == PATTERN_WALLPAPER) {
-		albedo = wallpaper(uv);
+		albedo = wallpaper(uv, detail_fade);
 	} else if (pattern == PATTERN_MARBLE_TILES) {
-		albedo = marble_tiles(uv, grout);
+		albedo = marble_tiles(uv, detail_fade, grout);
 		roughness = mix(roughness, 0.95, grout);
 	} else if (pattern == PATTERN_WOOD) {
-		albedo = wood(uv);
+		albedo = wood(uv, detail_fade);
 	} else if (pattern == PATTERN_METAL) {
 		albedo = metal(uv);
 	} else if (pattern == PATTERN_RUG) {

@@ -125,12 +125,10 @@ quick_load={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
-renderer/rendering_method="forward_plus"
-rendering_device/fallback_to_opengl3=true
+environment/ssao/quality=1
 scaling_3d/mode=1
 scaling_3d/scale=0.6
-environment/ssao/quality=1
-environment/ssao/half_size=true
+scaling_3d/fsr_sharpness=1.0
 environment/volumetric_fog/volume_size=48
 environment/volumetric_fog/volume_depth=48
 2d/snap/snap_2d_transforms_to_pixel=true
