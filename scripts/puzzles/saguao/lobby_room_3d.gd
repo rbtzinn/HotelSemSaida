@@ -20,6 +20,8 @@ const ENTRANCE := Vector2(9.0, 11.0)
 ## Arco da escada e vão do elevador na parede norte (x).
 const STAIR_ARCH := Vector2(1.5, 4.5)
 const ELEVATOR := Vector2(15.4, 17.1)
+const PIT_FLOOR := -2.65
+const RACK := Vector3(7.85, 1.75, NORTH)
 ## Janelas da parede leste (z).
 const WINDOWS: Array[Vector2] = [Vector2(3.0, 4.8), Vector2(8.9, 10.4)]
 const WINDOW_SILL: float = 1.2
@@ -57,8 +59,12 @@ func _build_room() -> void:
 # --- Paredes, piso e teto -------------------------------------------------------------
 
 func _build_shell() -> void:
-	_part(Vector3(0, -0.2, 0), Vector3(20, 0, 11.5), "floor")
-	_solid(Vector3(-1, -0.2, -1), Vector3(21, 0, 12.5), "Floor")
+	# A laje termina na soleira. Dentro do vão, o primeiro piso é o fundo do poço.
+	for bounds: Rect2 in [Rect2(-1, NORTH, 22, 12.5-NORTH), Rect2(-1, -1, ELEVATOR.x+1, NORTH+1), Rect2(ELEVATOR.y, -1, 21-ELEVATOR.y, NORTH+1)]:
+		var a := Vector3(bounds.position.x, -0.2, bounds.position.y)
+		var b := Vector3(bounds.end.x, 0, bounds.end.y)
+		_part(a, b, "floor")
+		_solid(a, b, "Floor")
 	_part(Vector3(-0.5, HEIGHT, -3.5), Vector3(20.5, HEIGHT + 0.3, 11.5), "ceiling")
 
 	# Norte: arco da escada e vão do elevador
@@ -69,7 +75,9 @@ func _build_shell() -> void:
 	_part(Vector3(STAIR_ARCH.y, 0, n0), Vector3(ELEVATOR.x, HEIGHT, NORTH), "wallpaper")
 	_part(Vector3(ELEVATOR.x, 2.7, n0), Vector3(ELEVATOR.y, HEIGHT, NORTH), "wallpaper")
 	_part(Vector3(ELEVATOR.y, 0, n0), Vector3(EAST + WALL, HEIGHT, NORTH), "wallpaper")
-	_solid(Vector3(WEST - WALL, 0, n0), Vector3(EAST + WALL, HEIGHT, NORTH), "WallNorth")
+	_solid(Vector3(WEST - WALL, 0, n0), Vector3(ELEVATOR.x, HEIGHT, NORTH), "WallNorth")
+	_solid(Vector3(ELEVATOR.y, 0, n0), Vector3(EAST + WALL, HEIGHT, NORTH), "WallNorthEast")
+	_solid(Vector3(ELEVATOR.x, 2.7, n0), Vector3(ELEVATOR.y, HEIGHT, NORTH), "Lintel")
 
 	# Oeste: porta da Cozinha
 	_part(Vector3(WEST - WALL, 0, NORTH), Vector3(WEST, HEIGHT, KITCHEN_DOOR.x), "wallpaper")
@@ -325,19 +333,15 @@ func _build_elevator() -> void:
 	_block(dial + Vector3(0, 0, 0.04) + Vector3(-sin(deg_to_rad(needle_angle)), cos(deg_to_rad(needle_angle)), 0) * 0.11, Vector3(0.015, 0.22, 0.01), "iron", Vector3(0, 0, needle_angle))
 	_label("T   1   2   3", dial + Vector3(0, 0.12, 0.05), 0.07, Color("#2A1A10"))
 
-	# Cabine: atrás da grade em 1923; hoje, podre e afundada no térreo
-	var cabin_role := "mahogany" if not present else "plank"
-	var sink := 0.0 if not present else -0.35
-	var tilt := Vector3.ZERO if not present else Vector3(4, 0, -3)
-	_part(Vector3(x0, sink - 0.1, NORTH - 1.8), Vector3(x1, sink, NORTH - 0.05), cabin_role, tilt)
-	_part(Vector3(x0, sink, NORTH - 1.85), Vector3(x1, sink + 2.6, NORTH - 1.8), cabin_role, tilt)
-	_part(Vector3(x0, sink, NORTH - 1.8), Vector3(x0 + 0.05, sink + 2.6, NORTH - 0.05), cabin_role, tilt)
-	_part(Vector3(x1 - 0.05, sink, NORTH - 1.8), Vector3(x1, sink + 2.6, NORTH - 0.05), cabin_role, tilt)
-	_part(Vector3(x0, sink + 2.6, NORTH - 1.85), Vector3(x1, sink + 2.65, NORTH - 0.05), "dark_wood", tilt)
-	_part(Vector3(x0 + 0.1, sink + 0.9, NORTH - 1.78), Vector3(x1 - 0.1, sink + 0.95, NORTH - 1.74), "brass", tilt)
+	var car := preload("res://scripts/puzzles/saguao/lobby_lift_car_3d.gd").new()
+	car.name = "Cabin"
+	car.width = x1-x0
+	car.position = Vector3(center_x,0,face)
+	car.present = present
+	_add(car)
+	_build_lift_pit()
 	if not present:
-		_part(Vector3(center_x - 0.3, 2.54, NORTH - 1.2), Vector3(center_x + 0.3, 2.6, NORTH - 0.6), "bulb")
-		_omni(Vector3(center_x, 2.3, NORTH - 0.9), WARM, 0.8, 3.0)
+		_solid(Vector3(x0, 0, face), Vector3(x1, 2.65, face+0.06), "Grille")
 		# Grade pantográfica: verticais e diagonais cruzadas
 		for i in 9:
 			var x := x0 + 0.08 + i * (x1 - x0 - 0.16) / 8.0
@@ -349,14 +353,34 @@ func _build_elevator() -> void:
 	else:
 		# Portas de ferro forçadas, uma meio aberta e torta
 		_part(Vector3(x0, 0, face + 0.02), Vector3(x0 + 0.42, 2.6, face + 0.06), "iron", Vector3(0, 8, 0))
-		_block(Vector3(x1 - 0.35, 1.2, face + 0.25), Vector3(0.6, 2.4, 0.04), "iron", Vector3(4, -38, 6))
-		_part(Vector3(x0, 0, NORTH - 2.6), Vector3(x1, 0.02, NORTH - 1.9), "dark")
+		_block(Vector3(x1 - 0.09, 1.2, face - 0.17), Vector3(0.6, 2.4, 0.04), "iron", Vector3(2, -78, 3))
+
 
 	# Botoeira à direita
 	var panel := Vector3(x1 + 0.45, 1.35, face)
 	_part(panel + Vector3(-0.09, -0.16, 0), panel + Vector3(0.09, 0.16, 0.025), "brass")
 	_sphere(panel + Vector3(0, 0.05, 0.035), 0.025, "bulb" if not present else "iron")
 	_part(panel + Vector3(-0.012, -0.08, 0.025), panel + Vector3(0.012, -0.04, 0.03), "dark")
+
+
+func _build_lift_pit() -> void:
+	var x0 := ELEVATOR.x
+	var x1 := ELEVATOR.y
+	for corners: Array in [
+		[Vector3(x0-0.14,PIT_FLOOR,-0.45),Vector3(x0,HEIGHT,NORTH)],
+		[Vector3(x1,PIT_FLOOR,-0.45),Vector3(x1+0.14,HEIGHT,NORTH)],
+		[Vector3(x0,PIT_FLOOR,-0.45),Vector3(x1,HEIGHT,-0.3)],
+		[Vector3(x0,PIT_FLOOR,NORTH),Vector3(x1,0,NORTH+0.14)],
+		[Vector3(x0,PIT_FLOOR-0.18,-0.45),Vector3(x1,PIT_FLOOR,NORTH)]]:
+		_part(corners[0], corners[1], "stone")
+		_solid(corners[0], corners[1], "ShaftWall")
+	# Guias da cabine e escada de manutenção na parede lateral.
+	for x: float in [x0+0.08,x1-0.08]:
+		_block(Vector3(x,1.6,-0.24), Vector3(0.075,8.5,0.10), "cast_iron")
+	for z: float in [1.21,1.73]:
+		_block(Vector3(x1-0.11,-0.8,z), Vector3(0.045,3.7,0.045), "iron")
+	for rung in 12:
+		_block(Vector3(x1-0.11,PIT_FLOOR+0.22+rung*0.30,1.47), Vector3(0.055,0.045,0.56), "iron")
 
 
 # --- Recepção -----------------------------------------------------------------------
@@ -419,7 +443,7 @@ func _build_reception() -> void:
 	var sign_text := "GRAND HOTEL AURORA" if not present else "GR ND  HOT L  AUR RA"
 	_label(sign_text, Vector3(10, 3.32, NORTH + 0.07), 0.3, Color("#E8C27A") if not present else Color("#6E5A34"))
 
-	_build_key_rack(Vector3(7.85, 1.75, NORTH))
+	_build_key_rack(RACK)
 	_build_safe(Vector3(12.2, 0.2, NORTH))
 
 
@@ -433,10 +457,6 @@ func _build_key_rack(center: Vector3) -> void:
 			var hook := center + Vector3(-0.5 + col * 0.2, 0.22 - row * 0.44, 0.06)
 			_part(hook + Vector3(-0.06, 0.06, 0), hook + Vector3(0.06, 0.12, 0.005), "brass" if not present else "paper")
 			_cylinder(hook, 0.008, 0.008, 0.05, "brass" if not present else "iron", Vector3(90, 0, 0), 6)
-			if not present:
-				_torus(hook + Vector3(0, -0.04, 0.05), 0.018, 0.026, "brass", Vector3(90, 0, 0))
-				_part(hook + Vector3(-0.008, -0.17, 0.045), hook + Vector3(0.008, -0.06, 0.055), "brass")
-				_part(hook + Vector3(-0.025, -0.25, 0.04), hook + Vector3(0.025, -0.17, 0.05), "brass")
 
 
 func _build_safe(base: Vector3) -> void:

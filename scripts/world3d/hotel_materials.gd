@@ -23,6 +23,7 @@ const PAST := {
 	"mahogany": [Pattern.WOOD, "#5A1E16", "#3A120C", "#000000", 0.9, 0.4, 0.0],
 	"dark_wood": [Pattern.WOOD, "#2E1A12", "#1C0F0A", "#000000", 0.9, 0.5, 0.0],
 	"velvet": [Pattern.CLOTH, "#7A2230", "#4A1018", "#000000", 1.0, 0.95, 0.0],
+	"leather": [Pattern.PLAIN, "#573526", "#35221B", "#1E140F", 0.8, 0.63, 0.0],
 	"green_velvet": [Pattern.CLOTH, "#2A5A42", "#173526", "#000000", 1.0, 0.95, 0.0],
 	"rug": [Pattern.RUG, "#6B1E2A", "#A8782C", "#1F3A2E", 1.0, 0.95, 0.0],
 	"runner": [Pattern.RUG, "#5A1622", "#7A2230", "#C9973B", 1.0, 0.95, 0.0],

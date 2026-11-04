@@ -4,6 +4,7 @@ extends Interactable3D
 ## Com `extra_flag` ligada, `extra_text` entra no fim (ex.: um nome novo no livro).
 
 @export var title: String = ""
+@export var photograph: Texture2D
 @export_multiline var text: String = ""
 @export var extra_flag: String = ""
 @export_multiline var extra_text: String = ""
@@ -13,4 +14,4 @@ func _on_interact(_by: FirstPersonMotor) -> void:
 	var full := text
 	if extra_flag != "" and WorldState.is_set(extra_flag):
 		full += "\n\n" + extra_text
-	NoteUI.open(get_tree(), title, full)
+	NoteUI.open(get_tree(), title, full, photograph)

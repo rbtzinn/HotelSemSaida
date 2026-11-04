@@ -19,11 +19,17 @@ func _ready() -> void:
 		_build_interactions(world,present)
 	marker("DoSaguao",Vector3(9,0,11.5))
 	marker("DaManutencao",Vector3(15.5,0,11.4))
+	marker("DasCaldeiras", Vector3(6.95,0,-1.55), -PI/2)
 	_apply_state()
 	WorldState.flag_changed.connect(_on_flag_changed)
 	super()
 
 func _build_interactions(world: Node3D, present: bool) -> void:
+	area(preload("res://scripts/interaction3d/door_3d.gd"), world, "ParaCaldeiras",
+		Vector3(6.95,1.2,-2.82), Vector3(1.32,2.4,0.24), {
+			"target_scene": "res://scenes/rooms/caldeiras_3d.tscn", "target_spawn": "DoArquivo",
+			"prompt_text": "Descer às caldeiras", "required_flag": "biblioteca.arquivo.aberto"
+		})
 	area(preload("res://scripts/interaction3d/door_3d.gd"),world,"ParaSaguao",Vector3(9,1.2,12.65),Vector3(1.6,2.4,0.3),{"target_scene":"res://scenes/rooms/saguao_3d.tscn","target_spawn":"DaBiblioteca","prompt_text":"Voltar ao Saguão"})
 	# Retorno pelo corredor de serviço: mantém o trajeto da Lia reversível.
 	box(world,Vector3(16,1.2,12.91),Vector3(1.2,2.4,0.08),"dark_wood",present)
@@ -72,16 +78,16 @@ func _build_interactions(world: Node3D, present: bool) -> void:
 			action.interacted.connect(_choose_title.bind(i))
 	# Um registro de encadernações foi escavado por dentro. O atlas cabe nele,
 	# sob o peitoril seco: um livro dentro de outro, preservado da luz e da umidade.
-	box(world,Vector3(0.73,1.325,10.91),Vector3(0.65,0.025,0.82),"dark_wood",present)
+	box(world,Vector3(2.23,1.325,10.91),Vector3(0.65,0.025,0.82),"dark_wood",present)
 	for z: float in [10.52,11.3]:
-		box(world,Vector3(0.73,1.38,z),Vector3(0.65,0.09,0.035),"paper",present)
-	box(world,Vector3(0.42,1.38,10.91),Vector3(0.03,0.09,0.82),"mahogany",present)
+		box(world,Vector3(2.23,1.38,z),Vector3(0.65,0.09,0.035),"paper",present)
+	box(world,Vector3(1.92,1.38,10.91),Vector3(0.03,0.09,0.82),"mahogany",present)
 	if present:
-		_hidden_book = box(world,Vector3(0.73,1.38,10.91),Vector3(0.5,0.09,0.65),"mahogany",true)
-		var page := area(preload("res://scripts/interaction3d/note_interactable_3d.gd"),world,"RegistroPreservado",Vector3(1.15,1.4,10.9),Vector3(0.5,0.4,0.75),{"title":"Anotações de Caio Ferraz — 1951","text":"Encontrei este atlas protegido sob o peitoril. Quem o guardou antes de mim?\n\nAlgarismos nas fichas:\nAtlas — 6\nBotânica — 7\nCrônicas — 4\nDiários — 2\n\nA combinação não segue o catálogo. Segue os volumes como estavam antes do sol levar suas cores.\n\nSe eu não voltar, procurem no arquivo reservado.","prompt_text":"Ler registro","required_flag":"biblioteca.livro.guardado","available_in":1})
+		_hidden_book = box(world,Vector3(2.23,1.38,10.91),Vector3(0.5,0.09,0.65),"mahogany",true)
+		var page := area(preload("res://scripts/interaction3d/note_interactable_3d.gd"),world,"RegistroPreservado",Vector3(2.65,1.4,10.9),Vector3(0.5,0.4,0.75),{"title":"Anotações de Caio Ferraz — 1951","text":"Encontrei este atlas protegido sob o peitoril. Quem o guardou antes de mim?\n\nAlgarismos nas fichas:\nAtlas — 6\nBotânica — 7\nCrônicas — 4\nDiários — 2\n\nA combinação não segue o catálogo. Segue os volumes como estavam antes do sol levar suas cores.\n\nSe eu não voltar, procurem no arquivo reservado.","prompt_text":"Ler registro","required_flag":"biblioteca.livro.guardado","available_in":1})
 		page.interacted.connect(func(_by: FirstPersonMotor) -> void: WorldState.set_flag("biblioteca.pagina.lida"))
 	else:
-		area(preload("res://scripts/interaction3d/item_use_3d.gd"),world,"GuardarAtlas",Vector3(1.15,1.4,10.9),Vector3(0.5,0.4,0.75),{"accepted_item":"atlas","result_flag":"biblioteca.livro.guardado","success_message":"O atlas coube dentro do registro oco, protegido da luz e da umidade.","idle_message":"Um registro de encadernações oco por dentro, guardado sob o peitoril seco.","prompt_text":"Examinar livro oco","available_in":0})
+		area(preload("res://scripts/interaction3d/item_use_3d.gd"),world,"GuardarAtlas",Vector3(2.65,1.4,10.9),Vector3(0.5,0.4,0.75),{"accepted_item":"atlas","result_flag":"biblioteca.livro.guardado","success_message":"O atlas coube dentro do registro oco, protegido da luz e da umidade.","idle_message":"Um registro de encadernações oco por dentro, guardado sob o peitoril seco.","prompt_text":"Examinar registro","available_in":0})
 	# Estante móvel: desenho e corpo pertencem ao mesmo nó e se movem juntos.
 	var secret := Node3D.new()
 	secret.name = "EstanteSecreta"
@@ -107,7 +113,8 @@ func _build_interactions(world: Node3D, present: bool) -> void:
 	# No arquivo, o registro de desaparecimento encerra o capítulo.
 	box(world,Vector3(9,1.025,-1.55),Vector3(0.5,0.05,0.4),"paper",present)
 	if present:
-		var final_note := area(preload("res://scripts/interaction3d/note_interactable_3d.gd"),world,"DossieCaio",Vector3(9,1.1,-1.25),Vector3(0.65,0.3,0.65),{"title":"Arquivo de hóspedes — Dr. Caio Ferraz","text":"1951. Quarto ocupado, pertences intactos.\n\nO médico não foi visto deixando o hotel. Nenhum funcionário registrou sua saída.\n\nNo verso, uma anotação em tinta diferente: Marta Siqueira, levantamento fotográfico — 1979. A câmera não foi devolvida.\n\nEntre as fotografias, há uma ficha ainda sem nome. O papel é recente.","prompt_text":"Ler dossiê","required_flag":"biblioteca.arquivo.aberto","available_in":1})
+		var final_note := area(preload("res://scripts/interaction3d/note_interactable_3d.gd"),world,"DossieCaio",Vector3(9,1.1,-1.25),Vector3(0.65,0.3,0.65),{"title":"Arquivo de hóspedes — Dr. Caio Ferraz","text":"1951. Quarto ocupado, pertences intactos.\n\nO médico não foi visto deixando o hotel. Nenhum funcionário registrou sua saída.\n\nGrampos prendem uma ampliação ao dossiê. No verso, a letra de Marta Siqueira: «Oficina das caldeiras, 1979. Três cortes na quina. F-2». A câmera nunca foi devolvida.\n\nEntre as folhas há uma ficha recente, ainda sem nome.","prompt_text":"Ler dossiê","required_flag":"biblioteca.arquivo.aberto","available_in":1})
+		final_note.photograph = preload("res://art/biblioteca/marta_f2_1979.jpg")
 		final_note.interacted.connect(func(_by: FirstPersonMotor) -> void: WorldState.set_flag("biblioteca.concluida"))
 	else:
 		area(preload("res://scripts/interaction3d/note_interactable_3d.gd"),world,"LivroDoArquivo",Vector3(9,1.1,-1.25),Vector3(0.65,0.3,0.65),{"title":"Registro reservado — 1923","text":"Relação de quartos e documentos recolhidos.\n\nVários nomes foram raspados. Sob a última coluna, alguém começou a escrever uma palavra e parou: saída.","prompt_text":"Ler registro","available_in":0})

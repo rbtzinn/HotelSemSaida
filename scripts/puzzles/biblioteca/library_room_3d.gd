@@ -5,6 +5,8 @@ extends HotelBuilder3D
 const W: float = 18.0
 const D: float = 13.0
 const H: float = 6.0
+## Livre da estante lateral; o livro, a placa e as interações usam a mesma origem.
+const NICHE_ORIGIN := Vector3(2.2,0,10.9)
 
 func _build_room() -> void:
 	_part(Vector3(-0.3,-0.25,-3.3),Vector3(W+0.3,0,D+0.3),"floorboards")
@@ -58,11 +60,17 @@ func _build_room() -> void:
 	# Tapete comprido na passagem central.
 	var rug := HotelMaterials.rug_material("runner",present,Vector2(9,7),Vector2(1.4,4.4))
 	_part(Vector3(7.6,0.008,2.6),Vector3(10.4,0.02,11.4),"rug",Vector3.ZERO,rug)
-	# Nicho com porta de ferro, madeira seca e buraco preservado debaixo do peitoril.
-	_block(Vector3(0.7,0.65,10.9),Vector3(0.95,1.3,0.9),"dark_wood")
-	_solid(Vector3(0.2,0,10.4),Vector3(1.2,1.3,11.4),"NicheBase")
-	_block(Vector3(0.72,1.47,10.9),Vector3(0.98,0.1,1.05),"marble")
-	_label("ACERVO",Vector3(1.23,1.8,10.9),0.08,Color("#C9973B"),90)
+	# Acervo independente da estante, com uma abertura legível sob o tampo.
+	var n := NICHE_ORIGIN
+	_block(n+Vector3(0,0.65,0),Vector3(0.95,1.3,0.9),"dark_wood")
+	_solid(n+Vector3(-0.475,0,-0.45),n+Vector3(0.475,1.3,0.45),"NicheBase")
+	_block(n+Vector3(0,1.53,0),Vector3(1.1,0.1,1.08),"marble")
+	for x: float in [-0.5,0.5]:
+		for z: float in [-0.49,0.49]:
+			_block(n+Vector3(x,1.39,z),Vector3(0.055,0.2,0.06),"dark_wood")
+	# Placa presa na face do móvel, voltada para o corredor.
+	_block(n+Vector3(0.49,1.06,0),Vector3(0.025,0.2,0.5),"lacquer")
+	_label("ACERVO",n+Vector3(0.508,1.06,0),0.075,Color("#E8DCC0"),90)
 	# Janelas altas. Vidro no passado, tábuas e luar no presente.
 	for z: float in [3.0,7.0,10.5]:
 		_block(Vector3(17.81,3.5,z),Vector3(0.06,2.6,1.7),"night")
@@ -86,6 +94,13 @@ func _build_room() -> void:
 	for x: float in [2,5,13,16]:
 		_shelf(Vector3(x,0,-2.7),0,2.2,2.7,90+int(x))
 	_table(Vector3(9,0,-1.8))
+	_block(Vector3(6.95,1.2,-2.925), Vector3(1.34,2.4,0.15), "iron")
+	for x: float in [6.24, 7.66]:
+		_block(Vector3(x,1.25,-2.85), Vector3(0.09,2.5,0.15), "dark_wood")
+	_block(Vector3(6.95,2.46,-2.85), Vector3(1.51,0.1,0.15), "dark_wood")
+	_block(Vector3(6.95,1.87,-2.836), Vector3(0.86,0.22,0.028), "lacquer")
+	_label("CALDEIRAS", Vector3(6.95,1.87,-2.815), 0.10, Color("#E1C28C"))
+	_sphere(Vector3(7.46,1.07,-2.80), 0.054, "brass")
 	_label("ARQUIVO RESERVADO",Vector3(9,2.6,-2.94),0.12,Color("#C9973B"))
 	for z: float in [3.0,8.7]:
 		_cylinder(Vector3(9,H-0.8,z),0.025,0.025,0.8,"brass")
@@ -142,5 +157,5 @@ func _chair(at: Vector3, yaw: float) -> void:
 	_child_box(holder,Vector3(0,0.93,-0.25),Vector3(0.55,0.8,0.1),"mahogany")
 	for x: float in [-0.22,0.22]:
 		for z: float in [-0.22,0.22]:
-			_child_cylinder(holder,Vector3(x,0,z),0.025,0.45,"mahogany")
+			_child_cylinder(holder,Vector3(x,0.225,z),0.025,0.45,"mahogany")
 	_solid(at+Vector3(-0.3,0,-0.3),at+Vector3(0.3,1.35,0.3),"Chair")

@@ -167,7 +167,12 @@ func _refresh_held_view() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = Items.color(item)
 	match item:
-		"chave_biblioteca":
+		"pinhao_f2", "coroa_f2":
+			instance.mesh = preload("res://scripts/puzzles/caldeiras/gear_model_3d.gd").mesh_for(item)
+			instance.scale = Vector3.ONE * 0.42
+			instance.rotation_degrees = Vector3(12,-22,9)
+			material.metallic = 0.55
+		"chave_biblioteca", "chave_quadro":
 			var key_mesh := BoxMesh.new()
 			key_mesh.size = Vector3(0.16, 0.02, 0.025)
 			instance.mesh = key_mesh
@@ -179,6 +184,7 @@ func _refresh_held_view() -> void:
 			ring.mesh = ring_mesh
 			ring.position.x = -0.1
 			ring.material_override = material
+			ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			instance.add_child(ring)
 			var tooth := MeshInstance3D.new()
 			var tooth_mesh := BoxMesh.new()
@@ -186,6 +192,7 @@ func _refresh_held_view() -> void:
 			tooth.mesh = tooth_mesh
 			tooth.position = Vector3(0.06,0,0.02)
 			tooth.material_override = material
+			tooth.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			instance.add_child(tooth)
 		"atlas":
 			var book_mesh := BoxMesh.new()

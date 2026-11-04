@@ -111,6 +111,8 @@ D                  ( * )         PIANO  #
 
 **Ao voltar da Cozinha:** o livro de hoje mostra o nome de Otília, com a coluna "Saída" vazia, na mesma letra do lápis do cardápio ("3 8"). O jogador entende que a pista que usou foi deixada por ela tentando sair.
 
+**Trecho jogável em 3D.** No fim das Caldeiras, Tomás menciona a correia de uma máquina fotográfica presa na soleira do elevador principal. Lia pode voltar pela Biblioteca e seguir essa pista. O quadro tem doze ganchos. Em 1923, Helena pode retirar uma chave por vez e devolvê-la ao gancho de origem. Hoje, a tinta descascada revela o nome de cada funcionário. A chave de Bento fica presa na botoeira e a cabine sobe. Pela escada lateral do poço, Lia alcança a bolsa de Marta, examina a cópia da foto da oficina e vê a pequena chave de serviço dentro dela. A mesma escada leva de volta ao Saguão. A retirada dessa chave e o cofre da gerência ficam para a etapa seguinte.
+
 ### Cozinha (aprovado em 27/10/2026)
 
 **Espaço:** uma única tela lateral, em corte (como uma casa de bonecas): a **Cozinha** em cima e a **Despensa** embaixo. Não há troca de sala dentro do andar, então cada personagem fica onde foi deixada.
@@ -165,6 +167,14 @@ Esta sequência substitui o antigo fade de volta ao Saguão ao terminar a Cozinh
 2. **Inundação:** Lia só atravessa onde o nível da água ficou baixo, e isso depende de quais ralos Helena deixou abertos.
 3. **Engrenagens:** um mecanismo quebrado hoje precisa de peças que Helena guarda em lugares que vão sobreviver 100 anos.
 4. **Fornalha:** o encerramento do andar une as três mecânicas numa única sala.
+
+**Primeira etapa jogável em 3D.** A estante que Helena abre na Biblioteca revela, nas duas épocas, a porta de serviço no arquivo reservado. Cada personagem pode descer às caldeiras e voltar pela mesma porta. Na galeria dos foguistas, o esmalte do coletor encobre as marcas de montagem em 1923. Hoje, Lia vê os talhos sob a tinta descascada. Helena pode girar os três volantes e acompanhar a partida pelo manômetro. Um erro rompe a união de alívio e faz subir a água da bacia no presente. O registro de alimentação permite rearmar e repetir. Em regime, o nível baixa e revela a grade do ralo.
+
+**Drenagem jogável.** A passagem atrás da bacia leva ao coletor de esgotamento. Em 1923 a pressão de serviço libera três ralos. Hoje, Lia pode seguir as tubulações e inspecionar onde descarregam. Com apenas uma descarga livre o nível baixa parcialmente. O ramal rompido devolve água ao canal. Com as duas descargas livres e o ramal rompido isolado, a boia baixa, a grade sobe e Lia pode atravessar pelas rampas até a bancada da oficina. A cunha retém a regulagem, e o caminho de volta permanece livre. A ficha na bancada introduz a próxima etapa, as engrenagens.
+
+**Oficina e inspeção da F-2.** A duplicata de 1951 na manutenção identifica o arquivo de Caio. No dossiê, Marta deixou uma foto da bancada das caldeiras em 1979. Em 2003, Tomás reconheceu os três cortes de lima da foto e descreveu a altura da ferrugem no caderno que deixou junto à mochila. Helena pode transferir o pinhão e a coroa sobressalentes para os ganchos altos. Só as peças preservadas ficam disponíveis para Lia. Ela monta cada peça no eixo correspondente e gira a manivela. Uma haste liga a bancada à caixa de inspeção da segunda caldeira. Quando a portinhola sobe, Lia volta a pé até ela e vê as duas hastes de tiragem.
+
+**A última regulagem.** Cada haste tem quatro furos e apenas um deles está polido. Contando a partir do pivô de cada haste, Lia distingue a terceira posição na admissão e a segunda na chaminé. Em 1923, com a pressão de serviço e os ralos regulados, Helena pode experimentar as posições dos dois volantes. A regulagem certa deixa o ferrolho da caixa de limpeza alinhado. Hoje, Lia puxa a tampa ao lado da inspeção e encontra a lanterna apagada de Tomás com a última folha do caderno. Ler o relato dele encerra a Casa das Caldeiras. Lia permanece diante da caixa e pode refazer o caminho até a Biblioteca.
 
 ## Minigames
 

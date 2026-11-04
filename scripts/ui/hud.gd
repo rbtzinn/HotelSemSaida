@@ -19,6 +19,8 @@ func _ready() -> void:
 	add_to_group("hud")
 
 	_message = Label.new()
+	_message.add_theme_font_override("font", preload("res://art/fonts/interface_font.tres"))
+	_message.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_message.position = Vector2(16, 322)
 	_message.size = Vector2(608, 26)
 	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -48,6 +50,8 @@ func _ready() -> void:
 	row.add_child(_icon)
 
 	_label = Label.new()
+	_label.add_theme_font_override("font", preload("res://art/fonts/interface_font.tres"))
+	_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_label.add_theme_font_size_override("font_size", 10)
 	_label.add_theme_color_override("font_color", Color("#E8E2D0"))
 	_label.add_theme_color_override("font_outline_color", Color.BLACK)
@@ -64,14 +68,23 @@ func _ready() -> void:
 	add_child(_crosshair)
 
 	_prompt = Label.new()
-	_prompt.position = Vector2(220, 188)
-	_prompt.size = Vector2(200, 14)
+	_prompt.add_theme_font_override("font", preload("res://art/fonts/interface_font.tres"))
+	_prompt.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_prompt.position = Vector2(160, 190)
+	_prompt.size = Vector2(320, 20)
+	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_prompt.add_theme_font_size_override("font_size", 9)
+	_prompt.add_theme_font_size_override("font_size", 10)
 	_prompt.add_theme_color_override("font_color", Color("#E8E2D0"))
 	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
 	_prompt.add_theme_constant_override("outline_size", 1)
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var prompt_plate := StyleBoxFlat.new()
+	prompt_plate.bg_color = Color(0.02, 0.02, 0.025, 0.72)
+	prompt_plate.set_corner_radius_all(3)
+	prompt_plate.set_content_margin_all(3)
+	_prompt.add_theme_stylebox_override("normal", prompt_plate)
+	_prompt.hide()
 	add_child(_prompt)
 
 	EraManager.era_changed.connect(_refresh)
@@ -97,6 +110,10 @@ func set_first_person(enabled: bool) -> void:
 ## Aviso de interação no centro da tela ("" esconde).
 func show_prompt(text: String) -> void:
 	_prompt.text = text
+	_prompt.reset_size()
+	_prompt.size.y = 20
+	_prompt.position.x = (640.0 - _prompt.size.x) / 2.0
+	_prompt.visible = not text.is_empty()
 
 
 func _on_flag_changed(_key: String, _value: Variant) -> void:

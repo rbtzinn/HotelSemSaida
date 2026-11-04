@@ -4,6 +4,8 @@ extends EraLinked3D
 
 func _apply() -> void:
 	super()
+	if WorldState.is_set(IceDrop3D.ROT_FLAG):
+		hide()
 	var spot := IceDrop3D.placed_position()
 	position.x = spot.x
 	position.z = spot.y

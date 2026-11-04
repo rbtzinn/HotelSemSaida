@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/caldeiras/boiler_level_3d.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player3d/first_person_motor.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/era/era_visibility.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5"]
+[ext_resource type="Script" path="res://scripts/world3d/era_environment.gd" id="6"]
+
+[node name="Caldeiras3D" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+script = ExtResource("6")
+
+[node name="Helena" type="CharacterBody3D" parent="."]
+position = Vector3(6, 0, 10.65)
+script = ExtResource("2")
+
+[node name="EraVisibility" type="Node" parent="Helena"]
+script = ExtResource("3")
+
+[node name="Lia" type="CharacterBody3D" parent="."]
+position = Vector3(6, 0, 10.65)
+script = ExtResource("2")
+era = 1
+flashlight = true
+
+[node name="EraVisibility" type="Node" parent="Lia"]
+script = ExtResource("3")
+era = 1
+
+[node name="SoloInputRouter" type="Node" parent="." node_paths=PackedStringArray("helena", "lia")]
+script = ExtResource("4")
+helena = NodePath("../Helena")
+lia = NodePath("../Lia")
+
+[node name="HUD" parent="." instance=ExtResource("5")]

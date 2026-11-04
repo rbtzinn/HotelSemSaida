@@ -31,6 +31,11 @@ func _run() -> void:
 	await scene_changed
 	var lia = current_scene.get_node("Lia")
 	lia.input = controls
+	lia.position = Vector3(1.55,0,6.5)
+	await _aim(lia,Vector3(1.55,3.4,7.2))
+	assert(lia.focused == current_scene.get_node("WorldToday/AlcapaoDespensa"),"Alçapão visível e alcançável olhando para cima")
+	var ray := PhysicsRayQueryParameters3D.create(Vector3(1.55,3.45,7.4),Vector3(1.55,4.15,7.4),1)
+	assert(lia.get_world_3d().direct_space_state.intersect_ray(ray).is_empty(),"Abertura no teto não pode estar tampada por colisão")
 	lia.position = Vector3(4.5,0,7.0)
 	await _aim(lia,Vector3(4.5,1.3,8.7))
 	await _press()
@@ -68,16 +73,16 @@ func _run() -> void:
 	await _press()
 	assert(helena.get_held_item()=="atlas","O atlas indicado pode ser carregado")
 	# Guarda num nicho seco. Hoje surge o registro de Caio.
-	helena.position = Vector3(2.1,0,10.9)
-	await _aim(helena,Vector3(1.15,1.4,10.9))
+	helena.position = Vector3(3.6,0,10.9)
+	await _aim(helena,Vector3(2.65,1.4,10.9))
 	assert(helena.focused == room.get_node("World1923/GuardarAtlas"),"Nicho alcançável")
 	await _press()
 	assert(state.is_set("biblioteca.livro.guardado") and helena.get_held_item()=="","Atlas preservado")
 	eras.set_era(1)
 	lia = room.get_node("Lia")
 	lia.input = controls
-	lia.position = Vector3(2.1,0,10.9)
-	await _aim(lia,Vector3(1.15,1.4,10.9))
+	lia.position = Vector3(3.6,0,10.9)
+	await _aim(lia,Vector3(2.65,1.4,10.9))
 	assert(lia.focused == room.get_node("WorldToday/RegistroPreservado"),"Lia alcança o livro preservado")
 	await _press()
 	assert(paused,"Leitura pausa movimento")

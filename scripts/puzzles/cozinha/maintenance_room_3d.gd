@@ -11,7 +11,7 @@ func _build_room() -> void:
 	for z: float in [-0.15,9.15]:
 		_block(Vector3(4.5,1.8,z),Vector3(9.6,3.6,0.3),"plaster_cream")
 		_solid(Vector3(-0.3,0,z-0.15),Vector3(9.3,3.6,z+0.15),"Wall")
-	_part(Vector3(0,3.6,0),Vector3(9,3.8,9),"stone")
+	_build_ceiling_hatch()
 	for x: float in [1,4.5,8]:
 		_block(Vector3(x,3.42,4.5),Vector3(0.18,0.28,9),"cast_iron")
 	for y: float in [2.5,2.8,3.05]:
@@ -60,8 +60,8 @@ func _build_room() -> void:
 	_solid(Vector3(3.65,0,7.95),Vector3(5.35,0.84,9),"ServiceStairs")
 	# Poço de descida e escada de retorno à despensa.
 	for x: float in [1.2,1.9]:
-		_cylinder(Vector3(x,0,7.2),0.035,0.035,3.6,"iron")
-	for i in 12:
+		_cylinder(Vector3(x,0,7.2),0.035,0.035,4.25,"iron")
+	for i in 15:
 		_cylinder(Vector3(1.2,0.2+i*0.28,7.2),0.022,0.022,0.7,"iron",Vector3(0,0,-90),8)
 	if present:
 		for i in 14:
@@ -72,3 +72,32 @@ func _build_room() -> void:
 		_omni(Vector3(4.5,3.0,4),Color("#F2D49B"),1.6,11)
 	_cylinder(Vector3(4.5,3.2,4),0.18,0.11,0.2,"iron")
 	_sphere(Vector3(4.5,3.15,4),0.08,"bulb")
+
+
+## Vão real sobre a escada: a laje termina nas bordas, em vez de tapar a subida.
+func _build_ceiling_hatch() -> void:
+	var opening := Rect2(1.0,6.7,1.1,1.2)
+	for rect: Rect2 in [Rect2(0,0,9,opening.position.y),Rect2(0,opening.end.y,9,9-opening.end.y),Rect2(0,opening.position.y,opening.position.x,opening.size.y),Rect2(opening.end.x,opening.position.y,9-opening.end.x,opening.size.y)]:
+		var start := Vector3(rect.position.x,3.6,rect.position.y)
+		var end := Vector3(rect.end.x,3.8,rect.end.y)
+		_part(start,end,"stone")
+		_solid(start,end,"CeilingAroundHatch")
+	# Madeira do piso da despensa vista pela abertura e o pequeno poço de ligação.
+	for x: float in [0.93,2.17]:
+		_block(Vector3(x,3.7,7.3),Vector3(0.14,0.28,1.48),"oak")
+		_block(Vector3(x,4.1,7.3),Vector3(0.1,0.6,1.4),"plank")
+	for z: float in [6.63,7.97]:
+		_block(Vector3(1.55,3.7,z),Vector3(1.35,0.28,0.14),"oak")
+		_block(Vector3(1.55,4.1,z),Vector3(1.35,0.6,0.1),"plank")
+	# Tampa aberta apoiada ao lado do vão. A madeira está lascada no presente.
+	var lid := _group(Vector3(2.18,3.81,7.3),0)
+	lid.rotation_degrees.z = 75
+	for i in 5:
+		_child_box(lid,Vector3(0.52,0,-0.48+i*0.24),Vector3(1.04,0.055,0.22),"plank" if present else "oak")
+	for x: float in [0.12,0.85]:
+		_child_box(lid,Vector3(x,-0.04,0),Vector3(0.07,0.035,1.2),"iron")
+	if present:
+		for i in 5:
+			_block(Vector3(1.05+i*0.2,3.78,6.77),Vector3(0.12,0.06,0.28),"plank",Vector3(12+i*3,0,0))
+	# A câmara superior permanece escura, sem iluminar artificialmente a saída.
+	_part(Vector3(0.9,4.6,6.6),Vector3(2.2,4.65,8),"dark")

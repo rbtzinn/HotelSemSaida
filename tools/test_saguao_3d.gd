@@ -63,6 +63,10 @@ func _run() -> void:
 	assert(stopped.z > 7.8, "Lustre caído bloqueia o centro hoje: z=%s" % stopped.z)
 	assert((await _walk(lia, lia_input, Vector3(6.5, 0, 9.5), Vector2.UP, 240)).z < 5.0, "Dá para contornar o lustre")
 
+	await _test_lift()
+	room = current_scene
+	helena = room.get_node("Helena")
+	lia = room.get_node("Lia")
 	if "--capture" in OS.get_cmdline_user_args():
 		for setup in [[1, lia, "hoje"], [0, helena, "1923"]]:
 			era_manager.set_era(setup[0])
@@ -75,7 +79,7 @@ func _run() -> void:
 			var path := OS.get_environment("TEMP").path_join("saguao3d-%s.png" % setup[2])
 			root.get_texture().get_image().save_png(path)
 			print("captura: ", path)
-	print("PASS: saguao 3D cameras por epoca, colisao, lustre caido, mira no livro, cada uma fica onde foi deixada")
+	print("PASS: Saguão 3D, câmeras, colisão, quadro, chave errada e devolução, cabine, bolsa de Marta, escada e recarga")
 	quit()
 
 
@@ -88,3 +92,81 @@ func _walk(motor, input: TestInput, start: Vector3, direction: Vector2, ticks: i
 		await physics_frame
 	input.direction = Vector2.ZERO
 	return motor.position
+
+
+func _test_lift() -> void:
+	var state := root.get_node("WorldState")
+	var eras := root.get_node("EraManager")
+	var desk := Vector3(7.77,0,2.59)
+	var sill := Vector3(16.29,0,3.18)
+	var lock := Vector3(17.51,0,3.18)
+	state.set_flag("caldeiras.concluida")
+	await _use("Lia","WorldToday/OlharGrade",sill)
+	await _use("Lia","WorldToday/Chapa9",desk)
+	assert(paused and not state.is_set("saguao.elevador.no_alto"))
+	await _close_note()
+	eras.set_era(0)
+	await _use("Helena","World1923/Gancho2",desk)
+	await _use("Helena","World1923/PainelElevador",lock)
+	assert(not state.is_set("saguao.elevador.no_alto") and state.get_flag("helena.mao") == "chave_quadro")
+	await _reload_flags()
+	await _use("Helena","World1923/Gancho2",desk)
+	assert(state.get_flag("helena.mao") == "")
+	await _use("Helena","World1923/Gancho9",desk)
+	await _use("Helena","World1923/PainelElevador",lock)
+	assert(state.is_set("saguao.elevador.no_alto") and state.get_flag("helena.mao") == "")
+	for i in 108:
+		await physics_frame
+	assert(current_scene.get_node("World1923/Cabin").position.y > 3.5)
+	await _reload_flags()
+	eras.set_era(1)
+	assert(current_scene.get_node("WorldToday/Cabin").position.y > 3.5)
+	var lia = current_scene.get_node("Lia")
+	await _use("Lia","WorldToday/DescerPoco",sill)
+	assert(lia.is_traversing() and lia.get_save_position().distance_to(sill)<0.05)
+	for i in 340:
+		await physics_frame
+	assert(not lia.is_traversing() and lia.is_on_floor() and absf(lia.position.y+2.65)<0.03)
+	await _use("Lia","WorldToday/BolsaMarta",lia.position)
+	assert(paused and state.is_set("saguao.bolsa.marta"))
+	await _close_note()
+	await _use("Lia","WorldToday/SubirPoco",lia.position)
+	for i in 340:
+		await physics_frame
+	assert(lia.is_on_floor() and lia.position.distance_to(Vector3(16.48,0,2.55)) < 0.04)
+	assert(state.is_set("caldeiras.concluida"))
+
+
+func _use(character: String, path: String, at: Vector3) -> void:
+	var motor = current_scene.get_node(character)
+	var target: Area3D = current_scene.get_node(path)
+	var controls := TestInput.new()
+	motor.input = controls
+	motor.position = at
+	motor.velocity = Vector3.ZERO
+	var aim: Vector3 = target.global_position - motor.get_camera().global_position
+	motor.rotation.y = atan2(-aim.x,-aim.z)
+	motor.get_node("Head").rotation.x = atan2(aim.y,Vector2(aim.x,aim.z).length())
+	for i in 4:
+		await physics_frame
+	assert(motor.focused == target, "Alvo fora de alcance: " + path)
+	controls.interact = true
+	for i in 3:
+		await physics_frame
+
+
+func _close_note() -> void:
+	for child in root.get_children():
+		if child is CanvasLayer and child.has_method("close"):
+			child.close()
+	for i in 8:
+		await process_frame
+
+
+func _reload_flags() -> void:
+	var state := root.get_node("WorldState")
+	state.load_dict(JSON.parse_string(JSON.stringify(state.to_dict())))
+	var previous := current_scene
+	var path := previous.scene_file_path
+	change_scene_to_file(path)
+	await scene_changed

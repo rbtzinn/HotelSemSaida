@@ -122,6 +122,8 @@ func _pressed(event: InputEvent, actions: Array) -> bool:
 
 func _make_label(text: String, font_size: int) -> Label:
 	var label := Label.new()
+	label.add_theme_font_override("font", preload("res://art/fonts/interface_font.tres"))
+	label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	label.text = text
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", font_size)

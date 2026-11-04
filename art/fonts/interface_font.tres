@@ -1,0 +1,6 @@
+[gd_resource type="SystemFont" format=3]
+
+[resource]
+font_names = PackedStringArray("Segoe UI", "Noto Sans", "DejaVu Sans")
+antialiasing = 1
+hinting = 2

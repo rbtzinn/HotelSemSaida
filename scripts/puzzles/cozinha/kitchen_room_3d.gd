@@ -104,8 +104,16 @@ func _slab_rects() -> Array:
 func _build_shell() -> void:
 	var east := WIDTH
 	# Despensa: piso de tábuas (passa por baixo do poço)
-	_part(Vector3(-WALL, -0.2, -WALL), Vector3(SHAFT_X.y + WALL, 0, DEPTH + WALL), "floorboards")
-	_solid(Vector3(-1, -0.2, -1), Vector3(SHAFT_X.y + 1, 0, DEPTH + 1), "Floor")
+	var floor_rects: Array[Rect2] = [Rect2(-1,-1,SHAFT_X.y+2,DEPTH+2)]
+	if present:
+		# A fresta e a boca da escada ocupam o mesmo recorte, conforme a época do piso.
+		floor_rects = [Rect2(-1,-1,SHAFT_X.y+2,3.6),Rect2(-1,3.8,SHAFT_X.y+2,DEPTH+1-3.8),
+			Rect2(-1,2.6,12.2,1.2),Rect2(12.3,2.6,SHAFT_X.y+1-12.3,1.2)]
+	for rect in floor_rects:
+		var low := Vector3(rect.position.x,-0.2,rect.position.y)
+		var high := Vector3(rect.end.x,0,rect.end.y)
+		_part(low,high,"floorboards")
+		_solid(low,high,"Floor")
 
 	for rect: Array in _slab_rects():
 		_part(Vector3(rect[0], SLAB_BOTTOM, rect[1]), Vector3(rect[2], K - 0.02, rect[3]), "plaster_cream")
@@ -241,7 +249,10 @@ func _build_stairs() -> void:
 func _build_kitchen_wall_dressing() -> void:
 	# Azulejo até 1,5 m e uma régua de madeira por cima, nas quatro paredes da cozinha
 	var tile_top := K + 1.5
-	_part(Vector3(STAIR_X.y + 0.15, K, 0), Vector3(WIDTH, tile_top, 0.02), "tile")
+	# O trecho do fogão é revestido uma única vez pela coifa. Sobrepor os dois
+	# painéis deixava faces coincidentes com a régua de madeira (cintilação).
+	for span: Vector2 in [Vector2(STAIR_X.y + 0.15, STOVE.x - 0.1), Vector2(STOVE.y + 0.1, WIDTH)]:
+		_part(Vector3(span.x, K, 0), Vector3(span.y, tile_top, 0.02), "tile")
 	_part(Vector3(STAIR_X.y + 0.15, tile_top, 0), Vector3(WIDTH, tile_top + 0.06, 0.04), "dark_wood")
 	_part(Vector3(0, K, PARTITION.y), Vector3(0.02, tile_top, DEPTH), "tile")
 	_part(Vector3(0, tile_top, PARTITION.y), Vector3(0.04, tile_top + 0.06, DEPTH), "dark_wood")
@@ -343,7 +354,8 @@ func _build_stove_hood() -> void:
 	_solid(Vector3(STOVE.x - 0.15, y0, 0), Vector3(STOVE.y + 0.15, y0 + 0.12, 1.1), "HoodRim")
 	_solid(Vector3(STOVE.x + 0.1, y0 + 0.12, 0), Vector3(STOVE.y - 0.1, y0 + 0.45, 0.8), "HoodBody")
 	# Azulejo atrás do fogão
-	_part(Vector3(STOVE.x - 0.1, K, 0.02), Vector3(STOVE.y + 0.1, y0, 0.04), "tile")
+	# Mesmo plano dos demais azulejos; a régua fica 2 cm à frente, sem disputar profundidade.
+	_part(Vector3(STOVE.x - 0.1, K, 0), Vector3(STOVE.y + 0.1, y0, 0.02), "tile")
 
 
 ## Fogão a lenha de ferro (1923): forno aberto à esquerda, chapas e panelas em cima.

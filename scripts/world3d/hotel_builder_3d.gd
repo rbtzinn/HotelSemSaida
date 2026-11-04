@@ -179,6 +179,9 @@ func _spot(at: Vector3, look_target: Vector3, color: Color, energy: float, light
 
 func _label(text: String, at: Vector3, size: float, color: Color, rotation_y_deg: float = 0.0) -> Label3D:
 	var label := Label3D.new()
+	label.font = preload("res://art/fonts/sign_font.tres")
+	label.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	label.text = text
 	label.position = at
 	label.rotation_degrees.y = rotation_y_deg

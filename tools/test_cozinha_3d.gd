@@ -194,9 +194,10 @@ func _run() -> void:
 	lia.position = Vector3(11.75, 0, 4.1)
 	assert(await _aim(lia, Vector3(11.75, 0.1, 3.2)) == room.get_node("WorldToday/Buraco/Descer"), "Mira o buraco")
 	await _press(lia, lia_input)
-	assert(world_state.is_set("cozinha.concluida"), "Andar concluído")
-	for tick in 120:
+	assert(lia.is_traversing() and not world_state.is_set("cozinha.concluida"), "Começa a descer antes da troca de sala")
+	for tick in 185:
 		await process_frame
+	assert(world_state.is_set("cozinha.concluida"), "Andar concluído no patamar")
 	assert(current_scene.scene_file_path == "res://scenes/rooms/manutencao_3d.tscn", "Chegou à manutenção: %s" % current_scene.scene_file_path)
 	var arrived = current_scene.get_node("Lia")
 	assert(arrived.position.distance_to(Vector3(2.6, 0, 6.3)) < 0.3, "Pousa na manutenção: %s" % arrived.position)
