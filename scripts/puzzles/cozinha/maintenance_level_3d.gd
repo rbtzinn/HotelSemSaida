@@ -17,11 +17,13 @@ func _ready() -> void:
 			_build_key(world)
 	_build_time_cards()
 	marker("DaDespensa", Vector3(2.6, 0, 6.3))
+	marker("DaBiblioteca", Vector3(MaintenanceRoom3D.CORRIDOR_END - 1.6, 0, _corridor_mid()), PI / 2)
 	super()
 
 
 func _build_exits(world: Node3D) -> void:
-	area(KEY_DOOR, world, "ParaBiblioteca", Vector3(4.5, 1.3, 8.7), Vector3(1.7, 2.6, 0.35), {
+	var stairs := Vector3(MaintenanceRoom3D.CORRIDOR_END - 0.3, 1.3, _corridor_mid())
+	area(KEY_DOOR, world, "ParaBiblioteca", stairs, Vector3(0.35, 2.6, 1.7), {
 		"target_scene": "res://scenes/rooms/biblioteca_3d.tscn",
 		"target_spawn": "DaManutencao",
 		"prompt_text": "Subir à Biblioteca",
@@ -34,6 +36,10 @@ func _build_exits(world: Node3D) -> void:
 	area(DOOR, world, "ParaDespensa", Vector3(1.55, 1.25, 7.2), Vector3(0.9, 2.5, 0.4), to_pantry)
 	# A mesma saída também pode ser usada mirando o alçapão no alto da escada.
 	area(DOOR, world, "AlcapaoDespensa", Vector3(1.55, 3.4, 7.2), Vector3(0.9, 0.3, 0.95), to_pantry)
+
+
+func _corridor_mid() -> float:
+	return (MaintenanceRoom3D.CORRIDOR_Z.x + MaintenanceRoom3D.CORRIDOR_Z.y) / 2.0
 
 
 ## A duplicata de 1951 da Biblioteca, sobre a bancada, com a etiqueta.

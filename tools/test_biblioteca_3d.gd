@@ -36,8 +36,12 @@ func _run() -> void:
 	assert(lia.focused == current_scene.get_node("WorldToday/AlcapaoDespensa"), "Alçapão visível e alcançável olhando para cima")
 	var ray := PhysicsRayQueryParameters3D.create(Vector3(1.55, 3.45, 7.4), Vector3(1.55, 4.15, 7.4), 1)
 	assert(lia.get_world_3d().direct_space_state.intersect_ray(ray).is_empty(), "Abertura no teto não pode estar tampada por colisão")
-	lia.position = Vector3(4.5, 0, 7.0)
-	await _aim(lia, Vector3(4.5, 1.3, 8.7))
+	# Corredor de serviço: da sala, pelo vão sul, e depois sob o Saguão até a escada.
+	for leg: Array in [[Vector3(4.5, 1, 6.0), Vector3(4.5, 1, 11.4)], [Vector3(4.5, 1, 11.4), Vector3(25.8, 1, 11.4)]]:
+		var walk := PhysicsRayQueryParameters3D.create(leg[0], leg[1], 1)
+		assert(lia.get_world_3d().direct_space_state.intersect_ray(walk).is_empty(), "Corredor livre de %s a %s" % leg)
+	lia.position = Vector3(25.0, 0, 11.4)
+	await _aim(lia, Vector3(26.7, 1.3, 11.4))
 	await _press()
 	assert(current_scene.scene_file_path.ends_with("manutencao_3d.tscn"), "Sem chave, a porta atual continua trancada")
 	assert(not state.is_set("biblioteca.porta.hoje"), "Tentativa não destranca a porta")
@@ -47,8 +51,8 @@ func _run() -> void:
 	await _press()
 	assert(lia.get_held_item()=="chave_biblioteca", "Lia pega a chave de 1951")
 	assert(not state.is_set("biblioteca.estante.ordenada"), "Pegar a chave hoje não altera mecanismo no passado")
-	lia.position = Vector3(4.5, 0, 7.0)
-	await _aim(lia, Vector3(4.5, 1.3, 8.7))
+	lia.position = Vector3(25.0, 0, 11.4)
+	await _aim(lia, Vector3(26.7, 1.3, 11.4))
 	assert(lia.focused == current_scene.get_node("WorldToday/ParaBiblioteca"), "Escada de serviço alcançável")
 	await _press()
 	await _transition()
@@ -158,8 +162,8 @@ func _run() -> void:
 	await scene_changed
 	helena = current_scene.get_node("Helena")
 	helena.input = controls
-	helena.position = Vector3(1.7, 0, 4.9)
-	await _aim(helena, Vector3(0.65, 1.2, 4.9))
+	helena.position = Vector3(18.7, 0, 3.4)
+	await _aim(helena, Vector3(18.7, 1.2, 2.15))
 	assert(helena.focused == current_scene.get_node("World1923/PortaBiblioteca"), "Entrada da Biblioteca alcançável no Saguão")
 	assert(helena.get_held_item()=="", "Helena não precisa da chave futura")
 	await _press()

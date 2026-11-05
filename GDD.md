@@ -141,7 +141,7 @@ D                  ( * )         PIANO  #
 
 ### Continuação da Cozinha em 3D — 04/11/2026
 
-O buraco no piso da despensa leva **fisicamente à manutenção sob a cozinha**, sem retorno automático ao Saguão. Lia encontra ali uma chave de 1951, identificada como duplicata da Biblioteca, e usa a escada/corredor de serviço para entrar na próxima fase. Pode voltar à despensa pela escada da manutenção.
+O buraco no piso da despensa leva **fisicamente à manutenção sob a cozinha**, sem retorno automático ao Saguão. A Cozinha fica na ala oeste e a Biblioteca na ala nordeste do hotel; o corredor de serviço da manutenção atravessa o subsolo, sob o Saguão, até a escada da Biblioteca. Lia encontra ali uma chave de 1951, identificada como duplicata da Biblioteca, e usa a escada/corredor de serviço para entrar na próxima fase. Pode voltar à despensa pela escada da manutenção.
 
 A porta pública da Biblioteca fica no Saguão. Em 1923 ela funciona normalmente para Helena; hoje está trancada, e Lia precisa da chave. A chave destranca apenas o presente: não atravessa o tempo e não modifica o passado. A conclusão da Cozinha libera a continuação. A passagem pelo buraco registra `cozinha.concluida`, mas a descoberta sobre Otília pode ser lida no Saguão quando o jogador voltar por vontade própria.
 

@@ -2,15 +2,32 @@
 class_name MaintenanceRoom3D
 extends HotelBuilder3D
 ## Sala de manutenção sob a despensa, com corredor de serviço para a Biblioteca.
+## A Cozinha fica na ala oeste e a Biblioteca na nordeste: o corredor sai pela parede sul,
+## vira e passa por baixo do Saguão até a escada de serviço da Biblioteca.
+
+## Vão da parede sul (x) que leva ao corredor.
+const CORRIDOR_DOOR := Vector2(3.7, 5.3)
+## Trecho longo do corredor: faixa livre em z e fim em x (escada da Biblioteca).
+const CORRIDOR_Z := Vector2(10.6, 12.2)
+const CORRIDOR_END: float = 27.0
+const CORRIDOR_HEIGHT: float = 2.8
+
 func _build_room() -> void:
 	_part(Vector3(-0.3, -0.25, -0.3), Vector3(9.3, 0, 9.3), "stone")
 	_solid(Vector3(-0.3, -0.25, -0.3), Vector3(9.3, 0, 9.3), "Floor")
 	for x: float in [-0.15, 9.15]:
 		_block(Vector3(x, 1.8, 4.5), Vector3(0.3, 3.6, 9.6), "plaster_cream")
 		_solid(Vector3(x-0.15, 0, -0.3), Vector3(x+0.15, 3.6, 9.3), "Wall")
-	for z: float in [-0.15, 9.15]:
-		_block(Vector3(4.5, 1.8, z), Vector3(9.6, 3.6, 0.3), "plaster_cream")
-		_solid(Vector3(-0.3, 0, z-0.15), Vector3(9.3, 3.6, z+0.15), "Wall")
+	_block(Vector3(4.5, 1.8, -0.15), Vector3(9.6, 3.6, 0.3), "plaster_cream")
+	_solid(Vector3(-0.3, 0, -0.3), Vector3(9.3, 3.6, 0), "Wall")
+	# Parede sul com o vão do corredor de serviço.
+	var door := CORRIDOR_DOOR
+	for span: Vector2 in [Vector2(-0.3, door.x), Vector2(door.y, 9.3)]:
+		_part(Vector3(span.x, 0, 9.0), Vector3(span.y, 3.6, 9.3), "plaster_cream")
+		_solid(Vector3(span.x, 0, 9.0), Vector3(span.y, 3.6, 9.3), "WallSouth")
+	_part(Vector3(door.x, CORRIDOR_HEIGHT, 9.0), Vector3(door.y, 3.6, 9.3), "plaster_cream")
+	_solid(Vector3(door.x, CORRIDOR_HEIGHT, 9.0), Vector3(door.y, 3.6, 9.3), "CorridorLintel")
+	_build_corridor()
 	_build_ceiling_hatch()
 	_build_time_clock()
 	_build_storage()
@@ -51,15 +68,6 @@ func _build_room() -> void:
 		var at := Vector3(7.8, 0.22+(i%2)*0.46, 3.0+(i/2)*0.7)
 		_block(at, Vector3(0.8, 0.44, 0.6), "plank", Vector3(0, _random(i)*6, 0))
 	_solid(Vector3(7.3, 0, 2.6), Vector3(8.3, 0.9, 5), "Crates")
-	# Escada de acesso à Biblioteca, porta usada com E no patamar inferior.
-	for i in 6:
-		_block(Vector3(4.5, 0.07+i*0.14, 8.1+i*0.14), Vector3(1.6, 0.14, 0.3), "stone")
-	_block(Vector3(4.5, 1.45, 8.95), Vector3(1.6, 2.7, 0.08), "iron")
-	_label("BIBLIOTECA — SERVIÇO", Vector3(4.5, 2.95, 8.9), 0.1, Color("#C9973B"), 180)
-	for x: float in [3.6, 5.4]:
-		_block(Vector3(x, 1.45, 8.9), Vector3(0.12, 2.9, 0.12), "brass")
-
-	_solid(Vector3(3.65, 0, 7.95), Vector3(5.35, 0.84, 9), "ServiceStairs")
 	# Poço de descida e escada de retorno à despensa.
 	for x: float in [1.2, 1.9]:
 		_cylinder(Vector3(x, 0, 7.2), 0.035, 0.035, 4.25, "iron")
@@ -74,6 +82,61 @@ func _build_room() -> void:
 		_omni(Vector3(4.5, 3.0, 4), Color("#F2D49B"), 1.6, 11)
 	_cylinder(Vector3(4.5, 3.2, 4), 0.18, 0.11, 0.2, "iron")
 	_sphere(Vector3(4.5, 3.15, 4), 0.08, "bulb")
+
+
+## Corredor de serviço: desce para o sul, vira para o leste e segue sob o Saguão.
+## No fim, a escada e a porta de ferro da Biblioteca (usada com E no patamar inferior).
+func _build_corridor() -> void:
+	var d := CORRIDOR_DOOR
+	var cz := CORRIDOR_Z
+	var top := CORRIDOR_HEIGHT
+	var mid := (cz.x + cz.y) / 2.0
+	var wall := "plaster_cream" if not present else "stone"
+	_part(Vector3(d.x - 0.3, -0.25, 9.3), Vector3(CORRIDOR_END + 0.3, 0, cz.y + 0.3), "stone")
+	_solid(Vector3(d.x - 0.3, -0.25, 9.3), Vector3(CORRIDOR_END + 0.3, 0, cz.y + 0.3), "CorridorFloor")
+	_part(Vector3(d.x - 0.3, top, 9.3), Vector3(CORRIDOR_END + 0.3, top + 0.2, cz.y + 0.3), "stone")
+	_solid(Vector3(d.x - 0.3, top, 9.3), Vector3(CORRIDOR_END + 0.3, top + 0.2, cz.y + 0.3), "CorridorCeiling")
+	# Paredes: oeste do trecho curto (e fundo do longo), leste do curto, norte e sul do longo, fim.
+	for wall_box: Array in [
+		[Vector3(d.x - 0.3, 0, 9.3), Vector3(d.x, top, cz.y + 0.3)],
+		[Vector3(d.y, 0, 9.3), Vector3(d.y + 0.3, top, cz.x)],
+		[Vector3(d.y, 0, cz.x - 0.3), Vector3(CORRIDOR_END + 0.3, top, cz.x)],
+		[Vector3(d.x - 0.3, 0, cz.y), Vector3(CORRIDOR_END + 0.3, top, cz.y + 0.3)],
+		[Vector3(CORRIDOR_END, 0, cz.x - 0.3), Vector3(CORRIDOR_END + 0.3, top, cz.y + 0.3)],
+	]:
+		_part(wall_box[0], wall_box[1], wall)
+		_solid(wall_box[0], wall_box[1], "CorridorWall")
+	# Canos de vapor ao longo da parede norte, da Cozinha até a Biblioteca.
+	for y: float in [2.25, 2.5]:
+		_cylinder(Vector3(d.y + 0.3, y, cz.x + 0.1), 0.05, 0.05, CORRIDOR_END - d.y - 0.3, "copper",
+			Vector3(0, 0, -90), 10)
+		for x: float in [8.0, 13.0, 18.0, 23.0]:
+			_torus(Vector3(x, y, cz.x + 0.1), 0.055, 0.075, "iron", Vector3(0, 0, 90))
+	# Placa na curva e placa no meio, para o jogador saber por onde passa.
+	_label("BIBLIOTECA  →", Vector3(d.x + 0.02, 1.9, mid), 0.1, Color("#C9973B"), 90)
+	_label("SOB O SAGUÃO — NÃO FUMAR", Vector3(15.5, 1.9, cz.y - 0.02), 0.08,
+		Color("#C9973B") if not present else Color("#5A5040"), 180)
+	if present:
+		_part(Vector3(11.0, 0.005, cz.x + 0.2), Vector3(14.2, 0.012, cz.y - 0.3), "dark")
+		for i in 10:
+			var at := Vector3(7.0 + _random(i, 7) * 17.0, 0.04, cz.x + 0.25 + _random(i, 8) * 1.1)
+			_block(at, Vector3(0.22, 0.08, 0.3), "rubble", Vector3(0, _random(i, 9) * 170, 0))
+	for x: float in [7.5, 15.5, 23.5]:
+		_cylinder(Vector3(x, top - 0.18, mid), 0.1, 0.06, 0.18, "iron")
+		_sphere(Vector3(x, top - 0.25, mid), 0.06, "bulb")
+		if not present:
+			_omni(Vector3(x, top - 0.4, mid), Color("#F2D49B"), 0.9, 6.0)
+	if present:
+		_omni(Vector3(16.0, 2.2, mid), Color("#6A7E96"), 0.35, 12.0)
+	# Escada de acesso à Biblioteca no fim do corredor.
+	var width := cz.y - cz.x
+	for i in 6:
+		_block(Vector3(CORRIDOR_END - 0.9 + i * 0.14, 0.07 + i * 0.14, mid), Vector3(0.3, 0.14, width), "stone")
+	_block(Vector3(CORRIDOR_END - 0.05, 1.4, mid), Vector3(0.08, 2.6, width - 0.1), "iron")
+	_label("BIBLIOTECA — SERVIÇO", Vector3(CORRIDOR_END - 0.1, 2.55, mid), 0.1, Color("#C9973B"), -90)
+	for z: float in [cz.x + 0.06, cz.y - 0.06]:
+		_block(Vector3(CORRIDOR_END - 0.1, 1.35, z), Vector3(0.12, 2.7, 0.12), "brass")
+	_solid(Vector3(CORRIDOR_END - 1.05, 0, cz.x), Vector3(CORRIDOR_END, 0.84, cz.y), "ServiceStairs")
 
 
 ## Relógio de ponto dos funcionários na parede oeste, com o escaninho das fichas.

@@ -76,7 +76,7 @@ func _build_doors(world: Node3D, present: bool) -> void:
 	service_label.rotation.y = PI
 	area(DOOR, world, "ParaManutencao", Vector3(16, 1.2, 12.68), Vector3(1.2, 2.4, 0.35), {
 		"target_scene": "res://scenes/rooms/manutencao_3d.tscn",
-		"target_spawn": "DaDespensa",
+		"target_spawn": "DaBiblioteca",
 		"prompt_text": "Corredor de serviço",
 		"available_in": Interactable3D.Availability.PRESENT_ONLY,
 	})

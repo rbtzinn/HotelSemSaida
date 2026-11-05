@@ -7,6 +7,9 @@ const D: float = 13.0
 const H: float = 6.0
 ## Livre da estante lateral; o livro, a placa e as interações usam a mesma origem.
 const NICHE_ORIGIN := Vector3(2.2, 0, 10.9)
+## A Biblioteca ocupa a ala nordeste; a porta do Saguão fica ao lado do elevador, e o poço
+## dele sobe por este canto. Aqui é só a alvenaria revestida, sem porta.
+const SHAFT := Rect2(5.55, 10.5, 2.0, 2.5)
 
 func _build_room() -> void:
 	_part(Vector3(-0.3, -0.25, -3.3), Vector3(W+0.3, 0, D+0.3), "floorboards")
@@ -84,6 +87,7 @@ func _build_room() -> void:
 			for i in 2:
 				_block(Vector3(17.65, 2.8+i*0.7, z), Vector3(0.1, 0.15, 1.7), "plank", Vector3(8, 0, 10-i*15))
 			_spot(Vector3(17.4, 4.6, z), Vector3(9, 0, z-1), Color("#9FB4C8"), 3.0, 14, 20)
+	_build_lift_shaft()
 	# Entrada com letreiro e moldura, em frente ao corredor central.
 	_block(Vector3(9, 1.25, 12.92), Vector3(1.6, 2.5, 0.1), "mahogany")
 	for x: float in [8.08, 9.92]:
@@ -159,3 +163,18 @@ func _chair(at: Vector3, yaw: float) -> void:
 		for z: float in [-0.22, 0.22]:
 			_child_cylinder(holder, Vector3(x, 0.225, z), 0.025, 0.45, "mahogany")
 	_solid(at+Vector3(-0.3, 0, -0.3), at+Vector3(0.3, 1.35, 0.3), "Chair")
+
+
+func _build_lift_shaft() -> void:
+	var a := Vector3(SHAFT.position.x, 0, SHAFT.position.y)
+	var b := Vector3(SHAFT.end.x, H, SHAFT.end.y)
+	_part(a, b, "wallpaper")
+	_solid(a, b, "LiftShaft")
+	# Rodapé e friso de latão nas três faces à vista, como nas paredes.
+	for face: Array in [
+		[Vector3(a.x - 0.03, 0, a.z - 0.03), Vector3(b.x + 0.03, 0, a.z)],
+		[Vector3(a.x - 0.03, 0, a.z), Vector3(a.x, 0, b.z)],
+		[Vector3(b.x, 0, a.z), Vector3(b.x + 0.03, 0, b.z)],
+	]:
+		_part(face[0], face[1] + Vector3(0, 0.3, 0), "dark_wood")
+		_part(face[0] + Vector3(0, 1.12, 0), face[1] + Vector3(0, 1.18, 0), "brass")

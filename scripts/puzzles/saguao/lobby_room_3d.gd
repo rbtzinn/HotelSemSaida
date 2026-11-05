@@ -20,6 +20,9 @@ const ENTRANCE := Vector2(9.0, 11.0)
 ## Arco da escada e vão do elevador na parede norte (x).
 const STAIR_ARCH := Vector2(1.5, 4.5)
 const ELEVATOR := Vector2(15.4, 17.1)
+## Porta da Biblioteca na parede norte (x), entre o elevador e o canto leste: a Biblioteca
+## ocupa a ala nordeste, longe da Cozinha (ala oeste).
+const LIBRARY_DOOR := Vector2(18.05, 19.35)
 const PIT_FLOOR := -2.65
 const RACK := Vector3(7.85, 1.75, NORTH)
 ## Janelas da parede leste (z).
@@ -634,16 +637,16 @@ func _build_piano() -> void:
 
 func _build_library_door() -> void:
 	# A entrada pública de 1923; hoje, trancada até Lia achar a chave na manutenção.
-	var z0 := 4.25
-	var z1 := 5.55
-	_part(Vector3(WEST + 0.01, 0, z0), Vector3(WEST + 0.07, 2.4, z1), "mahogany" if not present else "plank")
-	for z: float in [z0-0.1, z1]:
-		_part(Vector3(WEST, 0, z), Vector3(WEST+0.13, 2.55, z+0.1), "brass")
-	_part(Vector3(WEST, 2.4, z0-0.1), Vector3(WEST+0.13, 2.57, z1+0.1), "brass")
+	var x0 := LIBRARY_DOOR.x
+	var x1 := LIBRARY_DOOR.y
+	_part(Vector3(x0, 0, NORTH + 0.01), Vector3(x1, 2.4, NORTH + 0.07), "mahogany" if not present else "plank")
+	for x: float in [x0 - 0.1, x1]:
+		_part(Vector3(x, 0, NORTH), Vector3(x + 0.1, 2.55, NORTH + 0.13), "brass")
+	_part(Vector3(x0 - 0.1, 2.4, NORTH), Vector3(x1 + 0.1, 2.57, NORTH + 0.13), "brass")
 	for y: float in [0.2, 1.2]:
-		_part(Vector3(WEST+0.07, y, z0+0.12), Vector3(WEST+0.09, y+0.85, z1-0.12), "panel")
-	_sphere(Vector3(WEST+0.12, 1.05, z1-0.18), 0.04, "brass")
-	_label("BIBLIOTECA", Vector3(WEST+0.14, 2.18, 4.9), 0.10, Color("#C9973B"), 90)
+		_part(Vector3(x0 + 0.12, y, NORTH + 0.07), Vector3(x1 - 0.12, y + 0.85, NORTH + 0.09), "panel")
+	_sphere(Vector3(x0 + 0.18, 1.05, NORTH + 0.12), 0.04, "brass")
+	_label("BIBLIOTECA", Vector3((x0 + x1) / 2.0, 2.18, NORTH + 0.14), 0.10, Color("#C9973B"))
 
 
 func _build_kitchen_door() -> void:
@@ -777,7 +780,7 @@ func _build_furniture() -> void:
 	_palm(Vector3(11.8, 0, 10.2), 2)
 	_palm(Vector3(5.15, 0, 2.6), 3)
 	_palm(Vector3(18.95, 0, 10.2), 4)
-	_grandfather_clock(Vector3(18.4, 0, NORTH))
+	_grandfather_clock(Vector3(14.6, 0, NORTH))
 	_luggage_cart(Vector3(13.4, 0, 9.7))
 
 
