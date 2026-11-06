@@ -176,6 +176,44 @@ Esta sequência substitui o antigo fade de volta ao Saguão ao terminar a Cozinh
 
 **A última regulagem.** Cada haste tem quatro furos e apenas um deles está polido. Contando a partir do pivô de cada haste, Lia distingue a terceira posição na admissão e a segunda na chaminé. Em 1923, com a pressão de serviço e os ralos regulados, Helena pode experimentar as posições dos dois volantes. A regulagem certa deixa o ferrolho da caixa de limpeza alinhado. Hoje, Lia puxa a tampa ao lado da inspeção e encontra a lanterna apagada de Tomás com a última folha do caderno. Ler o relato dele encerra a Casa das Caldeiras. Lia permanece diante da caixa e pode refazer o caminho até a Biblioteca.
 
+### Volta ao Saguão e final desta versão (proposta de 06/11/2026, aguardando aprovação)
+
+Escolhas do Roberto: a etapa S4 abre a **entrada principal** (não mais a porta da Cozinha, que já fica aberta desde o começo); o livro de hóspedes ganha **um nome por capítulo**; o final é a **revelação na saída**.
+
+**O fio da história, sem quebras:**
+
+1. Cozinha → Otília (1923). Biblioteca → Caio Ferraz (1951); o dossiê dele traz a foto de Marta. Caldeiras → Tomás Reis (2003), que seguiu a foto de Marta e, no último bilhete, aponta a correia presa sob o elevador do Saguão.
+2. Lia volta ao Saguão, Helena faz a cabine subir e Lia acha a bolsa de Marta (1979) no poço. Fecha-se a corrente dos quatro desaparecidos: cada um achou a pista do anterior.
+3. Da bolsa sai a chave do cadeado que Marta pôs na entrada. É a única porta que ninguém usou para sair, e o último enigma é tentar sair por ela.
+
+**Livro de hóspedes de hoje (texto acumulativo, cada trecho liga com a flag do capítulo):**
+
+- Sempre: «O livro está mofado. Na coluna "Saída", várias linhas em branco. A primeira delas, em 1923: Helena. A última linha tem a data de hoje, e a tinta ainda está úmida. Uma assinatura recente. A letra parece familiar.»
+- `cozinha.concluida` (já existe): Otília, cozinheira, «a letra é a mesma do lápis no cardápio: "3 8"».
+- `biblioteca.concluida`: «Dr. Caio Ferraz, 1951, quarto 214. Saída: em branco. Ao lado, alguém escreveu a lápis: "médico — não saiu".»
+- `saguao.bolsa.marta`: «Marta Siqueira, 1979, "imprensa". Saída: em branco. A assinatura dela tem a mesma tinta úmida da última linha.»
+- `caldeiras.concluida`: «Tomás Reis, 2003. Não é letra de hóspede: está escrito por cima, na margem, como quem assina sem ninguém pedir.»
+- Assinatura úmida: ilegível no começo; com dois capítulos feitos, «a primeira letra parece um L»; depois do final, «Lia».
+- Hoje, o nome de Helena não aparece no livro de 1923 antes de ela assinar; ver o item 4 da S4.
+
+**S4. Cofre da gerência e entrada principal** (junta tudo; minigame do cadeado de 4 dígitos)
+
+1. **Chave de Marta.** Hoje, no poço, Lia já vê a chave miúda na bolsa; agora pode pegá-la (`saguao.chave.marta`, vai para a mão da Lia). A etiqueta de pano passa a dizer **PORTARIA** em vez de SERVIÇO, para não confundir com a porta de serviço.
+2. **Data certa.** Em 1923, na porta do cofre atrás do balcão, uma frase riscada: «o dia em que o Aurora se acendeu». Hoje, a coroa de latão do lustre caído (que em 1923 fica no teto, fora de alcance) mostra «Aceso pela primeira vez em 14/03/1923». Na parede junto à entrada, nas duas épocas, uma placa diz «Inaugurado em 06/09/1921»: é a pista falsa.
+3. **Cofre.** Helena abre o cofre com `1403` (tentativas ilimitadas, `CodeLock3D`) e pega a chave da entrada (`saguao.cofre.aberto`, a chave vai para a mão de Helena).
+4. **Trava de 1923.** Helena gira a chave na fechadura original da entrada principal: a lingueta recua (`saguao.entrada.trava_1923`). Mesmo destrancada, a porta não abre para ela, como se alguém a segurasse do outro lado. Ao lado, o livro de 1923 está aberto: Helena assina o próprio nome (texto: «Você escreve o seu nome. A coluna "Saída" fica esperando.»). É o que faz o nome dela aparecer hoje na primeira linha. A chave fica presa na fechadura (libera a mão).
+5. **Trava de hoje.** Hoje, a fechadura está corroída. Se Helena a destrancou, a lingueta enferrujou recolhida; se não, ela continua presa. As tábuas pregadas por dentro estão podres, e quem segura a porta é a corrente com o cadeado posto em 1979. Lia o abre com a chave de Marta (`saguao.entrada.cadeado`). As duas trancas valem em qualquer ordem; regra 1 mantida, pois a fechadura de hoje só cede pelo que Helena fez.
+
+**Final (revelação na saída)**
+
+- Com as duas trancas abertas, a entrada vira «Sair do hotel» para Lia. Ela empurra a porta, a luz de fora a cega (fade branco) e ela entra… no Saguão, de costas para a porta, que está de novo pregada e com a corrente (`jogo.final`).
+- Hoje, o livro está aberto na última linha. Agora a assinatura se lê: **Lia**, com a data de hoje. Coluna «Saída»: em branco. Ler encerra o jogo.
+- Tab, com `jogo.final`: Helena em 1923, diante da entrada. Do outro lado da porta, alguém bate. Mensagem: «Três batidas. Como os passos de alguém que tateia no escuro.» (ecoa a última folha de Tomás).
+- Tela de fim: «Grand Hotel Aurora. Hóspedes que entraram e nunca saíram: 1923, 1951, 1979, 2003… e hoje.» Volta à recepção (`entrada.tscn`); o save solo fica no estado final.
+- Fica em aberto, para depois desta versão: o que aconteceu com Helena e se o ciclo pode ser quebrado.
+
+**Flags novas** (todas entram em `coop_progress.gd`): passado `saguao.cofre.aberto`, `saguao.entrada.trava_1923`, `saguao.livro.helena`; presente `saguao.chave.marta`, `saguao.entrada.cadeado`, `jogo.final`.
+
 ## Minigames
 
 Os dois tipos escolhidos são mecanismos e fechaduras, e piano e ritmo. Cada minigame abre em uma tela própria, em close, e sempre faz parte de um enigma, nunca é só enfeite.
@@ -218,4 +256,4 @@ Cada etapa gera uma versão jogável, que você testa antes de seguirmos para a 
 - [x] Quantos hóspedes desaparecidos existem e quem são? (um por geração, ver "História e personagens")
 - [ ] O elevador principal leva aos andares em 1923? Hoje a cabine fica no alto para sempre; decidir antes da Biblioteca.
 - [ ] Qual é o nome definitivo do jogo?
-- [ ] Como serão o final e a revelação da reviravolta (depois da fase de testes)?
+- [ ] Como serão o final e a revelação da reviravolta? (proposta em "Volta ao Saguão e final desta versão", aguardando aprovação)
