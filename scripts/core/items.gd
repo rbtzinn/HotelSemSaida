@@ -6,6 +6,8 @@ const DATA: Dictionary = {
 	"chave_quadro": {"name": "Chave da recepção", "color": Color("#C9973B")},
 	"pinhao_f2": {"name": "Pinhão da F-2", "color": Color("#B9864C")},
 	"coroa_f2": {"name": "Coroa da F-2", "color": Color("#B59966")},
+	"chave_portaria": {"name": "Chave miúda da portaria", "color": Color("#9A8A6A")},
+	"chave_entrada": {"name": "Chave da porta principal", "color": Color("#C9973B")},
 	"chave_biblioteca": {"name": "Chave da Biblioteca", "color": Color("#C9973B")},
 	"atlas": {"name": "Atlas do Aurora", "color": Color("#5A1E16")},
 	"livro_botanica": {"name": "Botânica", "color": Color("#2A5A42")},

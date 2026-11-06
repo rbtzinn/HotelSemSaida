@@ -2,13 +2,14 @@
 
 Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 4.7** por Roberto com o Claude Code e o Codex (GPT). Este arquivo é a **única** fonte de verdade sobre o projeto (o `AGENTS.md` do Codex só aponta para cá): leia-o inteiro antes de qualquer tarefa e atualize-o ao terminar uma etapa.
 
-## Estado atual (05/11/2026)
+## Estado atual (06/11/2026)
 
 - **Jogo 3D em primeira pessoa** é o jogo de verdade. O 2D (pixel art) continua no repositório como histórico e referência dos enigmas da Cozinha; não é mais desenvolvido. As seções sobre 2D mais abaixo valem só para os arquivos 2D.
 - Cena principal: `scenes/ui/entrada.tscn` (recepção: jogar solo, continuar solo, ou dupla online).
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
-- Falta: cofre da gerência (S4), etapa seguinte do Saguão, final do jogo, opção de qualidade gráfica.
+- O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
+- Falta: piano do Saguão, áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -184,7 +185,7 @@ Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com 
   - Porta de serviço do Saguão 3D leva a `DoSaguao`; o buraco do piso e a porta da Cozinha voltam a `Pontos/DaCozinha`. Com `cozinha.concluida`, o livro de hoje mostra o nome de Otília.
   - Teste `tools/test_cozinha_3d.gd` (percurso completo; `-- --capture` sem `--headless` salva 4 vistas). Prévias em `art/previews/cozinha3d-*.png`.
 - **Só a ativa passa pela porta (decisão do Roberto, 04/11/2026)**: em 3D, `Door3D` e `ChapterEnd3D` usam `RoomManager.change_room_alone`; a outra fica onde foi deixada, na sala dela (`RoomManager._away`: sala, posição e direção do olhar). O Tab, com a outra em outra sala, abre a sala dela (`switch_to_away`, chamado pelo `EraManager`). O save guarda quem está fora em `"away"`. Cada cena continua com os dois nós de personagem; o da que está fora fica parado (época inativa) até ela voltar. Teste `tools/test_rooms_alone_3d.gd` (preserva o save real).
-- Falta: cofre da gerência (S4), opção de qualidade gráfica.
+- Falta: opção de qualidade gráfica.
 
 ## Capítulos 3D feitos depois da Cozinha (04–05/11/2026; design no `GDD.md`)
 
@@ -195,6 +196,14 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - **Manutenção** (`scripts/puzzles/cozinha/maintenance_*`): o buraco da despensa (`ChapterEnd3D` com `descent`) leva Lia para lá. Chave de 1951 na bancada; relógio de ponto com a ficha de Otília (entradas sem saída).
 - **Biblioteca** (`scripts/puzzles/biblioteca/`): 1. volumes trocados aos pares (ordem pelas silhuetas de sol de hoje); 2. cifra de César (carimbo mostra só "A → D") identifica o atlas; **qualquer** livro da mesa pode ser levado e guardado no registro oco (`biblioteca.registro`, 0..4) e retirado de novo; só o atlas recebe as anotações de Caio; 3. Lia lê os algarismos; 4. fechadura `7264` abre o arquivo e a porta das Caldeiras. Solução no `GDD.md`.
 - **Caldeiras** (`scripts/puzzles/caldeiras/`): partida com três volantes na ordem dos talhos que Lia vê hoje. A ordem só é conferida no terceiro volante (`caldeiras.pressao.abertos` bitmask, `caldeiras.pressao.erro`); erro rompe a união e alaga o presente; o registro de alimentação rearma. Depois: drenagem (ramais), engrenagens F-2 (Helena guarda as peças no alto, Lia monta), tiragem e caixa de limpeza com o caderno de Tomás.
+
+## Volta ao Saguão e final (06/11/2026; design aprovado no `GDD.md`)
+
+- `GuestBook3D` (`scripts/puzzles/saguao/guest_book_3d.gd`): o livro de hoje acumula um nome por capítulo (Otília, Caio, Marta, Tomás; Helena depois de assinar) e a assinatura úmida fica legível aos poucos. Em 1923, com a trava da entrada solta, Helena assina (`saguao.livro.helena`). Com `jogo.final`, ler o livro hoje liga `jogo.encerrado` ao fechar a leitura.
+- `MartaBag3D`: examinar a bolsa no poço também solta a chave miúda (`chave_portaria`, etiqueta PORTARIA; `saguao.chave.marta`) se a mão estiver livre.
+- `lobby_exit_puzzle_3d.gd` (instalado por `LobbyRoutes3D`): cofre de 1923 atrás do balcão (`1403`, `saguao.cofre.aberto`, chave `chave_entrada`, `saguao.chave.entrada`); a data está na coroa do lustre caído hoje e a placa de 1921 é a pista falsa. Entrada: Helena solta a trava da porta giratória (`saguao.entrada.trava_1923`), que mesmo assim não gira; Lia abre o cadeado de 1979 (`saguao.entrada.cadeado`). Com as duas, Lia "sai" num clarão e volta ao Saguão de costas para a porta (`jogo.final`); a corrente aparece de novo. Com o Tab (ou na dupla, na hora), Helena ouve três batidas.
+- `EndScreen` (`scripts/ui/end_screen.gd`): qualquer `Room3D` a abre quando `jogo.encerrado` liga; espera as telas em close fecharem, salva (solo ou dupla) e volta à recepção.
+- O cofre agora tem colisão (antes dava para atravessá-lo atrás do balcão). Teste `tools/test_saguao_final_3d.gd` (preserva o save real).
 
 ## Dupla online (05/11/2026)
 

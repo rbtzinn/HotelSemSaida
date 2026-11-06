@@ -19,6 +19,7 @@ var gate: StaticBody3D
 var grille_view: Area3D
 var keys: Array[Node3D] = []
 var inserted: Node3D
+var marta_key: Node3D
 
 
 func install(room: ChapterRoom3D) -> void:
@@ -109,11 +110,14 @@ func _make_pit(room: ChapterRoom3D, today: Node3D) -> void:
 		var strip := room.box(today, (start+end)*0.5, Vector3(0.038, 0.012, start.distance_to(end)), "leather", true)
 		strip.look_at(end)
 	room.box(today, strap[-1], Vector3(0.050, 0.018, 0.035), "brass", true)
-	var photo := room.area(NOTE, today, "BolsaMarta", at+Vector3(0, 0.02, 0.10), Vector3(0.55, 0.42, 0.32), {
-		"prompt_text":"Examinar bolsa de câmera", "title":"Bolsa de Marta Siqueira · 1979",
-		"text":"Uma cópia da fotografia da oficina. Desta vez dá para ler a borda inteira.\n\n«Última chapa. Se a luz falhar outra vez, revelo o resto em casa.»\n\nMarta Siqueira, 1979. No bolso do filme há uma chave miúda presa a uma etiqueta de pano. Ainda se lê SERVIÇO.",
-		"photograph":preload("res://art/biblioteca/marta_f2_1979.jpg"), "available_in":1, "required_flag":RAISED})
-	photo.interacted.connect(func(_by: FirstPersonMotor) -> void: WorldState.set_flag(BAG))
+	room.area(preload("res://scripts/puzzles/saguao/marta_bag_3d.gd"), today, "BolsaMarta", at+Vector3(0, 0.02, 0.10),
+		Vector3(0.55, 0.42, 0.32), {
+			"prompt_text":"Examinar bolsa de câmera", "title":"Bolsa de Marta Siqueira · 1979",
+			"photograph":preload("res://art/biblioteca/marta_f2_1979.jpg"), "available_in":1, "required_flag":RAISED})
+	# A chave miúda pendurada na etiqueta, até Lia soltá-la
+	marta_key = room.key_visual(today, at+Vector3(0.13, -0.03, 0.15), true)
+	marta_key.scale = Vector3.ONE * 0.5
+	marta_key.rotation_degrees.z = -80
 	var down := room.area(ACTION, today, "DescerPoco", Vector3(16.42, 0.83, 2.08), Vector3(0.96, 1.10, 0.12), {
 		"prompt_text": "Descer pela escada do poço",
 		"available_in": 1,
@@ -165,6 +169,7 @@ func _restore() -> void:
 	gate.position.y = 4.77 if raised else 1.28
 	grille_view.collision_layer = 0 if raised else FirstPersonMotor.INTERACT_LAYER
 	inserted.visible = raised
+	marta_key.visible = not WorldState.is_set(MartaBag3D.TAKEN)
 	_show_keys()
 
 
@@ -177,6 +182,8 @@ func _show_keys() -> void:
 func _on_flag(key: String, _value: Variant) -> void:
 	if key == HOOK:
 		_show_keys()
+	elif key == MartaBag3D.TAKEN:
+		marta_key.visible = not WorldState.is_set(key)
 	elif key == RAISED:
 		present_car.position.y = 3.55
 		gate.position.y = 4.77

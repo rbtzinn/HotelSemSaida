@@ -7,9 +7,9 @@
 [ext_resource type="Script" path="res://scripts/player/solo_input_router.gd" id="5_router"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="6_hud"]
 [ext_resource type="Script" path="res://scripts/interaction3d/message_interactable_3d.gd" id="7_message"]
-[ext_resource type="Script" path="res://scripts/interaction3d/note_interactable_3d.gd" id="8_note"]
 [ext_resource type="Script" path="res://scripts/world3d/era_environment.gd" id="9_env"]
 [ext_resource type="Script" path="res://scripts/interaction3d/door_3d.gd" id="10_door"]
+[ext_resource type="Script" path="res://scripts/puzzles/saguao/guest_book_3d.gd" id="11_book"]
 
 [sub_resource type="Environment" id="Environment_lobby"]
 background_mode = 1
@@ -21,9 +21,6 @@ tonemap_mode = 2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_book"]
 size = Vector3(0.8, 0.3, 0.6)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_entrance"]
-size = Vector3(2, 2.4, 0.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_kitchen_door"]
 size = Vector3(0.3, 2.4, 1.5)
@@ -43,7 +40,7 @@ script = ExtResource("3_vis")
 
 [node name="Livro" type="Area3D" parent="World1923"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 3.5)
-script = ExtResource("8_note")
+script = ExtResource("11_book")
 title = "Livro de hóspedes"
 text = "Março de 1923. Nomes da semana, quartos e horas de chegada, em letra caprichada.
 
@@ -52,15 +49,6 @@ prompt_text = "Ler"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Livro"]
 shape = SubResource("BoxShape3D_book")
-
-[node name="Entrada" type="Area3D" parent="World1923"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 9.95)
-script = ExtResource("7_message")
-message = "A porta giratória está travada. Ninguém a destrava."
-prompt_text = "Examinar"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World1923/Entrada"]
-shape = SubResource("BoxShape3D_entrance")
 
 [node name="PortaCozinha" type="Area3D" parent="World1923"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.2, 7.25)
@@ -83,28 +71,12 @@ era = 1
 
 [node name="Livro" type="Area3D" parent="WorldToday"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 3.5)
-script = ExtResource("8_note")
+script = ExtResource("11_book")
 title = "Livro de hóspedes"
-text = "O livro está mofado. Na coluna \"Saída\", várias linhas em branco.
-
-A última linha tem a data de hoje, e a tinta ainda está úmida. Uma assinatura recente. A letra parece familiar."
 prompt_text = "Ler"
-extra_flag = "cozinha.concluida"
-extra_text = "Mais acima, um nome que você não tinha notado: Otília, cozinheira. A coluna \"Saída\" está vazia.
-
-A letra é a mesma do lápis no cardápio: \"3 8\"."
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Livro"]
 shape = SubResource("BoxShape3D_book")
-
-[node name="Entrada" type="Area3D" parent="WorldToday"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.2, 9.95)
-script = ExtResource("7_message")
-message = "Tábuas e correntes. Pregadas por dentro."
-prompt_text = "Examinar"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WorldToday/Entrada"]
-shape = SubResource("BoxShape3D_entrance")
 
 [node name="PortaCozinha" type="Area3D" parent="WorldToday"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.2, 7.25)

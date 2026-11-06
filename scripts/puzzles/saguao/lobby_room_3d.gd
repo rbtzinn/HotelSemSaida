@@ -462,7 +462,9 @@ func _build_key_rack(center: Vector3) -> void:
 			_cylinder(hook, 0.008, 0.008, 0.05, "brass" if not present else "iron", Vector3(90, 0, 0), 6)
 
 
+## Cofre da gerência, atrás do balcão. A porta que abre fica com LobbyExitPuzzle3D.
 func _build_safe(base: Vector3) -> void:
+	_solid(Vector3(base.x - 0.58, 0, base.z), Vector3(base.x + 0.58, base.y + 1.1, base.z + 0.53), "Safe")
 	var body := "lacquer" if not present else "iron"
 	_part(base + Vector3(-0.58, 0, 0), base + Vector3(0.58, 1.1, 0.5), body)
 	_part(base + Vector3(-0.52, 0.06, 0.5), base + Vector3(0.52, 1.04, 0.52), body)
@@ -475,6 +477,10 @@ func _build_safe(base: Vector3) -> void:
 	_block(base + Vector3(0.22, 0.4, 0.56), Vector3(0.2, 0.03, 0.03), "brass", Vector3(0, 0, -20))
 	for y: float in [0.2, 0.9]:
 		_cylinder(base + Vector3(-0.52, y, 0.53), 0.025, 0.025, 0.12, "brass")
+	if not present:
+		# Frase riscada a lápis na porta: a senha é a data em que o lustre se acendeu
+		_label("o dia em que o Aurora se acendeu", base + Vector3(0, 0.88, 0.535), 0.055, Color("#2A2018"))
+		_block(base + Vector3(0, 0.885, 0.537), Vector3(0.82, 0.006, 0.002), "dark", Vector3(0, 0, 2))
 
 
 # --- Colunas, lustre, piano -------------------------------------------------------------
@@ -562,6 +568,7 @@ func _build_fallen_chandelier() -> void:
 	_cylinder(crown, 0.62, 0.55, 0.36, "brass", Vector3(0, 0, 4), 32)
 	_torus(crown + Vector3(0, 0.18, 0), 0.6, 0.66, "brass", Vector3(0, 0, 4))
 	_cylinder(crown + Vector3(0, 0.36, 0), 0.4, 0.2, 0.18, "brass", Vector3(0, 0, 4), 24)
+	_label("ACESO PELA PRIMEIRA VEZ\nEM 14/03/1923", crown + Vector3(0, 0.16, 0.66), 0.07, Color("#C8B07A"))
 	# Buraco no teto e corrente pendurada
 	_cylinder(Vector3(c.x, HEIGHT - 0.08, c.z), 0.75, 0.75, 0.1, "dark", Vector3.ZERO, 20)
 	_cylinder(Vector3(c.x + 0.05, HEIGHT - 1.2, c.z), 0.03, 0.03, 1.2, "iron", Vector3(0, 0, 6), 6)
@@ -710,14 +717,15 @@ func _build_entrance() -> void:
 			_block(center + direction * 0.5 + Vector3(0, 1.4, 0), Vector3(0.02, 2.6, 0.95), "glass", Vector3(0, yaw + 90.0, 0))
 			_block(center + direction * 0.5 + Vector3(0, 1.0, 0), Vector3(0.03, 0.04, 0.95), "brass", Vector3(0, yaw + 90.0, 0))
 	else:
-		# Tábuas pregadas e corrente
+		# Tábuas pregadas por dentro; a corrente e o cadeado de 1979 ficam com LobbyExitPuzzle3D
 		_part(Vector3(x0, 0, face + 0.15), Vector3(x1, 3.0, face + 0.2), "dark")
 		for i in 6:
 			var y := 0.35 + i * 0.45
 			_block(Vector3(mid, y, face - 0.05), Vector3(2.4, 0.2, 0.05), "plank", Vector3(0, 0, 10.0 * (_random(i) - 0.5)))
-		for i in 9:
-			_torus(Vector3(mid - 0.45 + i * 0.11, 1.35 - 0.12 * sin(i * 0.4), face - 0.1), 0.025, 0.045, "iron", Vector3(0, 90 if i % 2 == 0 else 0, 90))
-		_block(Vector3(mid + 0.05, 1.22, face - 0.11), Vector3(0.1, 0.12, 0.05), "iron")
+	# Placa de bronze junto à entrada, nas duas épocas: a data de inauguração é a pista falsa
+	_part(Vector3(11.5, 1.45, face - 0.03), Vector3(12.3, 1.85, face), "brass")
+	_label("INAUGURADO EM\n06/09/1921", Vector3(11.9, 1.65, face - 0.035), 0.07,
+		Color("#3A2A14") if not present else Color("#2E2A22"), 180.0)
 
 
 func _build_windows() -> void:

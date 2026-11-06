@@ -10,6 +10,13 @@ extends Node3D
 func _ready() -> void:
 	get_tree().call_group("hud", "set_first_person", true)
 	get_tree().process_frame.connect(_update_mouse_mode)
+	# O fim pode chegar em qualquer sala (na dupla online, Helena pode estar longe do Saguão)
+	WorldState.flag_changed.connect(_on_world_flag)
+
+
+func _on_world_flag(key: String, value: Variant) -> void:
+	if key == EndScreen.ENDED and value:
+		EndScreen.open(get_tree())
 
 
 func _update_mouse_mode() -> void:

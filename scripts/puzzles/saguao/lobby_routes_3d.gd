@@ -21,4 +21,7 @@ func _ready() -> void:
 	var lift := preload("res://scripts/puzzles/saguao/lobby_lift_puzzle_3d.gd").new()
 	add_child(lift)
 	lift.install(self)
+	var exit := preload("res://scripts/puzzles/saguao/lobby_exit_puzzle_3d.gd").new()
+	add_child(exit)
+	exit.install(self)
 	super()

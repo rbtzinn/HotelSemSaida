@@ -8,11 +8,13 @@ const PAST_SWITCHES := [
 	"cozinha.elevador.no_alto", "cozinha.elevador.freio", "cozinha.elevador.travado",
 	"biblioteca.estante.ordenada", "biblioteca.cifra.resolvida", "biblioteca.livro.pego",
 	"biblioteca.livro.guardado", "biblioteca.arquivo.aberto", "caldeiras.pressao.erro",
+	"saguao.cofre.aberto", "saguao.chave.entrada", "saguao.entrada.trava_1923", "saguao.livro.helena",
 ]
 const PRESENT_SWITCHES := [
 	"saguao.bolsa.marta", "cozinha.concluida", "manutencao.chave.pega", "biblioteca.porta.hoje",
 	"biblioteca.pagina.lida", "biblioteca.concluida", "caldeiras.oficina.visitada",
 	"caldeiras.f2.inspecao.aberta", "caldeiras.limpeza.aberta", "caldeiras.concluida",
+	"saguao.chave.marta", "saguao.entrada.cadeado", "jogo.final", "jogo.encerrado",
 ]
 const RANGES := {
 	"saguao.quadro.gancho": Vector2i(0, 12), "caldeiras.pressao.etapa": Vector2i(-1, 3),
