@@ -214,6 +214,65 @@ Escolhas do Roberto: a etapa S4 abre a **entrada principal** (não mais a porta 
 
 **Flags novas** (todas entram em `coop_progress.gd`): passado `saguao.cofre.aberto`, `saguao.entrada.trava_1923`, `saguao.livro.helena`; presente `saguao.chave.marta`, `saguao.entrada.cadeado`, `jogo.final`.
 
+### Andares de cima: Quartos, Salão de baile e Torre do relógio (proposta de 06/11/2026, aguardando aprovação)
+
+Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; acesso pelo **elevador principal**; as fases trazem **pistas sobre Helena** sem fechar o destino dela; o **piano do Saguão** toca a melodia descoberta no salão e abre o caminho para o telhado.
+
+**Ordem completa:** Saguão → Cozinha → Manutenção → Biblioteca → Caldeiras → Saguão (bolsa de Marta) → **Quartos (2º andar) → Salão de baile (3º andar) → piano do Saguão → Torre do relógio** → Saguão (cofre e entrada principal) → final.
+
+**Como se sobe.** Helena usa a escada principal de 1923 e, nos andares, a cabine do elevador (a chave de Bento ficou presa no painel do térreo, então a cabine não volta mais ao Saguão). Hoje, a escada principal desabou; Lia sobe pela escada de marinheiro do poço, a mesma que leva à bolsa de Marta. A cabine tem alçapão no piso e no teto, então parada no meio do poço ela nunca prende Lia. **Onde Helena deixa a cabine é onde ela está hoje** (`saguao.elevador.andar`: 1 = 2º andar, 2 = 3º andar, 3 = casa de máquinas, que é o padrão depois da chave de Bento). A bolsa de Marta passa a apontar o caminho: «O Dr. Ferraz morava no 214. A gerência nunca mais abriu o andar.»
+
+**Mudança na bolsa:** examinar a bolsa só lê a foto. A chave miúda vira um «Pegar chave miúda» à parte, para Lia não subir os andares com a mão ocupada.
+
+#### Quartos (2º andar) — o que cada hóspede deixou
+
+1. **Porta de pavimento** (ensina o acesso). Hoje, Lia chega pelo poço à porta do 2º andar, travada; pela fresta vê a alavanca de destrave do lado do corredor. Em 1923, Helena puxa a alavanca e a calça com a cunha do carrinho de serviço (sem a cunha, ela volta sozinha). Hoje, a alavanca enferrujou presa embaixo e a porta abre. Flag `quartos.pavimento.calcado`.
+2. **Bandeira do 207** (quarto de Helena). Em 1923, Helena tem a chave do próprio quarto. Hoje, a porta do 207 está inchada e trancada pelo trinco de dentro. Helena pode abrir a bandeira de vidro sobre a porta (correntinha, por dentro) e deixá-la aberta. Hoje, a bandeira ficou emperrada aberta; Lia pega um cabide de arame na rouparia e, pela bandeira, levanta o trinco. Flags `quartos.bandeira.aberta`, `quartos.cabide.pego`, `quartos.207.aberto`.
+3. **Diário de Helena** (onde guardar). Em 1923, Helena escreve no diário na escrivaninha e escolhe onde guardá-lo: gaveta, guarda-roupa ou fundo falso da mala de couro encerado. Hoje, a gaveta virou pasta de papel, o guarda-roupa tem cupins, e só na mala o diário sobrevive (Lia acha o fundo falso pelo forro descosturado). Texto do diário (pista sobre Helena): ela ouve música no salão de baile às 3 h, sempre quatro notas, sem ninguém tocando; o Sr. Amaral, o gerente, «toca a valsa no piano do Saguão toda noite e depois sobe para dar corda no relógio da torre. A chave do cofre mora com o pêndulo.» Flags `quartos.diario.local` (0 a 3), `quartos.diario.lido`.
+4. **Quarto 214** (fecho; Caio, 1951). Em 1923, a chave mestra do andar fica no armário da governanta. Helena pode escondê-la atrás do espelho chumbado do corredor, o único lugar que ninguém mexe em 100 anos. Hoje, o espelho está rachado; Lia o tira da parede e acha a chave. O 214 está como o dossiê dizia, «pertences intactos»: a maleta de médico de Caio e o caderno dele, «Ouvi as quatro notas pela parede do salão. Escrevi os números na partitura que achei na banqueta.» Flags `quartos.chave_mestra.escondida`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`.
+
+#### Salão de baile (3º andar) — a valsa das 3 h
+
+1. **Cabine como degrau** (acesso de Lia). Hoje, a escada do poço está quebrada entre o 2º e o 3º andar. Em 1923, Helena chama a cabine na botoeira do 2º andar e a deixa ali. Hoje, a cabine está parada no 2º andar: Lia entra nela pela porta do corredor, sai pelo alçapão do teto e alcança a escada inteira acima do trecho quebrado. Flag `saguao.elevador.andar` = 1.
+2. **Contrapeso da cortina**. Hoje, a escadinha do palco desabou e o palco ficou 1,2 m acima do piso. Em 1923, Helena solta o saco de areia do contrapeso da cortina, que cai na frente do palco. Hoje, o saco endureceu num monte que serve de degrau (como o forno petrificado da Cozinha). Flag `salao.contrapeso.solto`.
+3. **Partitura na banqueta**. Em 1923, a partitura da «Valsa da Aurora» fica na estante do maestro, só com a pauta. Helena pode guardá-la na banqueta forrada do piano de palco. Hoje, se ela foi guardada, Lia a encontra com os números a lápis de Caio (1951): o dedilhado da introdução, **3 · 1 · 5 · 6** a partir da tecla marcada com latão. Se ficou na estante, virou pó. Em 1923, quem lê música pode deduzir as notas pela pauta, mas sem os números. Flags `salao.partitura.guardada`, `salao.partitura.lida`.
+4. **A valsa às 3 h** (fecho e cutscene). Ao ler a partitura, a cutscene mostra o salão de 1923 vazio às 3 h, as luzes oscilando e o piano de palco tocando sozinho. Flag `salao.concluido`.
+
+#### Piano do Saguão (minigame de piano)
+
+- Em 1923, Helena toca no piano de cauda do Saguão: minigame em close, uma oitava de teclas brancas, com a tecla de latão marcada. A sequência 3 · 1 · 5 · 6 solta a lingueta do painel atrás do piano, que o Sr. Amaral mandou ligar ao mecanismo do piano: é a entrada da escada de serviço da torre, em caracol. Hoje, o painel ficou destrancado e Lia também passa. Sequência errada: nada acontece; tentativas ilimitadas. Flag `saguao.piano.valsa`.
+- Sem áudio ainda: o minigame mostra as teclas abaixando. Quando houver som, cada tecla toca a nota.
+
+#### Telhado e torre do relógio — a hora em que Helena sumiu
+
+1. **Caixa d'água** (travessia). A escada em caracol sai no telhado. Hoje, o caminho até a torre passa por vigas podres. Em 1923, a boia da caixa d'água vaza sobre um dos lados do telhado; Helena fecha o registro. Hoje, as vigas do lado seco estão firmes e as do outro desabaram: Lia atravessa pelo lado seco. Sem o registro fechado, as duas passagens estão podres. Flag `torre.registro.fechado`.
+2. **Relógio parado**. Hoje, o relógio da torre está parado em **3h07**, e a janelinha da data mostra **14/03**, o mesmo dia em que o lustre se acendeu pela primeira vez. Em 1923, o relógio funciona.
+3. **Pêndulo e chave do gerente**. Em 1923, a caixa do pêndulo é trancada por um mecanismo que só cede com os ponteiros em 3h07. Helena move os ponteiros (minigame de dois ponteiros), a caixa abre e ela pega a **chave do gerente**. Os ponteiros ficam onde ela os deixou: se Helena puser outra hora, hoje o relógio mostra essa outra hora. Flags `torre.ponteiros` (minutos, 0 a 719), `torre.pendulo.aberto`, `torre.chave.gerente`.
+4. **Os nomes riscados** (fecho e cutscene). Hoje, dentro da caixa do pêndulo, Lia vê riscos na madeira: «H. 14/03/1923», «O. 1923», «C.F. 1951», «M.S. 1979», «T.R. 2003» e, embaixo, um risco novo que começa e não termina. Flag `torre.concluida`.
+
+#### O cofre com duas fechaduras (ajuste da S4)
+
+O cofre da gerência passa a ter também a fechadura do gerente: Helena precisa girar a chave do gerente (da torre) **e** acertar o segredo 1403 (coroa do lustre). Isso impede abrir o cofre antes das fases novas. O resto da S4 e o final continuam como aprovados.
+
+#### Cutscenes (no motor, com câmera, faixas de cinema e legendas, sem vozes)
+
+A câmera sai dos olhos da personagem, percorre o cenário 3D e volta para onde ela estava. E, Enter ou Esc pulam a cutscene; cada uma toca só uma vez (`cena.<nome>`, entra no save).
+
+| Momento | O que mostra |
+| --- | --- |
+| Abertura | Saguão em 1923: festa, lustre aceso, «Grand Hotel Aurora, março de 1923». Corte para o mesmo percurso hoje, em ruínas: «O mesmo hotel, cem anos depois. Lia não lembra de ter entrado.» Termina nos olhos de Helena. |
+| Primeira troca de época | Ao primeiro Tab, a câmera recua dos olhos de uma e entra nos da outra pela mesma planta: «Mesmo lugar. Outro tempo.» |
+| Fim da Cozinha | Lia cai pelo piso. A câmera mostra a despensa de 1923 e o lápis no cardápio: «Otília, cozinheira. 1923.» |
+| Fim da Biblioteca | O dossiê aberto no arquivo, a ficha sem nome: «Dr. Caio Ferraz. 1951.» |
+| Fim das Caldeiras | A lanterna apagada de Tomás; a câmera sobe pelos canos até o Saguão: «Tomás Reis. 2003.» |
+| Bolsa de Marta | A foto da oficina e a correia na soleira: «Marta Siqueira. 1979.» |
+| Fim dos Quartos | O diário de Helena aberto sobre a mala: «Helena. Março de 1923.» |
+| Fim do Salão | A valsa das 3 h tocando sozinha no salão de 1923. |
+| Fim da Torre | Os nomes riscados e o risco novo, inacabado. |
+| Final | Lia empurra a porta, clarão, contracampo: ela está de novo no Saguão. Depois do livro, corte para Helena em 1923 diante da porta giratória, que treme com três batidas. Tela de fim. |
+
+**Flags novas** (todas entram em `coop_progress.gd`). Passado: `quartos.pavimento.calcado`, `quartos.bandeira.aberta`, `quartos.diario.local`, `quartos.chave_mestra.escondida`, `saguao.elevador.andar`, `salao.contrapeso.solto`, `salao.partitura.guardada`, `saguao.piano.valsa`, `torre.registro.fechado`, `torre.ponteiros`, `torre.pendulo.aberto`, `torre.chave.gerente`, `saguao.cofre.chave`. Presente: `quartos.cabide.pego`, `quartos.207.aberto`, `quartos.diario.lido`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`, `salao.partitura.lida`, `salao.concluido`, `torre.concluida`. As cutscenes (`cena.*`) são locais em cada máquina.
+
 ## Minigames
 
 Os dois tipos escolhidos são mecanismos e fechaduras, e piano e ritmo. Cada minigame abre em uma tela própria, em close, e sempre faz parte de um enigma, nunca é só enfeite.

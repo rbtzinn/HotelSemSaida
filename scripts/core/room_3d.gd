@@ -20,6 +20,9 @@ func _on_world_flag(key: String, value: Variant) -> void:
 
 
 func _update_mouse_mode() -> void:
+	# O sinal pode chegar no mesmo quadro em que a sala sai da árvore (volta à recepção)
+	if not is_inside_tree():
+		return
 	var wanted := Input.MOUSE_MODE_VISIBLE if get_tree().paused else Input.MOUSE_MODE_CAPTURED
 	if Input.mouse_mode != wanted:
 		Input.mouse_mode = wanted
