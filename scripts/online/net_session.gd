@@ -122,6 +122,8 @@ func _begin(data: Dictionary) -> void:
 	phase = Phase.PLAYING
 	RoomManager.clear_away()
 	WorldState.load_dict(data.get("flags", {}))
+	if data.is_empty():
+		WorldState.set_flag(StoryCutscenes.OPENING_PENDING)
 	EraManager.set_era(local_era)
 	var spot: Dictionary = data.get(Era.character_name(local_era), {})
 	get_tree().change_scene_to_file(spot.get("room", HOTEL))
@@ -133,7 +135,8 @@ func _begin(data: Dictionary) -> void:
 		motor.get_node("Head").rotation.x = spot.pitch
 
 func _publish(key: String, value: Variant) -> void:
-	if phase != Phase.PLAYING or _receiving:
+	# Cutscenes vistas são de cada máquina
+	if phase != Phase.PLAYING or _receiving or key.begins_with(Cutscene.PREFIX):
 		return
 	if RULES.allowed(local_era, key, value):
 		_receive_flag.rpc_id(partner, key, value)

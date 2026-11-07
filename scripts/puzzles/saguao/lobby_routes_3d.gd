@@ -25,3 +25,6 @@ func _ready() -> void:
 	add_child(exit)
 	exit.install(self)
 	super()
+	if WorldState.is_set(StoryCutscenes.OPENING_PENDING):
+		WorldState.set_flag(StoryCutscenes.OPENING_PENDING, false)
+		StoryCutscenes.opening.call_deferred(get_tree())

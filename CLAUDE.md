@@ -205,6 +205,11 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `EndScreen` (`scripts/ui/end_screen.gd`): qualquer `Room3D` a abre quando `jogo.encerrado` liga; espera as telas em close fecharem, salva (solo ou dupla) e volta à recepção.
 - O cofre agora tem colisão (antes dava para atravessá-lo atrás do balcão). Teste `tools/test_saguao_final_3d.gd` (preserva o save real).
 
+## Cutscenes (07/11/2026)
+
+- `Cutscene` (`scripts/ui/cutscene.gd`): câmera própria no cenário 3D, faixas de cinema e legendas; pausa o jogo, esconde o HUD, troca a época por tomada (`"era"`) e no fim devolve a época e os olhos da personagem ativa. E, Enter ou Esc pulam. Toca uma vez: `cena.<id>` no WorldState (vai no save, nunca pela rede). Desligada sem janela (`Cutscene.enabled`), para os testes automáticos não pararem; `tools/test_cutscenes.gd` liga de novo.
+- `StoryCutscenes` (`scripts/story/story_cutscenes.gd`) guarda o roteiro: `opening` (jogo novo: `entrada.gd` e `NetSession._begin` ligam `cena.abertura.pendente`, o Saguão toca) e `first_switch` (`Room3D`, no primeiro Tab dentro da mesma sala, só no solo). As cutscenes de fim de capítulo e do final entram nas próximas etapas (lista no `GDD.md`).
+
 ## Dupla online (05/11/2026)
 
 - `NetSession` (autoload, `scripts/online/net_session.gd`): ENet UDP 7777; o anfitrião escolhe a época e o visitante fica com a outra. Cada máquina simula só a própria personagem; portas, leitura e pausa são locais. Roteiro do Playit em `JOGAR-ONLINE.md`.
