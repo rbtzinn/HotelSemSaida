@@ -194,7 +194,12 @@ func _save_with(guest: Dictionary) -> void:
 	if not is_host or not _saving or multiplayer.get_remote_sender_id() != partner:
 		return
 	_saving = false
-	var data := {"version":PROTOCOL, "flags":WorldState.to_dict()}
+	var flags := WorldState.to_dict()
+	# Cutscenes vistas são de cada máquina e ficam fora do save da dupla
+	for key: String in flags.keys():
+		if key.begins_with(Cutscene.PREFIX):
+			flags.erase(key)
+	var data := {"version":PROTOCOL, "flags":flags}
 	data[Era.character_name(local_era)] = _spot()
 	data[Era.character_name(Era.other(local_era))] = guest
 	var message := "Aguarde os dois terminarem a travessia e salve de novo."
