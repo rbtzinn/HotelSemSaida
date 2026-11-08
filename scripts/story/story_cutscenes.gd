@@ -123,3 +123,17 @@ static func knocks(tree: SceneTree) -> Cutscene:
 	shots.append({"time": 1.5, "from": Vector3(10, 1.6, 8.62), "look_from": Vector3(10, 1.5, 10.7),
 		"to": Vector3(10, 1.6, 8.8), "look_to": Vector3(10, 1.5, 10.7)})
 	return Cutscene.play(tree, "final_batidas", shots)
+
+
+## Quartos: o diário de Helena. A escrivaninha em 1923 e, hoje, a mala onde ele sobreviveu.
+static func helena_diary(tree: SceneTree) -> Cutscene:
+	var desk := GuestFloorRoom3D.DESK
+	var trunk := GuestFloorRoom3D.TRUNK + Vector3(0, 0.45, 0)
+	return Cutscene.play(tree, "fim_quartos", [
+		{"era": Era.Id.PAST_1923, "fade": true, "time": 5.0, "caption": "Helena. Quarto 207, março de 1923.",
+			"from": desk + Vector3(1.6, 0.8, -1.4), "look_from": desk,
+			"to": desk + Vector3(0.9, 0.5, -0.6), "look_to": desk + Vector3(0, -0.05, 0.1)},
+		{"era": Era.Id.PRESENT, "time": 5.0, "caption": "Ela escrevia que ia embora. Todas as noites.",
+			"from": trunk + Vector3(-1.2, 0.9, -1.0), "look_from": trunk,
+			"to": trunk + Vector3(-0.6, 0.5, -0.5), "look_to": trunk},
+	])

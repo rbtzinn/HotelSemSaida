@@ -5,7 +5,7 @@ extends SceneTree
 ## Rodar: Godot_console.exe --headless --path . --script res://tools/test_coop_flags.gd
 
 const RULES := preload("res://scripts/online/coop_progress.gd")
-const FLOORS := "(saguao|cozinha|manutencao|biblioteca|caldeiras|jogo)"
+const FLOORS := "(saguao|cozinha|manutencao|biblioteca|caldeiras|jogo|quartos|salao)"
 ## Chaves montadas com % no código, já expandidas.
 const EXPANDED := ["biblioteca.volume.0", "biblioteca.volume.1", "biblioteca.volume.2", "biblioteca.volume.3",
 	"caldeiras.f2.pinhao_f2.retirada", "caldeiras.f2.pinhao_f2.guardada",

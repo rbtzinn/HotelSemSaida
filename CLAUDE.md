@@ -6,7 +6,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 
 - **Jogo 3D em primeira pessoa** é o jogo de verdade. O 2D (pixel art) continua no repositório como histórico e referência dos enigmas da Cozinha; não é mais desenvolvido. As seções sobre 2D mais abaixo valem só para os arquivos 2D.
 - Cena principal: `scenes/ui/entrada.tscn` (recepção: jogar solo, continuar solo, ou dupla online).
-- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d` (pasta `scenes/rooms/`).
+- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
 - Falta: piano do Saguão, áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
@@ -204,6 +204,13 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `lobby_exit_puzzle_3d.gd` (instalado por `LobbyRoutes3D`): cofre de 1923 atrás do balcão (`1403`, `saguao.cofre.aberto`, chave `chave_entrada`, `saguao.chave.entrada`); a data está na coroa do lustre caído hoje e a placa de 1921 é a pista falsa. Entrada: Helena solta a trava da porta giratória (`saguao.entrada.trava_1923`), que mesmo assim não gira; Lia abre o cadeado de 1979 (`saguao.entrada.cadeado`). Com as duas, Lia "sai" num clarão e volta ao Saguão de costas para a porta (`jogo.final`); a corrente aparece de novo. Com o Tab (ou na dupla, na hora), Helena ouve três batidas.
 - `EndScreen` (`scripts/ui/end_screen.gd`): qualquer `Room3D` a abre quando `jogo.encerrado` liga; espera as telas em close fecharem, salva (solo ou dupla) e volta à recepção.
 - O cofre agora tem colisão (antes dava para atravessá-lo atrás do balcão). Teste `tools/test_saguao_final_3d.gd` (preserva o save real).
+
+## Quartos — 2º andar (08/11/2026; design aprovado no `GDD.md`, "Andares de cima")
+
+- Cena `scenes/rooms/quartos_3d.tscn`: `GuestFloorRoom3D` (cenário fixo: corredor, escada principal a oeste, rouparia, 214, 207, poço do elevador a leste no mesmo x do Saguão) e `GuestFloorLevel3D` (enigmas). Helena chega pela escada de 1923 (Saguão: `SubirEscada`, marker `DaEscada`); Lia pela escada do poço (Saguão: `SubirAndar`, exige `saguao.bolsa.marta`; marker `DoPoco`). Voltam a `DoAndar2Escada` / `DoAndar2Poco` no Saguão.
+- Q1 cunha do carrinho calça a alavanca (`quartos.pavimento.calcado`): hoje a grade do pavimento abre. Q2 correntinha da bandeira do 207 (`quartos.bandeira.aberta`) + cabide da rouparia hoje abrem o 207 (`quartos.207.aberto`). Q3 diário: `quartos.diario.local` 0 escrivaninha, 1 gaveta, 2 guarda-roupa, 3 fundo falso da mala, 4 na mão de Helena; só na mala Lia o lê hoje (`quartos.diario.lido`, cutscene `helena_diary`). Q4 chave mestra da rouparia escondida atrás do espelho (`quartos.chave_mestra.*`) abre o 214 hoje; o caderno de Caio liga `quartos.concluido` e muda conforme `salao.partitura.guardada`.
+- Bolsa de Marta: examinar só lê (o verso aponta o 214); a chave miúda é o `ChaveMiuda` à parte, para Lia não subir com a mão ocupada.
+- Teste `tools/test_quartos_3d.gd`. Protocolo da dupla subiu para 4.
 
 ## Cutscenes (07/11/2026)
 

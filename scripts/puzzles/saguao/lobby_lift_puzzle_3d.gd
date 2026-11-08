@@ -20,6 +20,7 @@ var grille_view: Area3D
 var keys: Array[Node3D] = []
 var inserted: Node3D
 var marta_key: Node3D
+var key_pickup: Area3D
 
 
 func install(room: ChapterRoom3D) -> void:
@@ -114,10 +115,20 @@ func _make_pit(room: ChapterRoom3D, today: Node3D) -> void:
 		Vector3(0.55, 0.42, 0.32), {
 			"prompt_text":"Examinar bolsa de câmera", "title":"Bolsa de Marta Siqueira · 1979",
 			"photograph":preload("res://art/biblioteca/marta_f2_1979.jpg"), "available_in":1, "required_flag":RAISED})
-	# A chave miúda pendurada na etiqueta, até Lia soltá-la
+	# A chave miúda pendurada na etiqueta, até Lia soltá-la. A área fica na frente da bolsa e só
+	# existe enquanto a chave estiver lá e a bolsa já tiver sido examinada.
 	marta_key = room.key_visual(today, at+Vector3(0.13, -0.03, 0.15), true)
 	marta_key.scale = Vector3.ONE * 0.5
 	marta_key.rotation_degrees.z = -80
+	key_pickup = room.area(preload("res://scripts/interaction3d/item_pickup_3d.gd"), today, "ChaveMiuda",
+		at+Vector3(0.13, -0.03, 0.31), Vector3(0.2, 0.2, 0.1), {
+			"prompt_text": "Pegar chave miúda", "item_id": MartaBag3D.KEY, "taken_flag": MartaBag3D.TAKEN,
+			"required_flag": BAG, "available_in": 1})
+	# Subida pela escada do poço até o 2º andar (depois da bolsa, que aponta o caminho)
+	room.area(preload("res://scripts/interaction3d/door_3d.gd"), today, "SubirAndar", Vector3(16.42, 2.1, 2.08),
+		Vector3(0.96, 0.9, 0.12), {
+			"target_scene": "res://scenes/rooms/quartos_3d.tscn", "target_spawn": "DoPoco",
+			"prompt_text": "Subir pela escada do poço", "available_in": 1, "required_flag": BAG})
 	var down := room.area(ACTION, today, "DescerPoco", Vector3(16.42, 0.83, 2.08), Vector3(0.96, 1.10, 0.12), {
 		"prompt_text": "Descer pela escada do poço",
 		"available_in": 1,
@@ -169,7 +180,7 @@ func _restore() -> void:
 	gate.position.y = 4.77 if raised else 1.28
 	grille_view.collision_layer = 0 if raised else FirstPersonMotor.INTERACT_LAYER
 	inserted.visible = raised
-	marta_key.visible = not WorldState.is_set(MartaBag3D.TAKEN)
+	_show_marta_key()
 	_show_keys()
 
 
@@ -182,8 +193,8 @@ func _show_keys() -> void:
 func _on_flag(key: String, _value: Variant) -> void:
 	if key == HOOK:
 		_show_keys()
-	elif key == MartaBag3D.TAKEN:
-		marta_key.visible = not WorldState.is_set(key)
+	elif key == MartaBag3D.TAKEN or key == BAG:
+		_show_marta_key()
 	elif key == RAISED:
 		present_car.position.y = 3.55
 		gate.position.y = 4.77
@@ -191,6 +202,13 @@ func _on_flag(key: String, _value: Variant) -> void:
 		inserted.show()
 		var lift := past_car.create_tween()
 		lift.tween_property(past_car, "position:y", 3.55, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _show_marta_key() -> void:
+	var there := not WorldState.is_set(MartaBag3D.TAKEN)
+	marta_key.visible = there
+	# Fora de uso, a área não pode tapar a bolsa na mira
+	key_pickup.collision_layer = FirstPersonMotor.INTERACT_LAYER if there and WorldState.is_set(BAG) else 0
 
 
 func _say(message: String) -> void:

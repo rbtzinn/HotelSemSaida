@@ -52,8 +52,10 @@ func _run() -> void:
 		await physics_frame
 	assert(current_scene.find_child("BolsaMarta", true, false).get_parent().name == "WorldToday")
 	await _use("Lia", "WorldToday/BolsaMarta", lia.position)
-	assert(state.is_set("saguao.bolsa.marta") and state.get_flag("lia.mao") == "chave_portaria", "Lia guarda a chave")
+	assert(state.is_set("saguao.bolsa.marta") and str(state.get_flag("lia.mao", "")) == "", "Examinar só lê")
 	await _close_overlays()
+	await _use("Lia", "WorldToday/ChaveMiuda", lia.position)
+	assert(state.get_flag("lia.mao") == "chave_portaria", "Lia pega a chave à parte")
 	assert("Marta Siqueira, 1979" in _book())
 	await _use("Lia", "WorldToday/SubirPoco", lia.position)
 	for i in 340:

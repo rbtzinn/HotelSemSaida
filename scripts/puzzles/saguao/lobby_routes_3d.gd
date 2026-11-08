@@ -18,6 +18,17 @@ func _ready() -> void:
 				"prompt_text": "Biblioteca",
 			})
 	marker("DaBiblioteca", Vector3(LIBRARY_DOOR.x, 0, LobbyRoom3D.NORTH + 1.0), PI)
+	# Escada principal: em 1923 leva ao 2º andar; hoje desabou
+	area(preload("res://scripts/interaction3d/door_3d.gd"), get_node("World1923"), "SubirEscada", Vector3(3.0, 1.0, 3.75),
+		Vector3(3.0, 2.0, 0.2), {
+			"target_scene": "res://scenes/rooms/quartos_3d.tscn", "target_spawn": "DaEscada",
+			"prompt_text": "Subir ao 2º andar", "available_in": 0})
+	area(preload("res://scripts/interaction3d/message_interactable_3d.gd"), get_node("WorldToday"), "EscadaDesabada",
+		Vector3(3.0, 1.0, 3.75), Vector3(3.0, 2.0, 0.2), {
+			"prompt_text": "Examinar escada", "available_in": 1,
+			"message": "A escada principal desabou. Os degraus que sobraram não aguentam peso."})
+	marker("DoAndar2Escada", Vector3(3.0, 0, 4.4), PI)
+	marker("DoAndar2Poco", Vector3(16.48, 0, 2.55), PI)
 	var lift := preload("res://scripts/puzzles/saguao/lobby_lift_puzzle_3d.gd").new()
 	add_child(lift)
 	lift.install(self)
