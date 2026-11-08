@@ -214,7 +214,7 @@ Escolhas do Roberto: a etapa S4 abre a **entrada principal** (não mais a porta 
 
 **Flags novas** (todas entram em `coop_progress.gd`): passado `saguao.cofre.aberto`, `saguao.entrada.trava_1923`, `saguao.livro.helena`; presente `saguao.chave.marta`, `saguao.entrada.cadeado`, `jogo.final`.
 
-### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos, Salão e piano do Saguão feitos em 08/11/2026)
+### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos, Salão, piano do Saguão e Torre feitos em 08/11/2026)
 
 Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; acesso pelo **elevador principal**; as fases trazem **pistas sobre Helena** sem fechar o destino dela; o **piano do Saguão** toca a melodia descoberta no salão e abre o caminho para o telhado.
 
@@ -252,6 +252,8 @@ Decisões do Roberto (08/11/2026): no 3º andar a porta de pavimento de hoje já
 2. **Relógio parado**. Hoje, o relógio da torre está parado em **3h07**, e a janelinha da data mostra **14/03**, o mesmo dia em que o lustre se acendeu pela primeira vez. Em 1923, o relógio funciona.
 3. **Pêndulo e chave do gerente**. Em 1923, a caixa do pêndulo é trancada por um mecanismo que só cede com os ponteiros em 3h07. Helena move os ponteiros (minigame de dois ponteiros), a caixa abre e ela pega a **chave do gerente**. Os ponteiros ficam onde ela os deixou: se Helena puser outra hora, hoje o relógio mostra essa outra hora. Flags `torre.ponteiros` (minutos, 0 a 719), `torre.pendulo.aberto`, `torre.chave.gerente`.
 4. **Os nomes riscados** (fecho). Hoje, dentro da caixa do pêndulo, Lia vê riscos na madeira: «H. 14/03/1923», «O. 1923», «C.F. 1951», «M.S. 1979», «T.R. 2003» e, embaixo, um risco novo que começa e não termina. Flag `torre.concluida`.
+
+Decisões do Roberto (08/11/2026): telhado e torre ficam **numa cena só** (casinha da escada, terraço da frente com a caixa d'água, duas passarelas de vigas sobre o vão, terraço e torre). Hoje, Lia lê a hora num **mostrador de acerto** pequeno no mecanismo, com a janelinha da data (o mostrador grande da fachada mostra a mesma hora). No minigame, Helena **gira o ponteiro dos minutos e o das horas acompanha** (A/D ou setas, segurando acelera; E confirma; Esc sai sem mexer). Passarela podre **não deixa passar** (tábuas quebradas fecham as pontas). Escolhas menores: a boia vaza sobre a passarela **leste**, então hoje o lado firme é o **oeste**; em 1923, antes de Helena mexer, o relógio marca **11h40**; a caixa do pêndulo, aberta uma vez, fica aberta mesmo que os ponteiros mudem de novo; hoje, só com a caixa aberta por Helena Lia lê os nomes.
 
 #### O cofre com duas fechaduras (ajuste da S4)
 

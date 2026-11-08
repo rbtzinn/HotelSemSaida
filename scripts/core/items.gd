@@ -12,6 +12,7 @@ const DATA: Dictionary = {
 	"cabide": {"name": "Cabide de arame", "color": Color("#8A8A88")},
 	"diario": {"name": "Diário de Helena", "color": Color("#573526")},
 	"chave_mestra": {"name": "Chave mestra do 2º andar", "color": Color("#C9973B")},
+	"chave_gerente": {"name": "Chave da gerência", "color": Color("#C9973B")},
 	"partitura": {"name": "Partitura da Valsa da Aurora", "color": Color("#E8DCC0")},
 	"chave_biblioteca": {"name": "Chave da Biblioteca", "color": Color("#C9973B")},
 	"atlas": {"name": "Atlas do Aurora", "color": Color("#5A1E16")},

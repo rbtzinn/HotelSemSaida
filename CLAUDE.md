@@ -6,10 +6,10 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 
 - **Jogo 3D em primeira pessoa** é o jogo de verdade. O 2D (pixel art) continua no repositório como histórico e referência dos enigmas da Cozinha; não é mais desenvolvido. As seções sobre 2D mais abaixo valem só para os arquivos 2D.
 - Cena principal: `scenes/ui/entrada.tscn` (recepção: jogar solo, continuar solo, ou dupla online).
-- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d` (pasta `scenes/rooms/`).
+- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d`, `torre_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: torre do relógio, cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -219,13 +219,20 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Helena sobe pela escada de 1923 dos Quartos (`SubirEscada`, lance leste do vão; `DescerEscada` ficou no lance oeste). Markers do Salão: `DaEscada`, `DoPoco`; voltam a `DaEscada` / `DoPoco` dos Quartos.
 - Contrapeso: em 1923 a malagueta solta o saco (`salao.contrapeso.solto`); hoje ele é o `MonteDeAreia` (0,6 m) encostado no palco, o degrau para Lia subir pulando.
 - Partitura (`partitura` na mão): estante ⇄ mão ⇄ banqueta (`salao.partitura.guardada`, ida e volta). Em 1923 a leitura mostra a pauta desenhada por `ScoreSheet` (`scripts/ui/score_sheet.gd`, imagem gerada por código); hoje, com a partitura guardada, a banqueta mostra os números de Caio (3 · 1 · 5 · 6 a partir da tecla de latão = dó) e liga `salao.partitura.lida` e `salao.concluido`.
-- Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5 (hoje 6); o save da dupla aceita qualquer versão anterior.
+- Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5 (hoje 7); o save da dupla aceita qualquer versão anterior.
 
 ## Piano do Saguão (08/11/2026; design no `GDD.md`, "Piano do Saguão")
 
 - `lobby_piano_3d.gd` (instalado por `LobbyRoutes3D`): em 1923, `TocarPiano` abre `PianoUI` (`scripts/ui/piano_ui.gd`: 8 teclas brancas, dó de latão na 1ª, mouse ou 1 a 8; as últimas notas formando a melodia emitem `solved`; errar não faz nada). A valsa `3 · 1 · 5 · 6` liga `saguao.piano.valsa` e abre o painel da parede leste atrás do piano (folha com colisão própria, que gira junto). Hoje: `LonaPiano` mostra a plaquinha de latão; o painel aberto vale para as duas.
-- A escada em caracol atrás do painel ainda só dá uma mensagem: a Torre vem na próxima etapa. O vão escuro ainda não tem passagem (a parede continua sólida atrás dele) e precisa virar porta para a Torre.
-- Teste `tools/test_piano_saguao_3d.gd`. Protocolo da dupla: 6.
+- Com o painel aberto, "Subir a escada em caracol" leva à Torre (`DaEscada`); de lá volta a `DaTorre`, na frente do painel. O vão é só a entrada visual (a parede atrás é sólida; a passagem é pela interação).
+- Teste `tools/test_piano_saguao_3d.gd`.
+
+## Telhado e torre do relógio (08/11/2026; design no `GDD.md`, "Andares de cima")
+
+- Cena `scenes/rooms/torre_3d.tscn`: `TowerRoom3D` (casinha da escada, terraço da frente com a caixa d'água, vão do telhado com parapeitos, terraço e torre com mecanismo, mostradores e caixa do pêndulo) e `TowerLevel3D`.
+- Passarelas: em 1923 as duas firmes; hoje dependem de `torre.registro.fechado` (oeste firme / leste caída; sem o registro, as duas podres). Podre ou caída: tábuas quebradas sólidas nas duas pontas, sem piso no meio. Cada estado é um nó com as próprias colisões (`_set_solid`).
+- Relógio: `torre.ponteiros` (0..719 minutos, 0 = 12h00). Sem a flag, 1923 marca 11h40 e hoje 3h07. `ClockUI` (`scripts/ui/clock_ui.gd`) gira os minutos e as horas juntos; confirmar em 3h07 liga `torre.pendulo.aberto` (fica aberta). Na caixa, Helena pega `chave_gerente` (`torre.chave.gerente`); hoje Lia lê os nomes riscados (`torre.concluida`).
+- Teste `tools/test_torre_3d.gd`. Protocolo da dupla: 7.
 
 ## Sem cutscenes (08/11/2026)
 

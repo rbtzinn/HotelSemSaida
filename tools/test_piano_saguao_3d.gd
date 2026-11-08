@@ -18,6 +18,7 @@ class TestInput extends CharacterInput:
 const LOBBY := "res://scenes/rooms/saguao_3d.tscn"
 const PIANO_UI := "res://scripts/ui/piano_ui.gd"
 const FLAG := "saguao.piano.valsa"
+const TOWER := "res://scenes/rooms/torre_3d.tscn"
 
 var state: Node
 var eras: Node
@@ -58,13 +59,16 @@ func _run() -> void:
 	var stop: Vector3 = await _walk(helena, Vector3(19.0, 0, 5.6), Vector2.DOWN, 90)
 	assert(stop.z < 6.6, "A folha aberta do painel bloqueia: %s" % stop)
 	await _use("Helena", "World1923/Painel1923", Vector3(18.6, 0, 7.1))
+	await _wait_room(TOWER)
+	assert(current_scene.get_node("Helena").position.distance_to(Vector3(1.5, 0, 2.4)) < 0.2, "O painel leva à torre")
 
 	# Hoje: a lona e o painel aberto
 	await _reload(LOBBY, 1)
 	assert(current_scene.get_node("WorldToday/Painel").rotation_degrees.y < -80.0, "Hoje o painel ficou aberto")
 	await _use("Lia", "WorldToday/LonaPiano", Vector3(14.4, 0, 7.2))
 	await _use("Lia", "WorldToday/PainelHoje", Vector3(18.6, 0, 7.1))
-	print("PASS: Piano do Saguão: teclado em close, erro sem efeito, valsa abre o painel nas duas épocas, folha sólida")
+	await _wait_room(TOWER)
+	print("PASS: Piano do Saguão: teclado em close, erro sem efeito, valsa abre o painel nas duas épocas, folha sólida, painel leva à torre")
 	quit()
 
 

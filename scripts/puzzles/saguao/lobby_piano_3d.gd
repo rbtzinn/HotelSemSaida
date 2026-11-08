@@ -2,8 +2,7 @@ extends Node
 ## Piano do Saguão: em 1923, Helena toca a introdução da «Valsa da Aurora» (3 · 1 · 5 · 6 a
 ## partir do dó de latão) e a lingueta do painel atrás do piano se solta. O Sr. Amaral ligou o
 ## painel ao mecanismo do piano: é a entrada da escada de serviço da torre, em caracol. Hoje, o
-## painel ficou destrancado e Lia também passa. A torre vem na próxima etapa; por enquanto a
-## escada só sobe no escuro.
+## painel ficou destrancado e Lia também passa. A escada leva ao telhado e à torre (torre_3d).
 
 const ACTION := preload("res://scripts/interaction3d/interactable_3d.gd")
 const MESSAGE := preload("res://scripts/interaction3d/message_interactable_3d.gd")
@@ -13,10 +12,11 @@ const WALTZ := [3, 1, 5, 6]
 const PANEL_Z := Vector2(6.6, 7.6)
 const PANEL_TOP: float = 2.2
 const KEYBOARD := Vector3(LobbyRoom3D.PIANO.x - 1.4, 0.95, LobbyRoom3D.PIANO.z)
-const STAIR_TEXT := "Uma escada de ferro em caracol sobe por dentro da parede, no escuro. Lá do alto vem um tique-taque."
+const TOWER := "res://scenes/rooms/torre_3d.tscn"
 
 var _leaves: Array[Node3D] = []
 var _openings: Array[Node3D] = []
+var _panel_areas: Array[Area3D] = []
 
 
 func install(room: ChapterRoom3D) -> void:
@@ -32,6 +32,8 @@ func install(room: ChapterRoom3D) -> void:
 		"prompt_text": "Levantar a lona", "available_in": 1,
 		"message": "Debaixo da lona, o teclado amarelou e várias teclas afundaram. Na frente do primeiro dó, uma plaquinha de latão.",
 	})
+	# Onde se chega descendo da torre: na frente do painel, de costas para ele
+	room.marker("DaTorre", Vector3(LobbyRoom3D.EAST - 0.8, 0, (PANEL_Z.x + PANEL_Z.y) / 2.0), PI / 2.0)
 	_restore()
 	WorldState.flag_changed.connect(_on_flag)
 
@@ -79,6 +81,7 @@ func _build_panel(room: ChapterRoom3D, world: Node3D, present: bool) -> void:
 	var spot := Vector3(face - 0.12, 1.1, (PANEL_Z.x + PANEL_Z.y) / 2.0)
 	var examine := room.area(ACTION, world, label, spot, Vector3(0.12, 1.8, width), {
 		"prompt_text": "Examinar painel", "available_in": 1 if present else 0})
+	_panel_areas.append(examine)
 	examine.interacted.connect(_use_panel.bind(present))
 
 
@@ -90,9 +93,10 @@ func _play(_by: FirstPersonMotor) -> void:
 			_say("Atrás do piano, a parede estala. Um painel do lambri se solta e abre."))
 
 
-func _use_panel(_by: FirstPersonMotor, present: bool) -> void:
+func _use_panel(by: FirstPersonMotor, present: bool) -> void:
 	if WorldState.is_set(WALTZ_PLAYED):
-		_say(STAIR_TEXT)
+		if not EraManager.is_switching() and not RoomManager.is_changing():
+			RoomManager.change_room_alone(TOWER, "DaEscada", by.era)
 	elif present:
 		_say("Um painel do lambri, inchado de umidade. Sem maçaneta, sem fechadura. Bate oco.")
 	else:
@@ -105,6 +109,8 @@ func _restore() -> void:
 		hinge.rotation_degrees.y = -95.0 if open else 0.0
 	for opening: Node3D in _openings:
 		opening.visible = open
+	for panel: Area3D in _panel_areas:
+		panel.prompt_text = "Subir a escada em caracol" if open else "Examinar painel"
 
 
 func _on_flag(key: String, _value: Variant) -> void:
