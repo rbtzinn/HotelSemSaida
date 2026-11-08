@@ -9,7 +9,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d`, `torre_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, modelos do Blender na Torre, manutenção e peças dos enigmas; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: áudio, modelos do Blender na Torre, manutenção e peças dos enigmas; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -202,7 +202,8 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `MartaBag3D`: examinar a bolsa no poço também solta a chave miúda (`chave_portaria`, etiqueta PORTARIA; `saguao.chave.marta`) se a mão estiver livre.
 - `lobby_exit_puzzle_3d.gd` (instalado por `LobbyRoutes3D`): cofre de 1923 atrás do balcão (`1403`, `saguao.cofre.aberto`, chave `chave_entrada`, `saguao.chave.entrada`); a data está na coroa do lustre caído hoje e a placa de 1921 é a pista falsa. Entrada: Helena solta a trava da porta giratória (`saguao.entrada.trava_1923`), que mesmo assim não gira; Lia abre o cadeado de 1979 (`saguao.entrada.cadeado`). Com as duas, Lia "sai" num clarão e volta ao Saguão de costas para a porta (`jogo.final`); a corrente aparece de novo. Com o Tab (ou na dupla, na hora), Helena ouve três batidas.
 - `EndScreen` (`scripts/ui/end_screen.gd`): qualquer `Room3D` a abre quando `jogo.encerrado` liga; espera as telas em close fecharem, salva (solo ou dupla) e volta à recepção.
-- O cofre agora tem colisão (antes dava para atravessá-lo atrás do balcão). Teste `tools/test_saguao_final_3d.gd` (preserva o save real).
+- O cofre agora tem colisão (antes dava para atravessá-lo atrás do balcão).
+- **Cofre com duas fechaduras (08/11/2026)**: além do `1403`, a chave do gerente (da Torre) na fechadura de baixo, em qualquer ordem. Girada, a chave fica nela (`saguao.cofre.chave`); o 1403 sem a chave deixa o disco travado no número (`saguao.cofre.segredo`). Com as duas, liga `saguao.cofre.aberto`. Hoje, `CofreHoje` mostra as duas fechaduras, a chave presa se Helena a girou, e o cofre aberto e vazio (`PortaCofreHoje`) se ela o abriu. Teste `tools/test_saguao_final_3d.gd` (preserva o save real).
 
 ## Quartos — 2º andar (08/11/2026; design aprovado no `GDD.md`, "Andares de cima")
 

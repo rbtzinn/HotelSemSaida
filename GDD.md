@@ -257,13 +257,13 @@ Decisões do Roberto (08/11/2026): telhado e torre ficam **numa cena só** (casi
 
 #### O cofre com duas fechaduras (ajuste da S4)
 
-O cofre da gerência passa a ter também a fechadura do gerente: Helena precisa girar a chave do gerente (da torre) **e** acertar o segredo 1403 (coroa do lustre). Isso impede abrir o cofre antes das fases novas. O resto da S4 e o final continuam como aprovados.
+O cofre da gerência passa a ter também a fechadura do gerente: Helena precisa girar a chave do gerente (da torre) **e** acertar o segredo 1403 (coroa do lustre). Isso impede abrir o cofre antes das fases novas. O resto da S4 e o final continuam como aprovados. Decisões do Roberto (08/11/2026): as fechaduras valem **em qualquer ordem**; acertado o 1403 sem a chave, o disco **fica travado no número** (não precisa redigitar); a chave do gerente **fica na fechadura** (a mão de Helena fica livre para a chave da entrada); hoje, Lia vê **as duas fechaduras** no cofre enferrujado, a chave do gerente presa se Helena a girou, e o cofre **aberto e vazio** se Helena o abriu. Flags `saguao.cofre.chave` (chave girada) e `saguao.cofre.segredo` (1403 acertado).
 
 #### Cutscenes: retiradas (08/11/2026)
 
 Pedido do Roberto: o jogo **não tem cutscenes**, e não se fazem novas. As que existiam (abertura, primeira troca, fins de capítulo, bolsa de Marta, valsa e final) foram tiradas do código; continuam só no histórico do git. Os fechos de capítulo ficam no que o jogador lê e vê no cenário (bilhetes, livro de hóspedes, clarão da saída, batidas na porta).
 
-**Flags novas** (todas entram em `coop_progress.gd`). Passado: `quartos.pavimento.calcado`, `quartos.bandeira.aberta`, `quartos.diario.local`, `quartos.chave_mestra.escondida`, `saguao.elevador.andar`, `salao.contrapeso.solto`, `salao.partitura.guardada`, `saguao.piano.valsa`, `torre.registro.fechado`, `torre.ponteiros`, `torre.pendulo.aberto`, `torre.chave.gerente`, `saguao.cofre.chave`. Presente: `quartos.cabide.pego`, `quartos.207.aberto`, `quartos.diario.lido`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`, `salao.partitura.lida`, `salao.concluido`, `torre.concluida`.
+**Flags novas** (todas entram em `coop_progress.gd`). Passado: `quartos.pavimento.calcado`, `quartos.bandeira.aberta`, `quartos.diario.local`, `quartos.chave_mestra.escondida`, `saguao.elevador.andar`, `salao.contrapeso.solto`, `salao.partitura.guardada`, `saguao.piano.valsa`, `torre.registro.fechado`, `torre.ponteiros`, `torre.pendulo.aberto`, `torre.chave.gerente`, `saguao.cofre.chave`, `saguao.cofre.segredo`. Presente: `quartos.cabide.pego`, `quartos.207.aberto`, `quartos.diario.lido`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`, `salao.partitura.lida`, `salao.concluido`, `torre.concluida`.
 
 ## Minigames
 

@@ -479,6 +479,9 @@ func _build_safe(base: Vector3) -> void:
 	_block(base + Vector3(0.22, 0.4, 0.56), Vector3(0.2, 0.03, 0.03), "brass", Vector3(0, 0, -20))
 	for y: float in [0.2, 0.9]:
 		_cylinder(base + Vector3(-0.52, y, 0.53), 0.025, 0.025, 0.12, "brass")
+	# Segunda fechadura, de chave, abaixo do segredo (a chave do gerente, da torre)
+	_part(base + Vector3(-0.255, 0.33, 0.52), base + Vector3(-0.185, 0.47, 0.534), "brass")
+	_part(base + Vector3(-0.228, 0.36, 0.534), base + Vector3(-0.212, 0.42, 0.538), "dark")
 	if not present:
 		# Frase riscada a lápis na porta: a senha é a data em que o lustre se acendeu
 		_label("o dia em que o Aurora se acendeu", base + Vector3(0, 0.88, 0.535), 0.055, Color("#2A2018"))

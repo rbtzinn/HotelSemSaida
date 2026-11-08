@@ -12,6 +12,7 @@ const PAST_SWITCHES := [
 	"quartos.pavimento.calcado", "quartos.cunha.pega", "quartos.bandeira.aberta", "quartos.chave_mestra.retirada",
 	"quartos.chave_mestra.escondida", "salao.partitura.guardada", "salao.contrapeso.solto",
 	"saguao.piano.valsa", "torre.registro.fechado", "torre.pendulo.aberto", "torre.chave.gerente",
+	"saguao.cofre.chave", "saguao.cofre.segredo",
 ]
 const PRESENT_SWITCHES := [
 	"saguao.bolsa.marta", "cozinha.concluida", "manutencao.chave.pega", "biblioteca.porta.hoje",

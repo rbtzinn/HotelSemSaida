@@ -1,6 +1,7 @@
 extends Node
 ## S4: cofre da gerência e entrada principal, o último enigma desta versão.
-## Em 1923, Helena abre o cofre com a data em que o lustre se acendeu (1403), pega a chave da
+## Em 1923, o cofre tem duas fechaduras, em qualquer ordem: a chave do gerente (da torre), que
+## fica na fechadura, e o segredo com a data em que o lustre se acendeu (1403). Helena pega a chave da
 ## porta principal e solta a trava da porta giratória. Hoje, a fechadura só cede porque Helena a
 ## deixou destrancada; a corrente posta em 1979 cai com a chave da bolsa de Marta.
 ## Com as duas trancas abertas, Lia tenta sair e volta a entrar no Saguão (`jogo.final`).
@@ -9,6 +10,12 @@ const ACTION := preload("res://scripts/interaction3d/interactable_3d.gd")
 const MESSAGE := preload("res://scripts/interaction3d/message_interactable_3d.gd")
 const SAFE_OPEN := "saguao.cofre.aberto"
 const SAFE_KEY_TAKEN := "saguao.chave.entrada"
+## As duas fechaduras do cofre: a chave do gerente girada (fica nela) e o segredo acertado.
+const SAFE_MANAGER_KEY := "saguao.cofre.chave"
+const SAFE_CODE_SET := "saguao.cofre.segredo"
+const MANAGER_KEY := "chave_gerente"
+## Onde fica a fechadura de chave, abaixo do segredo (mesma posição em LobbyRoom3D._build_safe).
+const KEYHOLE := Vector3(-0.22, 0.4, 0.536)
 const LATCH_1923 := "saguao.entrada.trava_1923"
 const PADLOCK := "saguao.entrada.cadeado"
 const FINAL := "jogo.final"
@@ -24,6 +31,11 @@ const KNOCK := "Do outro lado da porta giratória, alguém bate. Três batidas, 
 var safe_door: Node3D
 var safe_recess: MeshInstance3D
 var safe_key: Node3D
+## Chave do gerente na fechadura: na frente fechada e na porta aberta, em cada época.
+var lock_keys: Dictionary = {}
+var today_door: Node3D
+var today_recess: MeshInstance3D
+var today_safe: Node
 var latch_key: Node3D
 var chain: Node3D
 var _leaving := false
@@ -33,11 +45,7 @@ func install(room: ChapterRoom3D) -> void:
 	var past := room.get_node("World1923") as Node3D
 	var today := room.get_node("WorldToday") as Node3D
 	_build_safe(room, past)
-	room.area(MESSAGE, today, "CofreHoje", SAFE + Vector3(0, 0.62, 0.56), Vector3(1.0, 0.9, 0.12), {
-		"prompt_text": "Examinar cofre",
-		"message": "O segredo do cofre não gira mais, preso de ferrugem. Na porta, nenhuma frase sobreviveu à umidade.",
-		"available_in": 1,
-	})
+	_build_today_safe(room, today)
 	room.area(MESSAGE, today, "CoroaLustre", Vector3(LobbyRoom3D.CHANDELIER.x, 0.25, LobbyRoom3D.CHANDELIER.z + 1.75),
 		Vector3(1.2, 0.5, 0.2), {
 			"prompt_text": "Examinar coroa do lustre",
@@ -80,15 +88,75 @@ func _build_safe(room: ChapterRoom3D, past: Node3D) -> void:
 	var dial := room.box(safe_door, Vector3(0.52, 0.56, 0.06), Vector3(0.2, 0.2, 0.03), "brass", false)
 	dial.rotation_degrees.z = 45
 	safe_key = room.key_visual(past, SAFE + Vector3(0.15, 0.32, 0.595), false)
+	_add_lock_keys(room, past, safe_door, false)
+
+
+## Porta do cofre com a fechadura de chave, na mesma posição da frente fechada.
+func _door_keyhole(room: ChapterRoom3D, door: Node3D, present: bool) -> void:
+	var hole := Vector3(KEYHOLE.x + 0.52, KEYHOLE.y - 0.06, 0.056)
+	room.box(door, hole, Vector3(0.07, 0.14, 0.012), "brass", present)
+	room.box(door, hole + Vector3(0, -0.01, 0.007), Vector3(0.016, 0.06, 0.004), "dark", present)
+
+
+## Chave do gerente enfiada e girada: uma na frente fechada, outra na porta aberta.
+func _add_lock_keys(room: ChapterRoom3D, world: Node3D, door: Node3D, present: bool) -> void:
+	_door_keyhole(room, door, present)
+	var closed := room.key_visual(world, SAFE + KEYHOLE + Vector3(0, 0, 0.095), present)
+	closed.rotation_degrees.y = 90
+	var opened := room.key_visual(door, Vector3(KEYHOLE.x + 0.52, KEYHOLE.y - 0.06, 0.16), present)
+	opened.rotation_degrees.y = 90
+	lock_keys[present] = [closed, opened]
+
+
+## Hoje: fechado e enferrujado, ou aberto e vazio se Helena o abriu.
+func _build_today_safe(room: ChapterRoom3D, today: Node3D) -> void:
+	today_safe = room.area(MESSAGE, today, "CofreHoje", SAFE + Vector3(0, 0.62, 0.56), Vector3(1.0, 0.9, 0.12), {
+		"prompt_text": "Examinar cofre",
+		"message": "",
+		"available_in": 1,
+	})
+	today_recess = room.box(today, SAFE + Vector3(0, 0.55, 0.552), Vector3(1.0, 0.98, 0.058), "dark", true)
+	today_door = Node3D.new()
+	today_door.name = "PortaCofreHoje"
+	today_door.position = SAFE + Vector3(-0.52, 0.06, 0.585)
+	# Solta nas dobradiças, mais aberta que em 1923
+	today_door.rotation_degrees.y = -70
+	today.add_child(today_door)
+	room.box(today_door, Vector3(0.52, 0.49, 0.025), Vector3(1.04, 0.98, 0.05), "iron", true)
+	var dial := room.box(today_door, Vector3(0.52, 0.56, 0.06), Vector3(0.2, 0.2, 0.03), "iron", true)
+	dial.rotation_degrees.z = 45
+	_add_lock_keys(room, today, today_door, true)
+
+
+func _today_message() -> String:
+	var has_key := WorldState.is_set(SAFE_MANAGER_KEY)
+	if WorldState.is_set(SAFE_OPEN):
+		var text := "O cofre está aberto e vazio, a porta solta nas dobradiças."
+		if has_key:
+			text += " Na fechadura da porta ficou uma chave, presa pela ferrugem."
+		return text
+	if has_key:
+		return ("Uma chave enferrujada está enfiada na fechadura de baixo, virada até o fim. "
+			+ "O disco do segredo, acima dela, não gira mais.")
+	return ("O cofre tem duas fechaduras: o disco do segredo, preso de ferrugem, e abaixo dele "
+		+ "um buraco de chave entupido de pó. Na porta, nenhuma frase sobreviveu à umidade.")
 
 
 func _use_safe(by: FirstPersonMotor) -> void:
 	if not WorldState.is_set(SAFE_OPEN):
-		var ui := CodeLockUI.open(get_tree(), SAFE_CODE)
-		ui.solved.connect(func() -> void:
-			WorldState.set_flag(SAFE_OPEN)
-			_say("O segredo para no último número e a porta do cofre se solta."))
-		_say("Riscada a lápis na porta: «o dia em que o Aurora se acendeu».")
+		if by.get_held_item() == MANAGER_KEY and not WorldState.is_set(SAFE_MANAGER_KEY):
+			by.set_held_item("")
+			WorldState.set_flag(SAFE_MANAGER_KEY)
+			if WorldState.is_set(SAFE_CODE_SET):
+				_open_safe()
+			else:
+				_say("A chave do gerente entra na fechadura de baixo e gira até o fim. Fica presa nela. A porta ainda não cede: falta o segredo.")
+		elif WorldState.is_set(SAFE_CODE_SET):
+			_say("O disco está travado no número certo. Abaixo dele, a fechadura de chave continua trancada.")
+		else:
+			var ui := CodeLockUI.open(get_tree(), SAFE_CODE)
+			ui.solved.connect(_on_code_solved)
+			_say("Riscada a lápis na porta: «o dia em que o Aurora se acendeu». Abaixo do segredo, uma fechadura de chave.")
 	elif WorldState.is_set(SAFE_KEY_TAKEN):
 		_say("O cofre está vazio.")
 	elif by.get_held_item() != "":
@@ -97,6 +165,19 @@ func _use_safe(by: FirstPersonMotor) -> void:
 		by.set_held_item(ENTRANCE_KEY)
 		WorldState.set_flag(SAFE_KEY_TAKEN)
 		_say("Helena pega a chave da porta principal.")
+
+
+func _on_code_solved() -> void:
+	WorldState.set_flag(SAFE_CODE_SET)
+	if WorldState.is_set(SAFE_MANAGER_KEY):
+		_open_safe()
+	else:
+		_say("O segredo para no último número e o disco trava. A porta não cede: falta a fechadura de chave, abaixo dele.")
+
+
+func _open_safe() -> void:
+	WorldState.set_flag(SAFE_OPEN)
+	_say("Com a chave girada e o segredo certo, a porta do cofre se solta.")
 
 
 # --- Entrada principal -----------------------------------------------------------------------
@@ -197,12 +278,19 @@ func _restore() -> void:
 	safe_door.visible = open
 	safe_recess.visible = open
 	safe_key.visible = open and not WorldState.is_set(SAFE_KEY_TAKEN)
+	today_door.visible = open
+	today_recess.visible = open
+	today_safe.set("message", _today_message())
+	var turned := WorldState.is_set(SAFE_MANAGER_KEY)
+	for present: bool in lock_keys:
+		lock_keys[present][0].visible = turned and not open
+		lock_keys[present][1].visible = turned and open
 	latch_key.visible = WorldState.is_set(LATCH_1923)
 	chain.visible = not WorldState.is_set(PADLOCK) or WorldState.is_set(FINAL)
 
 
 func _on_flag(key: String, _value: Variant) -> void:
-	if key in [SAFE_OPEN, SAFE_KEY_TAKEN, LATCH_1923, PADLOCK, FINAL]:
+	if key in [SAFE_OPEN, SAFE_KEY_TAKEN, SAFE_MANAGER_KEY, SAFE_CODE_SET, LATCH_1923, PADLOCK, FINAL]:
 		_restore()
 	# Na dupla online, quem joga com Helena ouve as batidas quando Lia sai
 	if key == FINAL and EraManager.current_era == Era.Id.PAST_1923 and NetSession.phase == NetSession.Phase.PLAYING:
