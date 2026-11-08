@@ -6,7 +6,7 @@ enum Phase { OFF, HOSTING, JOINING, WAITING, PLAYING }
 const RULES := preload("res://scripts/online/coop_progress.gd")
 const PORT := 7777
 ## Suba a cada mudança nas regras de flags: versões diferentes não podem jogar juntas.
-const PROTOCOL := 5
+const PROTOCOL := 6
 const LOBBY := "res://scenes/ui/entrada.tscn"
 const HOTEL := "res://scenes/rooms/saguao_3d.tscn"
 const ROOMS := [HOTEL, "res://scenes/rooms/cozinha_3d.tscn", "res://scenes/rooms/manutencao_3d.tscn",

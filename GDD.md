@@ -214,7 +214,7 @@ Escolhas do Roberto: a etapa S4 abre a **entrada principal** (não mais a porta 
 
 **Flags novas** (todas entram em `coop_progress.gd`): passado `saguao.cofre.aberto`, `saguao.entrada.trava_1923`, `saguao.livro.helena`; presente `saguao.chave.marta`, `saguao.entrada.cadeado`, `jogo.final`.
 
-### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos e Salão feitos em 08/11/2026)
+### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos, Salão e piano do Saguão feitos em 08/11/2026)
 
 Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; acesso pelo **elevador principal**; as fases trazem **pistas sobre Helena** sem fechar o destino dela; o **piano do Saguão** toca a melodia descoberta no salão e abre o caminho para o telhado.
 
@@ -244,6 +244,7 @@ Decisões do Roberto (08/11/2026): no 3º andar a porta de pavimento de hoje já
 
 - Em 1923, Helena toca no piano de cauda do Saguão: minigame em close, uma oitava de teclas brancas, com a tecla de latão marcada. A sequência 3 · 1 · 5 · 6 solta a lingueta do painel atrás do piano, que o Sr. Amaral mandou ligar ao mecanismo do piano: é a entrada da escada de serviço da torre, em caracol. Hoje, o painel ficou destrancado e Lia também passa. Sequência errada: nada acontece; tentativas ilimitadas. Flag `saguao.piano.valsa`.
 - Sem áudio ainda: o minigame mostra as teclas abaixando. Quando houver som, cada tecla toca a nota.
+- Decisões do Roberto (08/11/2026): o teclado tem **8 teclas brancas** (dó a dó), com a de latão na primeira; toca-se com o **mouse** ou com as teclas **1 a 8**. O painel fica na parede leste, logo atrás do piano. Hoje, Lia levanta a lona do piano e vê a plaquinha de latão no primeiro dó; o painel aberto por Helena continua aberto. Até a Torre existir, a escada em caracol só mostra uma mensagem («sobe no escuro… um tique-taque»).
 
 #### Telhado e torre do relógio — a hora em que Helena sumiu
 

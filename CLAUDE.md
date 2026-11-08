@@ -9,7 +9,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: piano do Saguão, torre do relógio, cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: torre do relógio, cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -219,7 +219,13 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Helena sobe pela escada de 1923 dos Quartos (`SubirEscada`, lance leste do vão; `DescerEscada` ficou no lance oeste). Markers do Salão: `DaEscada`, `DoPoco`; voltam a `DaEscada` / `DoPoco` dos Quartos.
 - Contrapeso: em 1923 a malagueta solta o saco (`salao.contrapeso.solto`); hoje ele é o `MonteDeAreia` (0,6 m) encostado no palco, o degrau para Lia subir pulando.
 - Partitura (`partitura` na mão): estante ⇄ mão ⇄ banqueta (`salao.partitura.guardada`, ida e volta). Em 1923 a leitura mostra a pauta desenhada por `ScoreSheet` (`scripts/ui/score_sheet.gd`, imagem gerada por código); hoje, com a partitura guardada, a banqueta mostra os números de Caio (3 · 1 · 5 · 6 a partir da tecla de latão = dó) e liga `salao.partitura.lida` e `salao.concluido`, que toca a cutscene `ballroom_waltz` (luzes oscilando e teclas descendo; `Cutscene` aceita a chave `"call"` numa tomada).
-- Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5; o save da dupla aceita qualquer versão anterior.
+- Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5 (hoje 6); o save da dupla aceita qualquer versão anterior.
+
+## Piano do Saguão (08/11/2026; design no `GDD.md`, "Piano do Saguão")
+
+- `lobby_piano_3d.gd` (instalado por `LobbyRoutes3D`): em 1923, `TocarPiano` abre `PianoUI` (`scripts/ui/piano_ui.gd`: 8 teclas brancas, dó de latão na 1ª, mouse ou 1 a 8; as últimas notas formando a melodia emitem `solved`; errar não faz nada). A valsa `3 · 1 · 5 · 6` liga `saguao.piano.valsa` e abre o painel da parede leste atrás do piano (folha com colisão própria, que gira junto). Hoje: `LonaPiano` mostra a plaquinha de latão; o painel aberto vale para as duas.
+- A escada em caracol atrás do painel ainda só dá uma mensagem: a Torre vem na próxima etapa. O vão escuro ainda não tem passagem (a parede continua sólida atrás dele) e precisa virar porta para a Torre.
+- Teste `tools/test_piano_saguao_3d.gd`. Protocolo da dupla: 6.
 
 ## Cutscenes (07/11/2026)
 
