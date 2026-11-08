@@ -34,6 +34,10 @@ const DESK := Vector3(5.95, 0.78, 7.0)
 const WARDROBE := Vector3(6.8, 0, 9.0)
 const TRUNK := Vector3(9.0, 0, 6.2)
 
+const MODELS := "res://art/models/"
+## Hoje, os móveis dos modelos ficam com madeira velha e panos cobertos de pó.
+const AGED := {"mahogany": "plank", "dark_wood": "plank", "velvet": "tarp", "paper": "tarp", "brass": "iron"}
+
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
 
@@ -211,15 +215,13 @@ func _build_room_214() -> void:
 	_wall_x(r.position.y, r.position.x, r.end.x, [])
 	# Cama contra a parede do fundo, mesa com cadeira à direita
 	var bed := Vector3(r.position.x + 1.2, 0, r.position.y + 1.1)
-	_solid(bed + Vector3(-0.8, 0, -1.0), bed + Vector3(0.8, 0.55, 1.0), "Bed")
-	_part(bed + Vector3(-0.8, 0, -1.0), bed + Vector3(0.8, 0.35, 1.0), "mahogany" if not present else "plank")
-	_part(bed + Vector3(-0.75, 0.35, -0.95), bed + Vector3(0.75, 0.55, 0.95), "paper" if not present else "tarp")
-	_part(bed + Vector3(-0.8, 0, -1.1), bed + Vector3(0.8, 1.1, -1.0), "mahogany" if not present else "plank")
+	# A cabeceira fica contra a parede do fundo (norte)
+	_model(MODELS + "cama.glb", bed + Vector3(0, 0, 0.2), Vector3(0, 180, 0), 1.0, AGED if present else {})
+	_solid(bed + Vector3(-0.82, 0, -1.0), bed + Vector3(0.82, 0.6, 1.32), "Bed")
 	var desk := Vector3(r.end.x - 0.6, 0, r.position.y + 2.2)
-	_solid(desk + Vector3(-0.45, 0, -0.6), desk + Vector3(0.45, 0.78, 0.6), "Desk")
-	_part(desk + Vector3(-0.45, 0.72, -0.6), desk + Vector3(0.45, 0.78, 0.6), "oak")
-	for c: Vector2 in [Vector2(-0.4, -0.55), Vector2(0.4, -0.55), Vector2(-0.4, 0.55), Vector2(0.4, 0.55)]:
-		_part(desk + Vector3(c.x - 0.03, 0, c.y - 0.03), desk + Vector3(c.x + 0.03, 0.72, c.y + 0.03), "oak")
+	_model(MODELS + "escrivaninha.glb", desk, Vector3(0, 180, 0), 1.0,
+		{"mahogany": "oak", "dark_wood": "oak"} if not present else AGED)
+	_solid(desk + Vector3(-0.45, 0, -0.62), desk + Vector3(0.45, 0.78, 0.62), "Desk")
 	if present:
 		_part(desk + Vector3(-0.3, 0.78, -0.25), desk + Vector3(0.2, 0.8, 0.15), "paper")
 		# Maleta de médico no chão, junto da cama (sólida)
@@ -237,41 +239,35 @@ func _build_room_207() -> void:
 	_wall_z(r.position.x, SOUTH, r.end.y)
 	_wall_z(r.end.x, SOUTH, r.end.y)
 	_wall_x(r.end.y, r.position.x, r.end.x, [])
-	_part(Vector3(r.position.x + 0.3, 0.005, r.position.y + 0.8), Vector3(r.end.x - 0.6, 0.015, r.end.y - 0.6), "rug")
+	var rug_from := Vector3(r.position.x + 0.3, 0.005, r.position.y + 0.8)
+	var rug_to := Vector3(r.end.x - 0.6, 0.015, r.end.y - 0.6)
+	var rug_center := Vector2((rug_from.x + rug_to.x) / 2.0, (rug_from.z + rug_to.z) / 2.0)
+	var rug_half := Vector2(rug_to.x - rug_from.x, rug_to.z - rug_from.z) / 2.0
+	_part(rug_from, rug_to, "rug", Vector3.ZERO, HotelMaterials.rug_material("rug", present, rug_center, rug_half))
 	# Janela na parede do fundo: vidro em 1923, tábuas hoje
 	var window := Vector3(r.position.x + 2.6, 1.6, r.end.y - 0.11)
 	_part(window + Vector3(-0.6, -0.7, -0.02), window + Vector3(0.6, 0.7, 0.0), "glass" if not present else "plank")
 	_part(window + Vector3(-0.7, -0.78, -0.05), window + Vector3(0.7, -0.7, 0.0), "dark_wood")
 	# Cama (leste), escrivaninha (oeste), guarda-roupa (fundo) e mala (pé da cama)
 	var bed := Vector3(r.end.x - 1.0, 0, r.position.y + 3.2)
-	_solid(bed + Vector3(-0.8, 0, -1.1), bed + Vector3(0.8, 0.55, 1.1), "Bed")
-	_part(bed + Vector3(-0.8, 0, -1.1), bed + Vector3(0.8, 0.35, 1.1), "mahogany" if not present else "plank")
-	_part(bed + Vector3(-0.75, 0.35, -1.05), bed + Vector3(0.75, 0.55, 1.05), "velvet" if not present else "tarp")
-	_part(bed + Vector3(-0.8, 0, 1.1), bed + Vector3(0.8, 1.2, 1.2), "mahogany" if not present else "plank")
+	_model(MODELS + "cama.glb", bed, Vector3.ZERO, 1.0, AGED if present else {})
+	_solid(bed + Vector3(-0.82, 0, -1.15), bed + Vector3(0.82, 0.6, 1.2), "Bed")
 	var desk := DESK
-	_solid(Vector3(r.position.x + 0.1, 0, desk.z - 0.6), Vector3(r.position.x + 0.8, 0.78, desk.z + 0.6), "Desk")
-	_part(Vector3(r.position.x + 0.1, 0.72, desk.z - 0.6), Vector3(r.position.x + 0.8, 0.78, desk.z + 0.6), "mahogany")
-	_part(Vector3(r.position.x + 0.1, 0, desk.z - 0.6), Vector3(r.position.x + 0.8, 0.72, desk.z - 0.5), "mahogany")
-	_part(Vector3(r.position.x + 0.1, 0, desk.z + 0.5), Vector3(r.position.x + 0.8, 0.72, desk.z + 0.6), "mahogany")
-	# Frente da gaveta
-	_part(Vector3(r.position.x + 0.8, 0.55, desk.z - 0.35), Vector3(r.position.x + 0.82, 0.7, desk.z + 0.35), "dark_wood")
-	_cylinder(Vector3(r.position.x + 0.83, 0.62, desk.z), 0.02, 0.02, 0.03, "brass", Vector3(0, 0, 90), 8)
+	_model(MODELS + "escrivaninha.glb", Vector3(r.position.x + 0.47, 0, desk.z), Vector3.ZERO, 1.0, AGED if present else {})
+	_solid(Vector3(r.position.x + 0.1, 0, desk.z - 0.62), Vector3(r.position.x + 0.83, 0.78, desk.z + 0.62), "Desk")
 	if not present:
 		_cylinder(Vector3(r.position.x + 0.45, 0.78, desk.z - 0.4), 0.07, 0.05, 0.3, "brass")
 		_omni(Vector3(r.position.x + 0.45, 1.2, desk.z - 0.4), WARM, 0.6, 3.5)
 	var wardrobe := WARDROBE
-	_solid(wardrobe + Vector3(-0.6, 0, -0.35), wardrobe + Vector3(0.6, 2.2, 0.35), "Wardrobe")
-	_part(wardrobe + Vector3(-0.6, 0, -0.35), wardrobe + Vector3(0.6, 2.2, 0.35), "mahogany" if not present else "plank")
-	_part(wardrobe + Vector3(-0.02, 0.15, -0.37), wardrobe + Vector3(0.02, 2.05, -0.35), "dark_wood")
+	_model(MODELS + "guarda_roupa.glb", wardrobe, Vector3.ZERO, 1.0, AGED if present else {})
+	_solid(wardrobe + Vector3(-0.63, 0, -0.37), wardrobe + Vector3(0.63, 2.2, 0.36), "Wardrobe")
 	if present:
 		# Cupins: furos e serragem no pé do guarda-roupa
 		for i in 8:
 			_sphere(wardrobe + Vector3(-0.5 + _random(i) * 1.0, 0.03, -0.45 - _random(i, 1.0) * 0.2), 0.05, "flour", Vector3(1, 0.3, 1))
 	var trunk := TRUNK
-	_solid(trunk + Vector3(-0.4, 0, -0.25), trunk + Vector3(0.4, 0.42, 0.25), "Trunk")
-	_part(trunk + Vector3(-0.4, 0, -0.25), trunk + Vector3(0.4, 0.4, 0.25), "leather")
-	for x: float in [-0.25, 0.25]:
-		_part(trunk + Vector3(x - 0.03, 0, -0.26), trunk + Vector3(x + 0.03, 0.42, 0.26), "brass" if not present else "iron")
+	_model(MODELS + "bau.glb", trunk, Vector3.ZERO, 1.0, {"brass": "iron"} if present else {})
+	_solid(trunk + Vector3(-0.42, 0, -0.26), trunk + Vector3(0.42, 0.42, 0.26), "Trunk")
 	if present:
 		# O forro descosturado aparece num canto
 		_part(trunk + Vector3(0.15, 0.4, -0.2), trunk + Vector3(0.38, 0.41, 0.0), "velvet")

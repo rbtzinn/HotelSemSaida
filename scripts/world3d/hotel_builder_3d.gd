@@ -237,7 +237,10 @@ func _child_cylinder(holder: Node3D, center: Vector3, radius: float, height: flo
 ## Modelo feito no Blender (`art/models/`, ver tools/blender/). Cada objeto do modelo tem um
 ## material com o nome de um papel ("lacquer", "brass"...), trocado aqui pelo da época. As peças
 ## entram na junção de malhas da sala como as outras. Colisão continua sendo `_solid`.
-func _model(path: String, at: Vector3, rotation_deg: Vector3 = Vector3.ZERO, scale_factor: float = 1.0) -> Node3D:
+## `roles` troca papéis (ex.: {"velvet": "green_velvet"}); `parent` põe o modelo dentro de um
+## grupo da sala (ex.: a poltrona tombada hoje).
+func _model(path: String, at: Vector3, rotation_deg: Vector3 = Vector3.ZERO, scale_factor: float = 1.0,
+		roles: Dictionary = {}, parent: Node3D = null) -> Node3D:
 	var model := (load(path) as PackedScene).instantiate() as Node3D
 	model.position = at
 	model.rotation_degrees = rotation_deg
@@ -249,10 +252,15 @@ func _model(path: String, at: Vector3, rotation_deg: Vector3 = Vector3.ZERO, sca
 		var role := String(instance.name)
 		if source and source.resource_name != "":
 			role = source.resource_name
+		role = roles.get(role, role)
 		instance.material_override = _material(role)
 		if not _cast_shadows or role in ["bulb", "glass"]:
 			instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_add(model)
+	if parent:
+		model.set_meta("generated", true)
+		parent.add_child(model)
+	else:
+		_add(model)
 	return model
 
 

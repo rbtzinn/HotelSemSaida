@@ -305,8 +305,234 @@ def round_table():
     export("mesa_redonda")
 
 
+# --- Saguão: lustre grande, sofá, poltrona e relógio de carrilhão ---------------------------
+
+def grand_chandelier():
+    """Lustre do Saguão: três anéis (1,0 / 0,74 / 0,48 m), 12 velas, 40 gotas de cristal.
+    O topo (y = 0) fica no teto; a gota de baixo, 2,3 m abaixo."""
+    reset()
+    cylinder("Haste", (0, -1.1, 0), 0.03, 0.03, 1.1, "brass", segments=8)
+    cylinder("Coluna", (0, -2.0, 0), 0.08, 0.06, 0.9, "brass", segments=16)
+    for k, y in enumerate((-1.25, -1.5, -1.75)):
+        torus("Colar%d" % k, (0, y, 0), 0.085, 0.02, "brass", segments=16, sides=6)
+    sphere("Bacia", (0, -2.05, 0), 0.26, "brass", scale=(1, 0.6, 1), segments=20, rings=10)
+    sphere("Gota", (0, -2.28, 0), 0.07, "glass", scale=(1, 1.8, 1), segments=8, rings=6)
+    rings = [(-1.95, 1.0, 24), (-1.64, 0.74, 16), (-1.37, 0.48, 0)]
+    for k, (y, radius, drops) in enumerate(rings):
+        torus("Anel%d" % k, (0, y, 0), radius, 0.035, "brass", segments=64, sides=8)
+        # Raios do anel até a coluna
+        for i in range(8):
+            a = 2 * math.pi * (i + 0.5 * k) / 8
+            tube("Raio", [(0, y + 0.12, 0), (math.cos(a) * radius * 0.5, y + 0.02, math.sin(a) * radius * 0.5),
+                          (math.cos(a) * radius, y, math.sin(a) * radius)], 0.012, "brass", sides=6)
+        for i in range(drops):
+            a = 2 * math.pi * (i + 0.5) / drops
+            hang = 0.12 + 0.05 * (i % 2)
+            tube("Fio", [(math.cos(a) * radius, y, math.sin(a) * radius), (math.cos(a) * radius, y - hang + 0.04, math.sin(a) * radius)], 0.003, "brass", sides=4)
+            sphere("Cristal", (math.cos(a) * radius, y - hang, math.sin(a) * radius), 0.03, "glass", scale=(1, 2.2, 1), segments=6, rings=4)
+    # Braços em S e velas no anel de baixo
+    for i in range(12):
+        a = 2 * math.pi * i / 12
+        dx, dz = math.cos(a), math.sin(a)
+        points = []
+        for k in range(9):
+            t = k / 8
+            points.append((dx * (0.3 + 0.7 * t), -1.95 - 0.12 * math.sin(math.pi * t) + 0.08 * t, dz * (0.3 + 0.7 * t)))
+        tube("Braco", points, 0.016, "brass", sides=6)
+        tip = (dx * 1.0, -1.87, dz * 1.0)
+        cylinder("Bocal", (tip[0], tip[1] - 0.04, tip[2]), 0.04, 0.05, 0.06, "brass", segments=10)
+        cylinder("Vela", (tip[0], tip[1] + 0.02, tip[2]), 0.018, 0.018, 0.11, "ivory", segments=8)
+        sphere("Chama", (tip[0], tip[1] + 0.17, tip[2]), 0.035, "bulb", scale=(1, 1.4, 1), segments=8, rings=6)
+    export("lustre_saguao")
+
+
+def tufted_back(width, y0, y1, z, rows, cols, role):
+    """Botões do capitonê numa face voltada para +z."""
+    for r in range(rows):
+        for c in range(cols):
+            x = -width / 2 + width * (c + 0.5 + 0.5 * (r % 2)) / (cols + 0.5)
+            y = y0 + (y1 - y0) * (r + 0.5) / rows
+            sphere("Botao", (x, y, z), 0.018, role, segments=6, rings=4)
+
+
+def sofa():
+    """Sofá chesterfield de três lugares, 2,2 m; encosto do lado -z, frente para +z."""
+    reset()
+    box("Base", (0, 0.3, 0), (2.06, 0.3, 0.82), "velvet", bevel=0.04)
+    box("Encosto", (0, 0.72, -0.34), (2.06, 0.56, 0.18), "velvet", bevel=0.05)
+    tube("RoloEncosto", [(-1.0, 1.0, -0.34), (1.0, 1.0, -0.34)], 0.1, "velvet", sides=12)
+    for x in (-1.0, 1.0):
+        box("Braco", (x, 0.52, 0.0), (0.18, 0.36, 0.82), "velvet", bevel=0.04)
+        tube("RoloBraco", [(x, 0.72, -0.4), (x, 0.72, 0.42)], 0.12, "velvet", sides=12)
+        sphere("Voluta", (x, 0.72, 0.42), 0.12, "velvet", scale=(1, 1, 0.3), segments=12, rings=6)
+    for k in range(3):
+        box("Almofada%d" % k, (-0.62 + k * 0.62, 0.52, 0.06), (0.6, 0.14, 0.68), "velvet", bevel=0.05)
+    tufted_back(1.85, 0.5, 0.95, -0.245, 2, 8, "brass")
+    for x in (-0.95, 0.95):
+        for z in (-0.33, 0.33):
+            cylinder("Pe", (x, 0.0, z), 0.03, 0.045, 0.15, "dark_wood", segments=10)
+            sphere("Rodizio", (x, 0.02, z), 0.03, "brass", segments=8, rings=6)
+    export("sofa")
+
+
+def armchair():
+    """Poltrona de espaldar alto (bergère), 0,9 m; encosto do lado -z."""
+    reset()
+    box("Base", (0, 0.3, 0.0), (0.82, 0.28, 0.78), "velvet", bevel=0.04)
+    box("Encosto", (0, 0.82, -0.32), (0.82, 0.8, 0.16), "velvet", bevel=0.05)
+    tube("TopoEncosto", [(-0.41, 1.2, -0.32), (0.41, 1.2, -0.32)], 0.08, "velvet", sides=10)
+    for x in (-0.37, 0.37):
+        box("Braco", (x, 0.52, 0.02), (0.13, 0.3, 0.76), "velvet", bevel=0.03)
+        tube("RoloBraco", [(x, 0.68, -0.34), (x, 0.68, 0.4)], 0.07, "velvet", sides=10)
+    box("Almofada", (0, 0.5, 0.06), (0.6, 0.13, 0.62), "velvet", bevel=0.05)
+    tufted_back(0.62, 0.62, 1.1, -0.235, 3, 3, "brass")
+    for x in (-0.35, 0.35):
+        for z in (-0.32, 0.32):
+            cylinder("Pe", (x, 0.0, z), 0.025, 0.04, 0.16, "dark_wood", segments=10)
+    export("poltrona")
+
+
+def grandfather_clock():
+    """Relógio de carrilhão, 2,55 m; mostrador para +z. Ponteiros parados em 3h07."""
+    reset()
+    box("Pedestal", (0, 0.15, 0), (0.62, 0.3, 0.38), "mahogany", bevel=0.02)
+    box("Rodape", (0, 0.02, 0), (0.68, 0.04, 0.42), "dark_wood")
+    box("Tronco", (0, 1.1, 0), (0.48, 1.6, 0.3), "mahogany", bevel=0.015)
+    box("Porta", (0, 1.1, 0.155), (0.32, 1.15, 0.015), "dark_wood", bevel=0.005)
+    box("Vidro", (0, 1.15, 0.165), (0.24, 0.9, 0.005), "glass")
+    tube("Haste", [(0, 1.55, 0.13), (0, 0.85, 0.13)], 0.006, "brass", sides=6)
+    cylinder("Peso", (0, 0.7, 0.13), 0.08, 0.08, 0.015, "brass", segments=20, axis="z")
+    box("Capitel", (0, 2.15, 0), (0.62, 0.55, 0.38), "mahogany", bevel=0.02)
+    # Frontão em arco e pináculos
+    arch = [(-0.3 + 0.6 * i / 16, 2.42 + 0.12 * math.sin(math.pi * i / 16)) for i in range(17)]
+    for i in range(16):
+        x0, y0 = arch[i]
+        x1, y1 = arch[i + 1]
+        box("Arco%d" % i, ((x0 + x1) / 2, (y0 + y1) / 2 + 0.03, 0), (0.04, 0.06, 0.4), "dark_wood")
+    for x in (-0.28, 0.0, 0.28):
+        sphere("Pinaculo", (x, 2.62 if x == 0 else 2.5, 0.12), 0.04, "brass", segments=10, rings=6)
+    cylinder("Aro", (0, 2.15, 0.19), 0.23, 0.23, 0.02, "brass", segments=32, axis="z")
+    cylinder("Mostrador", (0, 2.15, 0.205), 0.2, 0.2, 0.008, "ivory", segments=32, axis="z")
+    for h in range(12):
+        a = 2 * math.pi * h / 12
+        box("Marca%d" % h, (math.sin(a) * 0.17, 2.15 + math.cos(a) * 0.17, 0.215), (0.012, 0.03, 0.004), "lacquer")
+    # Ponteiros em 3h07
+    for length, angle, width in ((0.1, 2 * math.pi * (3 + 7 / 60) / 12, 0.014), (0.16, 2 * math.pi * 7 / 60, 0.009)):
+        cx = math.sin(angle) * length / 2
+        cy = math.cos(angle) * length / 2
+        hand = box("Ponteiro", (cx, 2.15 + cy, 0.222), (width, length, 0.004), "lacquer")
+        # Gira no plano do mostrador, em torno do próprio centro (eixo z do Godot = -y do Blender)
+        hand.data.transform(Matrix.Translation(-g(cx, 2.15 + cy, 0.222)))
+        hand.data.transform(Matrix.Rotation(angle, 4, "Y"))
+        hand.data.transform(Matrix.Translation(g(cx, 2.15 + cy, 0.222)))
+    export("relogio_carrilhao")
+
+
+# --- Quartos: cama, guarda-roupa, escrivaninha e baú --------------------------------------
+
+def panel(name, center, size, role, depth=0.012):
+    """Almofada de porta: uma moldura em relevo sobre a face voltada para -z."""
+    cx, cy, cz = center
+    w, h = size
+    box(name + "Fundo", (cx, cy, cz - depth / 2), (w, h, depth), role, bevel=0.004)
+    for dy in (-h / 2, h / 2):
+        box(name + "H", (cx, cy + dy, cz - depth), (w, 0.025, 0.012), role)
+    for dx in (-w / 2, w / 2):
+        box(name + "V", (cx + dx, cy, cz - depth), (0.025, h, 0.012), role)
+
+
+def bed():
+    """Cama de casal: 1,6 x 2,2 m, colchão a 0,55 m, cabeceira do lado +z."""
+    reset()
+    box("Estrado", (0, 0.27, 0), (1.56, 0.16, 2.12), "mahogany", bevel=0.02)
+    box("Colchao", (0, 0.45, -0.02), (1.5, 0.2, 2.04), "paper", bevel=0.05)
+    box("Colcha", (0, 0.52, -0.25), (1.58, 0.07, 1.62), "velvet", bevel=0.03)
+    box("DobraColcha", (0, 0.565, 0.5), (1.58, 0.05, 0.22), "velvet", bevel=0.02)
+    for x in (-0.38, 0.38):
+        box("Travesseiro", (x, 0.6, 0.82), (0.62, 0.13, 0.36), "paper", bevel=0.06)
+    # Cabeceira alta com almofadas, pés torneados
+    box("Cabeceira", (0, 0.8, 1.13), (1.62, 0.9, 0.06), "mahogany", bevel=0.01)
+    tube("TopoCabeceira", [(-0.81, 1.27, 1.13), (0, 1.36, 1.13), (0.81, 1.27, 1.13)], 0.035, "mahogany", sides=8)
+    for x in (-0.4, 0.4):
+        panel("Almofada", (x, 0.85, 1.1), (0.62, 0.5), "dark_wood")
+    box("Peseira", (0, 0.5, -1.1), (1.62, 0.5, 0.05), "mahogany", bevel=0.01)
+    for x in (-0.81, 0.81):
+        for z, top in ((1.13, 1.4), (-1.1, 0.8)):
+            cylinder("Coluna", (x, 0, z), 0.045, 0.04, top, "mahogany", segments=10)
+            sphere("Pomo", (x, top + 0.03, z), 0.045, "brass", segments=10, rings=6)
+    export("cama")
+
+
+def wardrobe():
+    """Guarda-roupa de duas portas: 1,2 x 0,7 x 2,2 m, frente para -z."""
+    reset()
+    box("Corpo", (0, 1.12, 0), (1.16, 1.96, 0.66), "mahogany", bevel=0.01)
+    box("Base", (0, 0.09, 0), (1.22, 0.18, 0.7), "dark_wood", bevel=0.01)
+    box("Cornija", (0, 2.14, 0.01), (1.26, 0.12, 0.72), "dark_wood", bevel=0.015)
+    for x in (-0.29, 0.29):
+        box("Porta", (x, 1.12, -0.335), (0.56, 1.82, 0.02), "mahogany", bevel=0.004)
+        panel("AlmofadaAlta", (x, 1.5, -0.345), (0.42, 0.8), "dark_wood")
+        panel("AlmofadaBaixa", (x, 0.62, -0.345), (0.42, 0.6), "dark_wood")
+        cylinder("Puxador", (x * 0.12, 1.15, -0.36), 0.012, 0.012, 0.04, "brass", segments=8, axis="z")
+    cylinder("Fechadura", (0.02, 1.25, -0.36), 0.015, 0.015, 0.01, "brass", segments=8, axis="z")
+    export("guarda_roupa")
+
+
+def writing_desk():
+    """Escrivaninha: 0,7 de fundo (x) por 1,2 de largura (z), tampo a 0,78 m; gaveta para +x."""
+    reset()
+    box("Tampo", (0, 0.75, 0), (0.72, 0.04, 1.22), "mahogany", bevel=0.01)
+    box("Saia", (0, 0.65, 0), (0.62, 0.16, 1.12), "mahogany")
+    box("Gaveta", (0.315, 0.64, 0), (0.02, 0.12, 0.7), "dark_wood", bevel=0.004)
+    sphere("Puxador", (0.33, 0.64, 0), 0.018, "brass", segments=8, rings=6)
+    for x in (-0.3, 0.3):
+        for z in (-0.53, 0.53):
+            points = [(x, 0.57, z), (x * 0.97, 0.3, z * 0.98), (x * 1.04, 0.0, z * 1.03)]
+            tube("Perna", points, 0.025, "mahogany", sides=8)
+    # Galeria com escaninhos atrás
+    box("Galeria", (-0.3, 0.92, 0), (0.1, 0.3, 1.1), "mahogany", bevel=0.005)
+    for z in (-0.3, 0.0, 0.3):
+        box("Divisoria", (-0.24, 0.92, z), (0.02, 0.28, 0.01), "dark_wood")
+    export("escrivaninha")
+
+
+def trunk():
+    """Baú de viagem de couro: 0,8 x 0,5 x 0,42 m, com cintas, cantoneiras e tampa abaulada."""
+    reset()
+    box("Caixa", (0, 0.18, 0), (0.78, 0.34, 0.48), "leather", bevel=0.015)
+    # Tampa abaulada
+    for i in range(8):
+        a0 = math.pi * i / 8
+        a1 = math.pi * (i + 1) / 8
+        z0, y0 = -0.24 * math.cos(a0), 0.35 + 0.07 * math.sin(a0)
+        z1, y1 = -0.24 * math.cos(a1), 0.35 + 0.07 * math.sin(a1)
+        seg = box("Tampa%d" % i, (0, (y0 + y1) / 2, (z0 + z1) / 2), (0.8, 0.02, math.hypot(z1 - z0, y1 - y0) + 0.01), "leather")
+        angle = math.atan2(y1 - y0, z1 - z0)
+        center = g(0, (y0 + y1) / 2, (z0 + z1) / 2)
+        seg.data.transform(Matrix.Translation(-center))
+        seg.data.transform(Matrix.Rotation(angle, 4, "X"))
+        seg.data.transform(Matrix.Translation(center))
+    for x in (-0.25, 0.25):
+        box("Cinta", (x, 0.2, 0), (0.05, 0.36, 0.5), "brass")
+    for x in (-0.39, 0.39):
+        for z in (-0.24, 0.24):
+            box("Cantoneira", (x, 0.05, z), (0.04, 0.1, 0.04), "brass")
+    box("Fecho", (0, 0.32, -0.25), (0.08, 0.08, 0.02), "brass")
+    for x in (-0.41, 0.41):
+        tube("Alca", [(x, 0.22, -0.08), (x * 1.06, 0.26, 0.0), (x, 0.22, 0.08)], 0.01, "leather", sides=6)
+    export("bau")
+
+
 if __name__ == "__main__":
     grand_piano()
     chandelier()
     cafe_chair()
     round_table()
+    grand_chandelier()
+    sofa()
+    armchair()
+    grandfather_clock()
+    bed()
+    wardrobe()
+    writing_desk()
+    trunk()

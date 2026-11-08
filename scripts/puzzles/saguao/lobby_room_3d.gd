@@ -31,7 +31,8 @@ const WINDOW_SILL: float = 1.2
 const WINDOW_TOP: float = 4.6
 const CHANDELIER := Vector3(10.0, 0.0, 7.0)
 const PIANO := Vector3(17.0, 0.0, 8.0)
-const PIANO_MODEL := "res://art/models/piano_cauda.glb"
+const MODELS := "res://art/models/"
+const PIANO_MODEL := MODELS + "piano_cauda.glb"
 const COLUMNS: Array[Vector2] = [Vector2(5, 5.5), Vector2(15, 5.5), Vector2(5, 9.5), Vector2(15, 9.5)]
 
 const WARM := Color("#F2D49B")
@@ -514,33 +515,7 @@ func _build_chandelier() -> void:
 	var c := CHANDELIER
 	# A luz principal nasce dentro do lustre: as peças dele não fazem sombra no salão
 	_cast_shadows = false
-	_cylinder(Vector3(c.x, 4.9, c.z), 0.03, 0.03, HEIGHT - 4.9, "brass", Vector3.ZERO, 6)
-	_cylinder(Vector3(c.x, 4.0, c.z), 0.08, 0.06, 0.9, "brass", Vector3.ZERO, 12)
-	_sphere(Vector3(c.x, 3.95, c.z), 0.26, "brass", Vector3(1, 0.6, 1))
-	_sphere(Vector3(c.x, 3.72, c.z), 0.07, "glass", Vector3(1, 1.8, 1))
-	var rings := [[4.05, 1.0], [4.36, 0.74], [4.63, 0.48]]
-	for ring: Array in rings:
-		_torus(Vector3(c.x, ring[0], c.z), ring[1] - 0.04, ring[1] + 0.04, "brass")
-	# Braços e velas no anel de baixo
-	for i in 12:
-		var angle := TAU * i / 12.0
-		var direction := Vector3(cos(angle), 0, sin(angle))
-		_block(Vector3(c.x, 4.06, c.z) + direction * 0.5, Vector3(0.9, 0.025, 0.025), "brass", Vector3(0, -rad_to_deg(angle), 0))
-		var tip := Vector3(c.x, 4.05, c.z) + direction * 1.0
-		_cylinder(tip, 0.05, 0.04, 0.06, "brass", Vector3.ZERO, 8)
-		_cylinder(tip + Vector3(0, 0.06, 0), 0.02, 0.02, 0.1, "ivory", Vector3.ZERO, 6)
-		_sphere(tip + Vector3(0, 0.2, 0), 0.045, "bulb", Vector3(1, 1.4, 1))
-	# Gotas de cristal
-	for ring_index in 2:
-		var radius: float = rings[ring_index][1]
-		var count := 24 if ring_index == 0 else 16
-		for i in count:
-			var angle := TAU * (i + 0.5) / count
-			var drop := Vector3(c.x, rings[ring_index][0] - 0.12 - 0.05 * (i % 2), c.z) + Vector3(cos(angle), 0, sin(angle)) * radius
-			_sphere(drop, 0.03, "glass", Vector3(1, 2.2, 1))
-	for i in 8:
-		var angle := TAU * i / 8.0
-		_block(Vector3(c.x, 4.33, c.z) + Vector3(cos(angle), 0, sin(angle)) * 0.37, Vector3(0.7, 0.02, 0.02), "brass", Vector3(0, -rad_to_deg(angle), 20))
+	_model(MODELS + "lustre_saguao.glb", Vector3(c.x, HEIGHT, c.z))
 	_cast_shadows = true
 
 
@@ -780,17 +755,7 @@ func _build_furniture() -> void:
 
 func _sofa(at: Vector3, yaw: float) -> void:
 	var holder := _group(at, yaw if not present else yaw + 7.0)
-	var role := "velvet"
-	_child_box(holder, Vector3(0, 0.3, 0), Vector3(2.1, 0.3, 0.85), role)
-	_child_box(holder, Vector3(0, 0.75, -0.35), Vector3(2.1, 0.6, 0.18), role)
-	for x: float in [-1.0, 1.0]:
-		_child_box(holder, Vector3(x, 0.5, 0), Vector3(0.18, 0.4, 0.85), role)
-	for k in 3:
-		var tilt := Vector3(0, 0, 0) if not present else Vector3(15 * _random(k), 0, 20 * (_random(k, 1.0) - 0.5))
-		_child_box(holder, Vector3(-0.62 + k * 0.62, 0.52, 0.05), Vector3(0.58, 0.14, 0.7), role, tilt)
-	for x: float in [-0.95, 0.95]:
-		for z: float in [-0.35, 0.35]:
-			_child_box(holder, Vector3(x, 0.07, z), Vector3(0.06, 0.14, 0.06), "brass")
+	_model(MODELS + "sofa.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
 	_solid(at + Vector3(-1.1, 0, -0.5), at + Vector3(1.1, 0.95, 0.5), "Sofa")
 
 
@@ -800,15 +765,8 @@ func _armchair(at: Vector3, yaw: float, index: int) -> void:
 	var holder := _group(at + (Vector3(0, 0.38, 0) if fallen else Vector3.ZERO), yaw + (25.0 * index if present else 0.0))
 	if fallen:
 		holder.rotation_degrees.x = -80.0
-	var role := "green_velvet" if index > 0 else "velvet"
-	_child_box(holder, Vector3(0, 0.3, 0), Vector3(0.85, 0.3, 0.8), role)
-	_child_box(holder, Vector3(0, 0.8, -0.32), Vector3(0.85, 0.75, 0.16), role)
-	for x: float in [-0.38, 0.38]:
-		_child_box(holder, Vector3(x, 0.52, 0.02), Vector3(0.12, 0.3, 0.78), role)
-	_child_box(holder, Vector3(0, 0.5, 0.05), Vector3(0.62, 0.12, 0.62), role)
-	for x: float in [-0.35, 0.35]:
-		for z: float in [-0.32, 0.32]:
-			_child_box(holder, Vector3(x, 0.07, z), Vector3(0.05, 0.14, 0.05), "dark_wood")
+	var roles := {"velvet": "green_velvet"} if index > 0 else {}
+	_model(MODELS + "poltrona.glb", Vector3.ZERO, Vector3.ZERO, 1.0, roles, holder)
 	_solid(at + Vector3(-0.45, 0, -0.45), at + Vector3(0.45, 0.95, 0.45), "Armchair")
 
 
@@ -861,20 +819,7 @@ func _grandfather_clock(wall: Vector3) -> void:
 	var holder := _group(at + (Vector3(0, 0.15, 0.9) if present else Vector3.ZERO), 0.0)
 	if present:
 		holder.rotation_degrees.x = 78.0
-	_child_box(holder, Vector3(0, 0.15, 0), Vector3(0.62, 0.3, 0.38), "mahogany")
-	_child_box(holder, Vector3(0, 1.1, 0), Vector3(0.5, 1.6, 0.32), "mahogany")
-	_child_box(holder, Vector3(0, 1.1, 0.165), Vector3(0.3, 1.1, 0.01), "glass")
-	_child_box(holder, Vector3(0, 0.85, 0.15), Vector3(0.012, 0.6, 0.012), "brass")
-	var pendulum := _child_cylinder(holder, Vector3(0, 0.55, 0.15), 0.08, 0.015, "brass")
-	pendulum.rotation_degrees.x = 90.0
-	_child_box(holder, Vector3(0, 2.15, 0), Vector3(0.62, 0.55, 0.38), "mahogany")
-	var face := _child_cylinder(holder, Vector3(0, 2.15, 0.19), 0.2, 0.02, "ivory")
-	face.rotation_degrees.x = 90.0
-	var bezel := _child_cylinder(holder, Vector3(0, 2.15, 0.185), 0.23, 0.02, "brass")
-	bezel.rotation_degrees.x = 90.0
-	_child_box(holder, Vector3(0.05, 2.18, 0.21), Vector3(0.01, 0.13, 0.005), "lacquer", Vector3(0, 0, -40))
-	_child_box(holder, Vector3(-0.03, 2.16, 0.21), Vector3(0.01, 0.09, 0.005), "lacquer", Vector3(0, 0, 70))
-	_child_box(holder, Vector3(0, 2.5, 0), Vector3(0.7, 0.12, 0.42), "dark_wood")
+	_model(MODELS + "relogio_carrilhao.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
 	_solid(wall + Vector3(-0.35, 0, 0), wall + Vector3(0.35, 2.6 if not present else 0.6, 0.5 if not present else 2.8), "Clock")
 
 
