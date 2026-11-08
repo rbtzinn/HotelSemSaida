@@ -31,6 +31,7 @@ const WINDOW_SILL: float = 1.2
 const WINDOW_TOP: float = 4.6
 const CHANDELIER := Vector3(10.0, 0.0, 7.0)
 const PIANO := Vector3(17.0, 0.0, 8.0)
+const PIANO_MODEL := "res://art/models/piano_cauda.glb"
 const COLUMNS: Array[Vector2] = [Vector2(5, 5.5), Vector2(15, 5.5), Vector2(5, 9.5), Vector2(15, 9.5)]
 
 const WARM := Color("#F2D49B")
@@ -598,15 +599,15 @@ func _build_piano() -> void:
 		# Banco tombado
 		_block(Vector3(p.x - 2.1, 0.22, p.z + 0.2), Vector3(0.45, 0.9, 0.4), "velvet", Vector3(0, 20, 90))
 		return
-	_extrude(outline, 0.62, 1.0, p, 0, "lacquer")
-	_extrude(outline, 1.0, 1.02, p + Vector3(0, 0, 0), 0, "brass")
-	# Tampa aberta, presa no lado reto e apoiada numa vareta
+	# Piano modelado no Blender (tools/blender/make_props.py), com a mesma planta da colisão
+	_model(PIANO_MODEL, p)
+	# Tampa aberta, presa no lado reto e apoiada numa vareta: a colisão segue o contorno dela
+	# (a cabeça não pode atravessar). A malha só serve para tirar a forma.
 	var lid := PackedVector2Array()
 	for point in outline:
 		lid.append(point + Vector2(0, 0.75))
-	var lid_mesh := _extrude(lid, 0.0, 0.025, p + Vector3(0, 1.02, -0.75), 0, "lacquer")
+	var lid_mesh := _extrude(lid, 0.0, 0.025, p + Vector3(0, 1.0, -0.75), 0, "lacquer")
 	lid_mesh.rotation_degrees = Vector3(-36, 0, 0)
-	# A tampa aberta fica acima do corpo: também precisa impedir a cabeça de atravessar.
 	var lid_body := StaticBody3D.new()
 	lid_body.name = "PianoLid"
 	lid_body.transform = lid_mesh.transform
@@ -614,23 +615,8 @@ func _build_piano() -> void:
 	lid_collision.shape = lid_mesh.mesh.create_convex_shape()
 	lid_body.add_child(lid_collision)
 	_add(lid_body)
-	_block(p + Vector3(0.3, 1.32, -0.25), Vector3(0.02, 0.62, 0.02), "brass", Vector3(-22, 0, 0))
-	# Teclado
-	_part(p + Vector3(-1.48, 0.72, -0.72), p + Vector3(-1.25, 0.88, 0.72), "lacquer")
-	_part(p + Vector3(-1.46, 0.88, -0.7), p + Vector3(-1.27, 0.905, 0.7), "ivory")
-	for i in 36:
-		if i % 7 in [2, 6]:
-			continue
-		var z := -0.7 + (i + 1) * (1.4 / 36.0)
-		_part(p + Vector3(-1.38, 0.905, z - 0.008), p + Vector3(-1.27, 0.93, z + 0.008), "lacquer")
-	_block(p + Vector3(-1.12, 1.18, 0), Vector3(0.03, 0.32, 0.7), "lacquer", Vector3(0, 0, -14))
-	# Pernas, lira e pedais
-	for leg: Vector2 in [Vector2(-1.05, -0.6), Vector2(-1.05, 0.6), Vector2(1.0, -0.55)]:
-		_cylinder(p + Vector3(leg.x, 0, leg.y), 0.045, 0.07, 0.62, "lacquer", Vector3.ZERO, 10)
-		_cylinder(p + Vector3(leg.x, 0, leg.y), 0.05, 0.05, 0.04, "brass", Vector3.ZERO, 10)
-	_part(p + Vector3(-1.0, 0.1, -0.08), p + Vector3(-0.96, 0.62, 0.08), "lacquer")
-	for k in 3:
-		_part(p + Vector3(-1.12, 0.1, -0.06 + k * 0.05), p + Vector3(-1.0, 0.12, -0.04 + k * 0.05), "brass")
+	lid_mesh.get_parent().remove_child(lid_mesh)
+	lid_mesh.free()
 	# Banco
 	var bench := Vector3(p.x - 2.0, 0, p.z)
 	_part(bench + Vector3(-0.22, 0.42, -0.45), bench + Vector3(0.22, 0.5, 0.45), "velvet")

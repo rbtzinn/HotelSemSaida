@@ -36,8 +36,6 @@ const CLEAT := Vector3(1.7, 1.2, 13.72)
 ## Piano de palco: o pianista senta a oeste, de frente para leste; a tecla mais grave fica ao norte.
 const PIANO := Vector3(14.6, STAGE_TOP, 15.9)
 const KEYBOARD_X: float = 13.55
-const KEYS_Z: float = 15.3
-const KEY_WIDTH: float = 0.17
 const BENCH := Vector3(12.95, STAGE_TOP, 15.9)
 const MUSIC_STAND := Vector3(10.0, STAGE_TOP, 14.7)
 const CHANDELIERS: Array[Vector3] = [Vector3(6.0, 4.9, 9.0), Vector3(14.0, 4.9, 9.0)]
@@ -45,6 +43,11 @@ const TABLES: Array[Vector2] = [Vector2(2.8, 6.8), Vector2(2.8, 10.4), Vector2(1
 	Vector2(6.0, 12.0), Vector2(14.0, 12.0)]
 ## Hoje, o lustre do oeste caiu entre as mesas.
 const FALLEN_CHANDELIER := Vector3(6.0, 0, 8.6)
+
+const PIANO_MODEL := "res://art/models/piano_cauda.glb"
+const CHAIR_MODEL := "res://art/models/cadeira_cafe.glb"
+const TABLE_MODEL := "res://art/models/mesa_redonda.glb"
+const CHANDELIER_MODEL := "res://art/models/lustre.glb"
 
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
@@ -190,7 +193,7 @@ func _build_hall() -> void:
 	# Espelhos na parede oeste, lambri e rodapé
 	for z: float in [6.5, 9.5, 12.5]:
 		_part(Vector3(WEST + 0.1, 1.0, z - 0.9), Vector3(WEST + 0.14, 3.8, z + 0.9), "brass")
-		_part(Vector3(WEST + 0.14, 1.1, z - 0.8), Vector3(WEST + 0.16, 3.7, z + 0.8), "glass" if not present else "dark")
+		_part(Vector3(WEST + 0.14, 1.1, z - 0.8), Vector3(WEST + 0.16, 3.7, z + 0.8), "lacquer" if not present else "dark")
 	for x: float in [WEST + 0.11, EAST - 0.11]:
 		_part(Vector3(x - 0.01, 0, SOUTH), Vector3(x + 0.01, 0.2, BACK), "dark_wood")
 		_part(Vector3(x - 0.012, 1.0, SOUTH), Vector3(x + 0.012, 1.04, BACK), "brass")
@@ -241,17 +244,10 @@ func _build_stage() -> void:
 	_part(Vector3(CLEAT.x - 0.01, CLEAT.y, CLEAT.z - 0.01), Vector3(CLEAT.x + 0.01, PULLEY.y, CLEAT.z + 0.01), "leather")
 	_part(CLEAT + Vector3(-0.12, -0.03, -0.04), CLEAT + Vector3(0.12, 0.03, 0.0), "iron")
 	# Piano de palco (cauda), banqueta e estante do maestro
-	var wood := "lacquer" if not present else "dark_wood"
-	_part(Vector3(KEYBOARD_X + 0.25, STAGE_TOP + 0.62, PIANO.z - 0.75), Vector3(PIANO.x + 1.4, STAGE_TOP + 0.95, PIANO.z + 0.75), wood)
-	_part(Vector3(KEYBOARD_X, STAGE_TOP + 0.6, KEYS_Z - 0.08), Vector3(KEYBOARD_X + 0.25, STAGE_TOP + 0.72, KEYS_Z + 7 * KEY_WIDTH + 0.08), wood)
-	_part(Vector3(KEYBOARD_X + 0.18, STAGE_TOP + 0.72, KEYS_Z - 0.08), Vector3(KEYBOARD_X + 0.25, STAGE_TOP + 0.9, KEYS_Z + 7 * KEY_WIDTH + 0.08), wood)
-	for leg: Vector2 in [Vector2(KEYBOARD_X + 0.15, PIANO.z - 0.65), Vector2(KEYBOARD_X + 0.15, PIANO.z + 0.65), Vector2(PIANO.x + 1.2, PIANO.z)]:
-		_part(Vector3(leg.x - 0.05, STAGE_TOP, leg.y - 0.05), Vector3(leg.x + 0.05, STAGE_TOP + 0.62, leg.y + 0.05), wood)
-	if not present:
-		# Tampa aberta
-		var lid := _part(Vector3(KEYBOARD_X + 0.5, STAGE_TOP + 0.95, PIANO.z + 0.7), Vector3(PIANO.x + 1.4, STAGE_TOP + 0.98, PIANO.z + 0.75), wood)
-		lid.rotation_degrees.x = -55.0
-	_solid(Vector3(KEYBOARD_X, STAGE_TOP, PIANO.z - 0.75), Vector3(PIANO.x + 1.4, STAGE_TOP + 0.98, PIANO.z + 0.75), "Piano")
+	# Piano de cauda modelado no Blender; o teclado fica a oeste, na frente da banqueta
+	var piano_at := Vector3(KEYBOARD_X - 0.05 + 1.48, STAGE_TOP, PIANO.z)
+	_model(PIANO_MODEL, piano_at)
+	_solid(piano_at + Vector3(-1.48, 0, -0.75), piano_at + Vector3(1.25, 1.0, 0.75), "Piano")
 	var bench_wood := "mahogany" if not present else "plank"
 	_part(BENCH + Vector3(-0.2, 0.42, -0.4), BENCH + Vector3(0.2, 0.5, 0.4), "velvet")
 	for corner: Vector2 in [Vector2(-0.17, -0.37), Vector2(0.17, -0.37), Vector2(-0.17, 0.37), Vector2(0.17, 0.37)]:
@@ -269,11 +265,7 @@ func _build_stage() -> void:
 		var at := Vector3(5.5 + i * 1.1, STAGE_TOP, 16.2 + (i % 2) * 0.5)
 		if at.x > 12.3:
 			continue
-		var chair := "dark_wood" if not present else "plank"
-		_part(at + Vector3(-0.2, 0.42, -0.2), at + Vector3(0.2, 0.46, 0.2), chair)
-		_part(at + Vector3(-0.2, 0.46, 0.17), at + Vector3(0.2, 0.95, 0.2), chair)
-		for corner: Vector2 in [Vector2(-0.17, -0.17), Vector2(0.17, -0.17), Vector2(-0.17, 0.17), Vector2(0.17, 0.17)]:
-			_part(at + Vector3(corner.x - 0.02, 0, corner.y - 0.02), at + Vector3(corner.x + 0.02, 0.42, corner.y + 0.02), chair)
+		_model(CHAIR_MODEL, at)
 		_solid(at + Vector3(-0.2, 0, -0.2), at + Vector3(0.2, 0.95, 0.2), "Chair")
 
 
@@ -311,24 +303,21 @@ func _build_tables() -> void:
 	for i in TABLES.size():
 		var spot: Vector2 = TABLES[i]
 		var base := Vector3(spot.x, 0, spot.y)
-		var top_y := 0.75
-		_cylinder(base, 0.08, 0.06, top_y - 0.04, "dark_wood" if not present else "plank", Vector3.ZERO, 8)
-		_cylinder(base, 0.3, 0.3, 0.03, "dark_wood" if not present else "plank", Vector3.ZERO, 10)
 		if present and i % 3 == 1:
 			# Tampo partido, caído de lado contra o pé
+			_cylinder(base, 0.08, 0.06, 0.71, "plank", Vector3.ZERO, 8)
+			_cylinder(base, 0.3, 0.3, 0.03, "plank", Vector3.ZERO, 10)
 			_block(base + Vector3(0.3, 0.35, 0), Vector3(0.05, 0.9, 1.0), "plank", Vector3(0, 0, 12))
 			_solid_cylinder(base, 0.6, 0.75, "Table")
 			continue
-		_cylinder(base + Vector3(0, top_y - 0.04, 0), 0.55, 0.55, 0.04, "dark_wood" if not present else "plank", Vector3.ZERO, 16)
+		_model(TABLE_MODEL, base, Vector3(0, i * 40.0, 0))
 		if not present:
-			_cylinder(base + Vector3(0, top_y - 0.05, 0), 0.6, 0.6, 0.01, "paper", Vector3.ZERO, 16)
+			# Duas cadeiras de pernas para o ar sobre o tampo, com o encosto pendurado para fora
 			for k in 2:
-				var offset := Vector3(-0.22 + k * 0.44, top_y, 0)
-				_part(base + offset + Vector3(-0.18, 0.0, -0.18), base + offset + Vector3(0.18, 0.04, 0.18), "mahogany")
-				for corner: Vector2 in [Vector2(-0.15, -0.15), Vector2(0.15, -0.15), Vector2(-0.15, 0.15), Vector2(0.15, 0.15)]:
-					_part(base + offset + Vector3(corner.x - 0.02, 0.04, corner.y - 0.02),
-						base + offset + Vector3(corner.x + 0.02, 0.46, corner.y + 0.02), "mahogany")
-			_solid_cylinder(base, 0.6, 1.25, "Table")
+				var yaw := i * 40.0 + 180.0 * k
+				var offset := Vector3(0, 0, 0.45).rotated(Vector3.UP, deg_to_rad(yaw))
+				_model(CHAIR_MODEL, base + offset + Vector3(0, 0.755 + 0.465, 0), Vector3(0, yaw, 180))
+			_solid_cylinder(base, 0.68, 1.7, "Table")
 		else:
 			_solid_cylinder(base, 0.6, 0.75, "Table")
 
@@ -348,16 +337,10 @@ func _build_chandeliers() -> void:
 			_solid_cylinder(down, 0.85, 0.55, "Chandelier")
 			_part(Vector3(at.x - 0.01, at.y, at.z - 0.01), Vector3(at.x + 0.01, HALL_H, at.z + 0.01), "iron")
 			continue
-		var metal := "brass" if not present else "iron"
-		_part(Vector3(at.x - 0.015, at.y + 0.3, at.z - 0.015), Vector3(at.x + 0.015, HALL_H, at.z + 0.015), metal)
-		_torus(at, 0.55, 0.65, metal)
-		_torus(at + Vector3(0, -0.35, 0), 0.3, 0.38, metal)
-		_cylinder(at + Vector3(0, -0.5, 0), 0.05, 0.12, 0.8, metal, Vector3.ZERO, 8)
-		for k in 8:
-			var angle := TAU * k / 8.0
-			var tip := at + Vector3(cos(angle) * 0.6, 0.05, sin(angle) * 0.6)
-			var bulb := _sphere(tip, 0.06, "bulb" if not present else "glass")
-			bulb.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# Lustre modelado no Blender, pendurado do teto
+		_cast_shadows = false
+		_model(CHANDELIER_MODEL, Vector3(at.x, HALL_H, at.z), Vector3(0, i * 22.5, 0), 1.2)
+		_cast_shadows = true
 
 
 func _build_lights() -> void:

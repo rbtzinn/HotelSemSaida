@@ -27,7 +27,7 @@ const PAST := {
 	"green_velvet": [Pattern.CLOTH, "#2A5A42", "#173526", "#000000", 1.0, 0.95, 0.0],
 	"rug": [Pattern.RUG, "#6B1E2A", "#A8782C", "#1F3A2E", 1.0, 0.95, 0.0],
 	"runner": [Pattern.RUG, "#5A1622", "#7A2230", "#C9973B", 1.0, 0.95, 0.0],
-	"lacquer": [Pattern.PLAIN, "#0E0A0B", "#000000", "#000000", 1.0, 0.12, 0.0],
+	"lacquer": [Pattern.PLAIN, "#1C1416", "#000000", "#000000", 1.0, 0.1, 0.0],
 	"ivory": [Pattern.PLAIN, "#EDE4CF", "#000000", "#000000", 1.0, 0.3, 0.0],
 	"paper": [Pattern.PLAIN, "#E8DCC0", "#000000", "#000000", 1.0, 0.9, 0.0],
 	"leaf": [Pattern.CLOTH, "#2F5A2A", "#1E3E1C", "#000000", 0.4, 0.8, 0.0],

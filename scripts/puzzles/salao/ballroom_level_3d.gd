@@ -44,7 +44,6 @@ func _ready() -> void:
 		_build_landing(world, present)
 		_build_counterweight(world, present)
 		_build_score(world, present)
-		_build_keys(world, present)
 	marker("DaEscada", Vector3(3.0, 0, 2.9), PI)
 	marker("DoPoco", Vector3(16.25, 0, 1.2), PI)
 	_apply_state()
@@ -231,25 +230,6 @@ func _bench_today(_by: FirstPersonMotor) -> void:
 	NoteUI.open(get_tree(), SCORE_TITLE, SCORE_TODAY, ScoreSheet.texture(true))
 	WorldState.set_flag(SCORE_READ)
 	WorldState.set_flag(DONE)
-
-
-# --- Teclado do piano de palco -----------------------------------------------
-
-func _build_keys(world: Node3D, present: bool) -> void:
-	var keyboard := Node3D.new()
-	keyboard.name = "Teclado"
-	world.add_child(keyboard)
-	for i in 7:
-		var key := Node3D.new()
-		key.position = Vector3(ROOM.KEYBOARD_X - 0.1, ROOM.STAGE_TOP + 0.735, ROOM.KEYS_Z + (i + 0.5) * ROOM.KEY_WIDTH)
-		keyboard.add_child(key)
-		box(key, Vector3.ZERO, Vector3(0.3, 0.025, ROOM.KEY_WIDTH - 0.012), "ivory", present)
-		if i == 0:
-			box(key, Vector3(-0.13, 0.014, 0), Vector3(0.03, 0.006, ROOM.KEY_WIDTH - 0.03), "brass", present)
-	# Teclas pretas entre as brancas (dó#, ré#, fá#, sol#, lá#)
-	for i: int in [0, 1, 3, 4, 5]:
-		box(keyboard, Vector3(ROOM.KEYBOARD_X + 0.0, ROOM.STAGE_TOP + 0.755, ROOM.KEYS_Z + (i + 1) * ROOM.KEY_WIDTH),
-			Vector3(0.18, 0.03, 0.09), "lacquer", present)
 
 
 # --- Estado ---------------------------------------------------------------------------------

@@ -234,6 +234,28 @@ func _child_cylinder(holder: Node3D, center: Vector3, radius: float, height: flo
 	return instance
 
 
+## Modelo feito no Blender (`art/models/`, ver tools/blender/). Cada objeto do modelo tem um
+## material com o nome de um papel ("lacquer", "brass"...), trocado aqui pelo da época. As peças
+## entram na junção de malhas da sala como as outras. Colisão continua sendo `_solid`.
+func _model(path: String, at: Vector3, rotation_deg: Vector3 = Vector3.ZERO, scale_factor: float = 1.0) -> Node3D:
+	var model := (load(path) as PackedScene).instantiate() as Node3D
+	model.position = at
+	model.rotation_degrees = rotation_deg
+	model.scale = Vector3.ONE * scale_factor
+	for node in model.find_children("*", "MeshInstance3D", true, false):
+		var instance := node as MeshInstance3D
+		# O script do Blender junta as peças por material e dá ao objeto o nome do papel
+		var source := instance.mesh.surface_get_material(0)
+		var role := String(instance.name)
+		if source and source.resource_name != "":
+			role = source.resource_name
+		instance.material_override = _material(role)
+		if not _cast_shadows or role in ["bulb", "glass"]:
+			instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(model)
+	return model
+
+
 func _mesh(mesh: Mesh, center: Vector3, role: String, rotation_deg: Vector3 = Vector3.ZERO, material: Material = null) -> MeshInstance3D:
 	var instance := MeshInstance3D.new()
 	instance.mesh = mesh
