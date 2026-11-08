@@ -25,6 +25,9 @@ const ELEVATOR := Vector2(15.4, 17.1)
 const LIBRARY_DOOR := Vector2(18.05, 19.35)
 const PIT_FLOOR := -2.65
 const RACK := Vector3(7.85, 1.75, NORTH)
+## Cofre da gerência: na parede norte, entre a ponta leste do balcão e o elevador, onde a
+## porta (dobradiça à direita) abre inteira sem bater no balcão.
+const SAFE := Vector3(14.1, 0.2, NORTH)
 ## Janelas da parede leste (z).
 const WINDOWS: Array[Vector2] = [Vector2(3.0, 4.8), Vector2(8.9, 10.4)]
 const WINDOW_SILL: float = 1.2
@@ -449,7 +452,7 @@ func _build_reception() -> void:
 	_label(sign_text, Vector3(10, 3.32, NORTH + 0.07), 0.3, Color("#E8C27A") if not present else Color("#6E5A34"))
 
 	_build_key_rack(RACK)
-	_build_safe(Vector3(12.2, 0.2, NORTH))
+	_build_safe(SAFE)
 
 
 ## Quadro de chaves com 12 ganchos (2 fileiras de 6). Hoje, podre e vazio.
@@ -478,7 +481,7 @@ func _build_safe(base: Vector3) -> void:
 	_cylinder(base + Vector3(0, 0.62, 0.55), 0.04, 0.04, 0.03, "iron", Vector3(90, 0, 0), 12)
 	_block(base + Vector3(0.22, 0.4, 0.56), Vector3(0.2, 0.03, 0.03), "brass", Vector3(0, 0, -20))
 	for y: float in [0.2, 0.9]:
-		_cylinder(base + Vector3(-0.52, y, 0.53), 0.025, 0.025, 0.12, "brass")
+		_cylinder(base + Vector3(0.52, y, 0.53), 0.025, 0.025, 0.12, "brass")
 	# Segunda fechadura, de chave, abaixo do segredo (a chave do gerente, da torre)
 	_part(base + Vector3(-0.255, 0.33, 0.52), base + Vector3(-0.185, 0.47, 0.534), "brass")
 	_part(base + Vector3(-0.228, 0.36, 0.534), base + Vector3(-0.212, 0.42, 0.538), "dark")
@@ -747,7 +750,7 @@ func _build_furniture() -> void:
 	_palm(Vector3(11.8, 0, 10.2), 2)
 	_palm(Vector3(5.15, 0, 2.6), 3)
 	_palm(Vector3(18.95, 0, 10.2), 4)
-	_grandfather_clock(Vector3(14.6, 0, NORTH))
+	_grandfather_clock(Vector3(12.2, 0, NORTH))
 	_luggage_cart(Vector3(13.4, 0, 9.7))
 
 
@@ -813,12 +816,16 @@ func _palm(at: Vector3, index: int) -> void:
 
 
 func _grandfather_clock(wall: Vector3) -> void:
-	var at := wall + Vector3(0, 0, 0.2)
-	var holder := _group(at + (Vector3(0, 0.15, 0.9) if present else Vector3.ZERO), 0.0)
-	if present:
-		holder.rotation_degrees.x = 78.0
-	_model(MODELS + "relogio_carrilhao.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
-	_solid(wall + Vector3(-0.35, 0, 0), wall + Vector3(0.35, 2.6 if not present else 0.6, 0.5 if not present else 2.8), "Clock")
+	if not present:
+		var holder := _group(wall + Vector3(0, 0, 0.2), 0.0)
+		_model(MODELS + "relogio_carrilhao.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
+		_solid(wall + Vector3(-0.35, 0, 0), wall + Vector3(0.35, 2.6, 0.5), "Clock")
+		return
+	# Hoje tombou de lado, ao longo da parede, entre ela e o balcão (o mostrador ainda para o Saguão)
+	var fallen := _group(wall + Vector3(0.34, 0.35, 0.25), 0.0)
+	fallen.rotation_degrees.z = 88.0
+	_model(MODELS + "relogio_carrilhao.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, fallen)
+	_solid(wall + Vector3(-2.25, 0, 0), wall + Vector3(0.36, 0.72, 0.5), "Clock")
 
 
 func _luggage_cart(at: Vector3) -> void:
@@ -916,7 +923,7 @@ func _build_ruin_details() -> void:
 		var at := Vector3(6.0 + _random(i, 9.0) * 8.0, 0.008 + i * 0.0003, 4.2 + _random(i, 10.0) * 5.0)
 		_block(at, Vector3(0.21, 0.004, 0.29), "paper", Vector3(0, _random(i, 11.0) * 180.0, 0))
 	# Montes de reboco caído junto às paredes
-	for pile: Vector3 in [Vector3(0.9, 0, 3.0), Vector3(19.0, 0, 7.0), Vector3(7.5, 0, 10.3), Vector3(14.6, 0, 2.6)]:
+	for pile: Vector3 in [Vector3(0.9, 0, 3.0), Vector3(19.0, 0, 7.0), Vector3(7.5, 0, 10.3), Vector3(6.3, 0, 2.45)]:
 		for k in 6:
 			var at := pile + Vector3((_random(k, pile.x) - 0.5) * 1.0, 0.08 + _random(k, pile.z) * 0.15, (_random(k, pile.x + 1.0) - 0.5) * 0.8)
 			_block(at, Vector3(0.15 + _random(k, 2.0) * 0.35, 0.1 + _random(k, 3.0) * 0.2, 0.15 + _random(k, 4.0) * 0.3), "rubble", Vector3(_random(k) * 30.0, _random(k, 5.0) * 180.0, 0))

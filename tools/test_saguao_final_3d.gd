@@ -14,7 +14,7 @@ class TestInput extends CharacterInput:
 
 const END := "res://scripts/ui/end_screen.gd"
 const SILL := Vector3(16.29, 0, 3.18)
-const SAFE_SPOT := Vector3(13.3, 0, 2.62)
+const SAFE_SPOT := Vector3(14.1, 0, 3.4)
 const DOOR_SPOT := Vector3(10.0, 0, 9.0)
 const DESK_SPOT := Vector3(10.0, 0, 4.6)
 

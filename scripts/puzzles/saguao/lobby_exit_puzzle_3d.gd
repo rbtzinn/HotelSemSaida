@@ -22,7 +22,10 @@ const FINAL := "jogo.final"
 const SAFE_CODE := "1403"
 const ENTRANCE_KEY := "chave_entrada"
 const MARTA_KEY := "chave_portaria"
-const SAFE := Vector3(12.2, 0.2, LobbyRoom3D.NORTH)
+const SAFE := LobbyRoom3D.SAFE
+## Abertura da porta do cofre (dobradiça à direita, abre para o Saguão); hoje solta, mais aberta.
+const SAFE_OPEN_ANGLE := 90.0
+const SAFE_OPEN_ANGLE_TODAY := 112.0
 const ENTRANCE := Vector3(10.0, 1.2, 9.95)
 ## Onde Lia "entra" de novo, de costas para a porta que acabou de abrir.
 const RETURN_SPOT := Vector3(10.0, 0.0, 9.4)
@@ -79,21 +82,37 @@ func _build_safe(room: ChapterRoom3D, past: Node3D) -> void:
 	safe.interacted.connect(_use_safe)
 	# Aberta, a porta deixa ver o fundo escuro. A frente fixa fica por trás deste vão.
 	safe_recess = room.box(past, SAFE + Vector3(0, 0.55, 0.552), Vector3(1.0, 0.98, 0.058), "dark", false)
-	safe_door = Node3D.new()
-	safe_door.name = "PortaCofre"
-	safe_door.position = SAFE + Vector3(-0.52, 0.06, 0.585)
-	safe_door.rotation_degrees.y = -25
-	past.add_child(safe_door)
-	room.box(safe_door, Vector3(0.52, 0.49, 0.025), Vector3(1.04, 0.98, 0.05), "lacquer", false)
-	var dial := room.box(safe_door, Vector3(0.52, 0.56, 0.06), Vector3(0.2, 0.2, 0.03), "brass", false)
-	dial.rotation_degrees.z = 45
+	safe_door = _safe_door(room, past, "PortaCofre", SAFE_OPEN_ANGLE, false)
 	safe_key = room.key_visual(past, SAFE + Vector3(0.15, 0.32, 0.595), false)
 	_add_lock_keys(room, past, safe_door, false)
 
 
+## Porta aberta do cofre, com colisão própria (o que se vê é o que colide). A dobradiça fica
+## no canto direito; a folha ocupa x de -1,04 a 0 no espaço da dobradiça.
+func _safe_door(room: ChapterRoom3D, world: Node3D, node_name: String, angle: float, present: bool) -> Node3D:
+	var door := Node3D.new()
+	door.name = node_name
+	door.position = SAFE + Vector3(0.52, 0.06, 0.585)
+	door.rotation_degrees.y = angle
+	world.add_child(door)
+	room.box(door, Vector3(-0.52, 0.49, 0.025), Vector3(1.04, 0.98, 0.05), "iron" if present else "lacquer", present)
+	var dial := room.box(door, Vector3(-0.52, 0.56, 0.06), Vector3(0.2, 0.2, 0.03), "iron" if present else "brass", present)
+	dial.rotation_degrees.z = 45
+	var body := StaticBody3D.new()
+	body.name = "Solido"
+	var shape := BoxShape3D.new()
+	shape.size = Vector3(1.04, 0.98, 0.06)
+	var collision := CollisionShape3D.new()
+	collision.shape = shape
+	collision.position = Vector3(-0.52, 0.49, 0.025)
+	body.add_child(collision)
+	door.add_child(body)
+	return door
+
+
 ## Porta do cofre com a fechadura de chave, na mesma posição da frente fechada.
 func _door_keyhole(room: ChapterRoom3D, door: Node3D, present: bool) -> void:
-	var hole := Vector3(KEYHOLE.x + 0.52, KEYHOLE.y - 0.06, 0.056)
+	var hole := Vector3(KEYHOLE.x - 0.52, KEYHOLE.y - 0.06, 0.056)
 	room.box(door, hole, Vector3(0.07, 0.14, 0.012), "brass", present)
 	room.box(door, hole + Vector3(0, -0.01, 0.007), Vector3(0.016, 0.06, 0.004), "dark", present)
 
@@ -103,7 +122,7 @@ func _add_lock_keys(room: ChapterRoom3D, world: Node3D, door: Node3D, present: b
 	_door_keyhole(room, door, present)
 	var closed := room.key_visual(world, SAFE + KEYHOLE + Vector3(0, 0, 0.095), present)
 	closed.rotation_degrees.y = 90
-	var opened := room.key_visual(door, Vector3(KEYHOLE.x + 0.52, KEYHOLE.y - 0.06, 0.16), present)
+	var opened := room.key_visual(door, Vector3(KEYHOLE.x - 0.52, KEYHOLE.y - 0.06, 0.16), present)
 	opened.rotation_degrees.y = 90
 	lock_keys[present] = [closed, opened]
 
@@ -116,15 +135,8 @@ func _build_today_safe(room: ChapterRoom3D, today: Node3D) -> void:
 		"available_in": 1,
 	})
 	today_recess = room.box(today, SAFE + Vector3(0, 0.55, 0.552), Vector3(1.0, 0.98, 0.058), "dark", true)
-	today_door = Node3D.new()
-	today_door.name = "PortaCofreHoje"
-	today_door.position = SAFE + Vector3(-0.52, 0.06, 0.585)
 	# Solta nas dobradiças, mais aberta que em 1923
-	today_door.rotation_degrees.y = -70
-	today.add_child(today_door)
-	room.box(today_door, Vector3(0.52, 0.49, 0.025), Vector3(1.04, 0.98, 0.05), "iron", true)
-	var dial := room.box(today_door, Vector3(0.52, 0.56, 0.06), Vector3(0.2, 0.2, 0.03), "iron", true)
-	dial.rotation_degrees.z = 45
+	today_door = _safe_door(room, today, "PortaCofreHoje", SAFE_OPEN_ANGLE_TODAY, true)
 	_add_lock_keys(room, today, today_door, true)
 
 
@@ -275,10 +287,10 @@ func _on_era_changed(era: Era.Id) -> void:
 
 func _restore() -> void:
 	var open := WorldState.is_set(SAFE_OPEN)
-	safe_door.visible = open
+	_show_door(safe_door, open)
 	safe_recess.visible = open
 	safe_key.visible = open and not WorldState.is_set(SAFE_KEY_TAKEN)
-	today_door.visible = open
+	_show_door(today_door, open)
 	today_recess.visible = open
 	today_safe.set("message", _today_message())
 	var turned := WorldState.is_set(SAFE_MANAGER_KEY)
@@ -287,6 +299,12 @@ func _restore() -> void:
 		lock_keys[present][1].visible = turned and open
 	latch_key.visible = WorldState.is_set(LATCH_1923)
 	chain.visible = not WorldState.is_set(PADLOCK) or WorldState.is_set(FINAL)
+
+
+## A porta fechada é a frente fixa do cofre: a folha aberta some e para de colidir.
+func _show_door(door: Node3D, open: bool) -> void:
+	door.visible = open
+	(door.get_node("Solido").get_child(0) as CollisionShape3D).disabled = not open
 
 
 func _on_flag(key: String, _value: Variant) -> void:
