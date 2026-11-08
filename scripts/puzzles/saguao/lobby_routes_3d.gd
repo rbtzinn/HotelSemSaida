@@ -24,6 +24,9 @@ func _ready() -> void:
 	var exit := preload("res://scripts/puzzles/saguao/lobby_exit_puzzle_3d.gd").new()
 	add_child(exit)
 	exit.install(self)
+	StoryTrigger.attach(self, "saguao.bolsa.marta", StoryCutscenes.marta_bag)
+	StoryTrigger.attach(self, "jogo.final", StoryCutscenes.exit_return)
+	StoryTrigger.attach(self, "jogo.encerrado", StoryCutscenes.knocks)
 	super()
 	if WorldState.is_set(StoryCutscenes.OPENING_PENDING):
 		WorldState.set_flag(StoryCutscenes.OPENING_PENDING, false)

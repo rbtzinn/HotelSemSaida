@@ -208,7 +208,8 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 ## Cutscenes (07/11/2026)
 
 - `Cutscene` (`scripts/ui/cutscene.gd`): câmera própria no cenário 3D, faixas de cinema e legendas; pausa o jogo, esconde o HUD, troca a época por tomada (`"era"`) e no fim devolve a época e os olhos da personagem ativa. E, Enter ou Esc pulam. Toca uma vez: `cena.<id>` no WorldState (vai no save, nunca pela rede). Desligada sem janela (`Cutscene.enabled`), para os testes automáticos não pararem; `tools/test_cutscenes.gd` liga de novo.
-- `StoryCutscenes` (`scripts/story/story_cutscenes.gd`) guarda o roteiro: `opening` (jogo novo: `entrada.gd` e `NetSession._begin` ligam `cena.abertura.pendente`, o Saguão toca) e `first_switch` (`Room3D`, no primeiro Tab dentro da mesma sala, só no solo). As cutscenes de fim de capítulo e do final entram nas próximas etapas (lista no `GDD.md`).
+- `StoryCutscenes` (`scripts/story/story_cutscenes.gd`) guarda o roteiro: `opening` (jogo novo: `entrada.gd` e `NetSession._begin` ligam `cena.abertura.pendente`, o Saguão toca) e `first_switch` (`Room3D`, no primeiro Tab dentro da mesma sala, só no solo). Também `kitchen_end` (relógio de ponto, ao chegar à manutenção), `library_end`, `boilers_end`, `marta_bag`, `exit_return` (depois do clarão da entrada) e `knocks` (Helena em 1923; a tela de fim vem depois).
+- `StoryTrigger` (`scripts/story/story_trigger.gd`): filho da sala que toca uma cutscene quando a flag liga (`on_ready` toca também ao abrir a sala com a flag ligada). A cutscene espera bilhete, cadeado, troca de sala ou de época terminarem antes de começar. Nas tomadas de hoje a câmera leva uma lanterna.
 
 ## Dupla online (05/11/2026)
 

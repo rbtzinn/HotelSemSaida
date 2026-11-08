@@ -22,6 +22,7 @@ static var enabled: bool = DisplayServer.get_name() != "headless"
 var _id: String
 var _shots: Array
 var _camera: Camera3D
+var _lantern: SpotLight3D
 var _top: ColorRect
 var _bottom: ColorRect
 var _caption: Label
@@ -29,6 +30,7 @@ var _black: ColorRect
 var _tween: Tween
 var _start_era: Era.Id
 var _done := false
+var _started := false
 
 
 static func seen(id: String) -> bool:
@@ -55,17 +57,24 @@ func _ready() -> void:
 	add_to_group("room_overlay")
 	layer = 50
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_start_era = EraManager.current_era
 	WorldState.set_flag(PREFIX + _id)
-	get_tree().paused = true
-	get_tree().call_group("hud", "set", "visible", false)
 
 	_camera = Camera3D.new()
 	_camera.name = "CutsceneCamera"
 	_camera.fov = 62.0
 	_camera.near = 0.05
 	_camera.process_mode = Node.PROCESS_MODE_ALWAYS
-	get_tree().current_scene.add_child(_camera)
+	add_child(_camera)
+	# Hoje o hotel está no escuro: a câmera leva uma lanterna como a de Lia, mais aberta
+	_lantern = SpotLight3D.new()
+	_lantern.light_color = Color("#E8E2D0")
+	_lantern.light_energy = 3.2
+	_lantern.spot_range = 14.0
+	_lantern.spot_angle = 40.0
+	_lantern.shadow_enabled = true
+	_lantern.position = Vector3(0.12, -0.15, 0)
+	_lantern.visible = false
+	_camera.add_child(_lantern)
 
 	_black = _rect(Color(0, 0, 0, 0))
 	_black.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -89,6 +98,24 @@ func _ready() -> void:
 	_caption.anchor_bottom = 1.0
 	_caption.modulate.a = 0.0
 	add_child(_caption)
+
+
+## Começa quando o bilhete (ou outra tela em close) fechar e a troca de sala terminar.
+func _can_begin() -> bool:
+	if RoomManager.is_changing() or EraManager.is_switching():
+		return false
+	for node in get_tree().get_nodes_in_group("room_overlay"):
+		if node != self and not node.is_in_group("cutscene"):
+			return false
+	return get_tree().current_scene != null
+
+
+func _begin() -> void:
+	_started = true
+	_start_era = EraManager.current_era
+	get_tree().paused = true
+	get_tree().call_group("hud", "set", "visible", false)
+	_camera.reparent(get_tree().current_scene)
 	_play_shot(0)
 
 
@@ -101,6 +128,10 @@ func _rect(color: Color) -> ColorRect:
 
 
 func _process(_delta: float) -> void:
+	if not _started:
+		if _can_begin():
+			_begin()
+		return
 	# As faixas acompanham o tamanho da janela
 	var height := get_viewport().get_visible_rect().size.y
 	var amount := _top.get_meta("amount", 0.0) as float
@@ -137,8 +168,11 @@ func _play_shot(index: int) -> void:
 			EraManager.set_era(int(shot.era))
 		_camera.global_transform = from
 		_camera.make_current()
-		_caption.text = str(shot.get("caption", ""))
-		_caption.modulate.a = 0.0)
+		_lantern.visible = EraManager.current_era == Era.Id.PRESENT
+		# Tomada sem legenda deixa a anterior terminar sozinha
+		if str(shot.get("caption", "")) != "":
+			_caption.text = str(shot.caption)
+			_caption.modulate.a = 0.0)
 	if fade:
 		_tween.tween_property(_black, "color:a", 0.0, 0.45)
 	_tween.tween_method(func(weight: float) -> void:
@@ -165,7 +199,7 @@ func _xform(shot: Dictionary, key: String) -> Transform3D:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _done:
+	if _done or not _started:
 		return
 	for action in ["interact", "ui_accept", "ui_cancel", "pause"]:
 		if event.is_action_pressed(action):
@@ -175,7 +209,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func skip() -> void:
-	if _done:
+	if _done or not _started:
 		return
 	if _tween:
 		_tween.kill()

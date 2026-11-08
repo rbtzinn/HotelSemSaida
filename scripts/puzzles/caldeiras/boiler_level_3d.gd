@@ -24,6 +24,7 @@ var _motion: Tween
 
 
 func _ready() -> void:
+	StoryTrigger.attach(self, "caldeiras.concluida", StoryCutscenes.boilers_end)
 	for present: bool in [false, true]:
 		var world := make_world(PLANT, present)
 		area(DOOR, world, "ParaArquivo", Vector3(6, 1.22, 11.84), Vector3(1.6, 2.44, 0.22), {

@@ -171,6 +171,8 @@ func _leave(by: FirstPersonMotor) -> void:
 	layer.add_child(flash)
 	add_child(layer)
 	var tween := create_tween()
+	# A cutscene da saída pausa o jogo; o clarão precisa continuar sumindo por baixo dela
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(flash, "color:a", 1.0, 0.9)
 	tween.tween_callback(func() -> void:
 		by.global_position = RETURN_SPOT

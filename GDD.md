@@ -262,7 +262,7 @@ A câmera sai dos olhos da personagem, percorre o cenário 3D e volta para onde 
 | --- | --- |
 | Abertura | Saguão em 1923: festa, lustre aceso, «Grand Hotel Aurora, março de 1923». Corte para o mesmo percurso hoje, em ruínas: «O mesmo hotel, cem anos depois. Lia não lembra de ter entrado.» Termina nos olhos de Helena. |
 | Primeira troca de época | Ao primeiro Tab, a câmera recua dos olhos de uma e entra nos da outra pela mesma planta: «Mesmo lugar. Outro tempo.» |
-| Fim da Cozinha | Lia cai pelo piso. A câmera mostra a despensa de 1923 e o lápis no cardápio: «Otília, cozinheira. 1923.» |
+| Fim da Cozinha | Lia chega à manutenção pelo piso. A câmera mostra o relógio de ponto em 1923, com saídas carimbadas, e a ficha de Otília hoje: «Otília, cozinheira. 1923. Entrou e não saiu.» |
 | Fim da Biblioteca | O dossiê aberto no arquivo, a ficha sem nome: «Dr. Caio Ferraz. 1951.» |
 | Fim das Caldeiras | A lanterna apagada de Tomás; a câmera sobe pelos canos até o Saguão: «Tomás Reis. 2003.» |
 | Bolsa de Marta | A foto da oficina e a correia na soleira: «Marta Siqueira. 1979.» |
