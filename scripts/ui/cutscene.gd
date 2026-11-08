@@ -7,7 +7,8 @@ extends CanvasLayer
 ##
 ## Tomada (Dictionary): "from"/"to" (posição da câmera), "look_from"/"look_to" (para onde olha),
 ## ou "from_xform"/"to_xform" (Transform3D prontos); "time" (s); "caption" (legenda);
-## "era" (Era.Id da tomada; sem a chave, fica a época atual); "fade" (escurece antes da tomada).
+## "era" (Era.Id da tomada; sem a chave, fica a época atual); "fade" (escurece antes da tomada);
+## "call" (Callable chamado quando a tomada começa, ex.: luzes piscando; roda com o jogo pausado).
 
 signal finished
 
@@ -169,6 +170,8 @@ func _play_shot(index: int) -> void:
 		_camera.global_transform = from
 		_camera.make_current()
 		_lantern.visible = EraManager.current_era == Era.Id.PRESENT
+		if shot.get("call") is Callable:
+			(shot["call"] as Callable).call()
 		# Tomada sem legenda deixa a anterior terminar sozinha
 		if str(shot.get("caption", "")) != "":
 			_caption.text = str(shot.caption)

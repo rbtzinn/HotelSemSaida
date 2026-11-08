@@ -10,6 +10,9 @@ const NOTE := preload("res://scripts/interaction3d/note_interactable_3d.gd")
 const DOOR := preload("res://scripts/interaction3d/door_3d.gd")
 const PICKUP := preload("res://scripts/interaction3d/item_pickup_3d.gd")
 const LOBBY := "res://scenes/rooms/saguao_3d.tscn"
+const BALLROOM := "res://scenes/rooms/salao_3d.tscn"
+## Andar da cabine do elevador principal quando ela está parada aqui (ver BallroomLevel3D).
+const THIS_FLOOR := 1
 
 const PAVEMENT := "quartos.pavimento.calcado"
 const WEDGE_TAKEN := "quartos.cunha.pega"
@@ -40,6 +43,7 @@ const DIARY_TEXT := "14 de março de 1923.\n\nO lustre do Saguão acende hoje pe
 	+ "Amanhã vou embora. Já escrevi isso ontem.\n\nH."
 
 var _landing_doors: Array[StaticBody3D] = []
+var _cabs: Array[Node3D] = []
 var _levers: Array[Node3D] = []
 var _wedge_on_lever: Node3D
 var _wedge_on_cart: Node3D
@@ -74,9 +78,12 @@ func _ready() -> void:
 
 func _build_access(world: Node3D, present: bool) -> void:
 	if not present:
-		area(DOOR, world, "DescerEscada", Vector3(3.0, 0.9, 2.05), Vector3(3.0, 1.0, 0.15), {
+		area(DOOR, world, "DescerEscada", Vector3(2.25, 0.9, 2.05), Vector3(1.5, 1.0, 0.15), {
 			"target_scene": LOBBY, "target_spawn": "DoAndar2Escada",
 			"prompt_text": "Descer ao Saguão", "available_in": 0})
+		area(DOOR, world, "SubirEscada", Vector3(3.75, 0.9, 2.05), Vector3(1.5, 1.0, 0.15), {
+			"target_scene": BALLROOM, "target_spawn": "DaEscada",
+			"prompt_text": "Subir ao Salão de baile", "available_in": 0})
 	else:
 		area(MESSAGE, world, "EscadaDesabada", Vector3(3.0, 0.9, 2.05), Vector3(3.0, 1.0, 0.15), {
 			"prompt_text": "Examinar escada", "available_in": 1,
@@ -84,11 +91,15 @@ func _build_access(world: Node3D, present: bool) -> void:
 		area(DOOR, world, "DescerPoco", Vector3(16.48, 0.9, 0.62), Vector3(0.6, 1.4, 0.15), {
 			"target_scene": LOBBY, "target_spawn": "DoAndar2Poco",
 			"prompt_text": "Descer pela escada do poço", "available_in": 1})
+		var up := area(ACTION, world, "SubirPoco", Vector3(16.48, 2.3, 0.62), Vector3(0.6, 1.2, 0.15), {
+			"prompt_text": "Subir pela escada do poço", "available_in": 1})
+		up.interacted.connect(_climb_shaft)
 
 
 # --- Q1. Porta de pavimento -----------------------------------------------------------------
 
 func _build_landing(world: Node3D, present: bool) -> void:
+	_cabs.append(ElevatorCab3D.build(world, present))
 	var door := StaticBody3D.new()
 	door.name = "PortaPavimento"
 	door.position = Vector3(16.25, 1.15, GuestFloorRoom3D.NORTH)
@@ -113,9 +124,14 @@ func _build_landing(world: Node3D, present: bool) -> void:
 		var pull := area(ACTION, world, "Alavanca", lever.position + Vector3(0, 0.05, 0.05), Vector3(0.3, 0.5, 0.12), {
 			"prompt_text": "Puxar alavanca de destrave", "available_in": 0})
 		pull.interacted.connect(_pull_lever)
-		area(MESSAGE, world, "PavimentoFechado", Vector3(16.25, 1.2, GuestFloorRoom3D.NORTH + 0.15), Vector3(1.0, 2.0, 0.1), {
-			"prompt_text": "Examinar porta do elevador", "available_in": 0,
-			"message": "A porta do elevador está fechada. A cabine está lá em cima."})
+		var gate := area(ACTION, world, "PavimentoFechado", Vector3(16.25, 1.2, GuestFloorRoom3D.NORTH + 0.15), Vector3(1.0, 2.0, 0.1), {
+			"prompt_text": "Examinar porta do elevador", "available_in": 0})
+		gate.interacted.connect(func(_by: FirstPersonMotor) -> void:
+			_say("A porta do elevador está fechada. Pelas grades, a cabine está bem aqui." if BallroomLevel3D.lift_floor() == THIS_FLOOR \
+				else "A porta do elevador está fechada. A cabine está lá em cima."))
+		var button := area(ACTION, world, "Botoeira", Vector3(17.3, 1.2, GuestFloorRoom3D.NORTH + 0.18), Vector3(0.3, 0.5, 0.12), {
+			"prompt_text": "Chamar o elevador", "available_in": 0})
+		button.interacted.connect(_call_cab)
 		_wedge_on_cart = box(world, Vector3(5.45, 0.95, 4.0), Vector3(0.22, 0.08, 0.12), "oak", false)
 		_wedge_on_lever = box(world, lever.position + Vector3(0, -0.12, 0.06), Vector3(0.12, 0.06, 0.1), "oak", false)
 		area(PICKUP, world, "Cunha", Vector3(5.45, 0.98, 4.0), Vector3(0.32, 0.16, 0.3), {
@@ -124,6 +140,25 @@ func _build_landing(world: Node3D, present: bool) -> void:
 		area(MESSAGE, world, "Fresta", Vector3(16.25, 1.2, GuestFloorRoom3D.NORTH - 0.12), Vector3(1.0, 2.0, 0.08), {
 			"prompt_text": "Espiar pela fresta", "available_in": 1, "done_flag": PAVEMENT,
 			"message": "A porta do pavimento está travada. Pela fresta, do lado do corredor, aparece uma alavanca de destrave, levantada."})
+
+
+func _call_cab(_by: FirstPersonMotor) -> void:
+	if not WorldState.is_set(BallroomLevel3D.LIFT_POWER):
+		_say("Você aperta o botão. Nada acende: o elevador está desligado lá embaixo.")
+	elif BallroomLevel3D.lift_floor() == THIS_FLOOR:
+		_say("A cabine já está parada neste andar.")
+	else:
+		WorldState.set_flag(BallroomLevel3D.LIFT_FLOOR, THIS_FLOOR)
+		_say("Os cabos rangem no poço. A cabine desce e para no 2º andar.")
+
+
+## Hoje a escada do poço está partida entre o 2º e o 3º andar. Com a cabine parada aqui, Lia sai
+## pelo alçapão do teto e alcança a escada inteira lá em cima.
+func _climb_shaft(_by: FirstPersonMotor) -> void:
+	if BallroomLevel3D.lift_floor() == THIS_FLOOR:
+		RoomManager.change_room_alone(BALLROOM, "DoPoco", Era.Id.PRESENT)
+	else:
+		_say("Acima do patamar, faltam degraus num trecho de dois metros. Lá no alto, a escada continua inteira, fora de alcance.")
 
 
 func _pull_lever(by: FirstPersonMotor) -> void:
@@ -366,6 +401,8 @@ func _caio_text() -> String:
 # --- Estado ---------------------------------------------------------------------------------
 
 func _apply_state() -> void:
+	for cab: Node3D in _cabs:
+		cab.visible = BallroomLevel3D.lift_floor() == THIS_FLOOR
 	var calked := WorldState.is_set(PAVEMENT)
 	# Em 1923 a porta do elevador fica fechada; hoje, com a alavanca calçada, abre
 	_set_solid(_landing_doors[0], true)
@@ -398,7 +435,7 @@ func _set_solid(node: Node, solid: bool) -> void:
 
 
 func _on_flag(key: String, _value: Variant) -> void:
-	if key.begins_with("quartos.") or key == SCORE_SAVED:
+	if key.begins_with("quartos.") or key in [SCORE_SAVED, BallroomLevel3D.LIFT_FLOOR]:
 		_apply_state()
 
 

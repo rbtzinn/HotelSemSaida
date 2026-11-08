@@ -214,7 +214,7 @@ Escolhas do Roberto: a etapa S4 abre a **entrada principal** (não mais a porta 
 
 **Flags novas** (todas entram em `coop_progress.gd`): passado `saguao.cofre.aberto`, `saguao.entrada.trava_1923`, `saguao.livro.helena`; presente `saguao.chave.marta`, `saguao.entrada.cadeado`, `jogo.final`.
 
-### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos feito em 08/11/2026)
+### Andares de cima: Quartos, Salão de baile e Torre do relógio (aprovado em 07/11/2026; Quartos e Salão feitos em 08/11/2026)
 
 Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; acesso pelo **elevador principal**; as fases trazem **pistas sobre Helena** sem fechar o destino dela; o **piano do Saguão** toca a melodia descoberta no salão e abre o caminho para o telhado.
 
@@ -236,6 +236,8 @@ Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; ac
 1. **Cabine como degrau** (acesso de Lia). Hoje, a escada do poço está quebrada entre o 2º e o 3º andar. Em 1923, Helena chama a cabine na botoeira do 2º andar e a deixa ali. Hoje, a cabine está parada no 2º andar: Lia entra nela pela porta do corredor, sai pelo alçapão do teto e alcança a escada inteira acima do trecho quebrado. Flag `saguao.elevador.andar` = 1.
 2. **Contrapeso da cortina**. Hoje, a escadinha do palco desabou e o palco ficou 1,2 m acima do piso. Em 1923, Helena solta o saco de areia do contrapeso da cortina, que cai na frente do palco. Hoje, o saco endureceu num monte que serve de degrau (como o forno petrificado da Cozinha). Flag `salao.contrapeso.solto`.
 3. **Partitura na banqueta**. Em 1923, a partitura da «Valsa da Aurora» fica na estante do maestro, só com a pauta. Helena pode guardá-la na banqueta forrada do piano de palco. Hoje, se ela foi guardada, Lia a encontra com os números a lápis de Caio (1951): o dedilhado da introdução, **3 · 1 · 5 · 6** a partir da tecla marcada com latão. Se ficou na estante, virou pó. Em 1923, quem lê música pode deduzir as notas pela pauta, mas sem os números. Flags `salao.partitura.guardada`, `salao.partitura.lida`.
+Decisões do Roberto (08/11/2026): no 3º andar a porta de pavimento de hoje já está **arrombada** (o desafio do acesso é a cabine); Helena chama a cabine pelas botoeiras **do 2º e do 3º andar** (pode desfazer e refazer: se a deixar no 3º, Lia perde o degrau); a partitura vai e volta entre a estante, a mão de Helena e a banqueta, como o registro da Biblioteca; em 1923 a leitura mostra a **pauta desenhada** (mi, dó, sol, lá: quem lê música deduz as teclas a partir do dó de latão, sem precisar dos números de Caio). Descer pelo trecho quebrado da escada do poço sempre dá (pendurar e soltar); subir, só com a cabine no 2º andar.
+
 4. **A valsa às 3 h** (fecho e cutscene). Ao ler a partitura, a cutscene mostra o salão de 1923 vazio às 3 h, as luzes oscilando e o piano de palco tocando sozinho. Flag `salao.concluido`.
 
 #### Piano do Saguão (minigame de piano)
@@ -267,7 +269,7 @@ A câmera sai dos olhos da personagem, percorre o cenário 3D e volta para onde 
 | Fim das Caldeiras | A lanterna apagada de Tomás; a câmera sobe pelos canos até o Saguão: «Tomás Reis. 2003.» |
 | Bolsa de Marta | A foto da oficina e a correia na soleira: «Marta Siqueira. 1979.» |
 | Fim dos Quartos | O diário de Helena aberto sobre a mala: «Helena. Março de 1923.» |
-| Fim do Salão | A valsa das 3 h tocando sozinha no salão de 1923. |
+| Fim do Salão | A valsa das 3 h tocando sozinha no salão de 1923: as luzes oscilam e as quatro teclas do piano de palco descem sozinhas. |
 | Fim da Torre | Os nomes riscados e o risco novo, inacabado. |
 | Final | Lia empurra a porta, clarão, contracampo: ela está de novo no Saguão. Depois do livro, corte para Helena em 1923 diante da porta giratória, que treme com três batidas. Tela de fim. |
 

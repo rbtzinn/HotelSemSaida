@@ -144,15 +144,26 @@ func _build_stairwell() -> void:
 	_wall_z(STAIR.x, z0, NORTH)
 	_wall_z(STAIR.y, z0, NORTH)
 	_wall_x(z0, STAIR.x, STAIR.y, [])
-	# Degraus descendo para o Saguão (só vistos de cima) e o balaústre que fecha o vão
+	# A oeste, degraus descendo para o Saguão; a leste, o lance que sobe ao Salão de baile.
+	# Os dois só se veem por cima do balaústre que fecha o vão.
+	var middle := (STAIR.x + STAIR.y) / 2.0
 	_solid(Vector3(STAIR.x, 0, z0), Vector3(STAIR.y, H, NORTH - 0.05), "StairWell")
 	for i in 6:
 		var y := -0.17 * (i + 1)
 		var z := NORTH - 0.35 - i * 0.3
 		if present and i in [1, 2, 4]:
 			continue
-		_part(Vector3(STAIR.x + 0.1, y - 0.05, z - 0.3), Vector3(STAIR.y - 0.1, y, z), "mahogany")
-	_part(Vector3(STAIR.x, -1.4, z0), Vector3(STAIR.y, -1.3, NORTH), "dark")
+		_part(Vector3(STAIR.x + 0.1, y - 0.05, z - 0.3), Vector3(middle - 0.05, y, z), "mahogany")
+	for i in 9:
+		var y := 0.2 * (i + 1)
+		var z := NORTH - 0.35 - i * 0.3
+		if present and i not in [0, 1, 6]:
+			continue
+		_part(Vector3(middle + 0.05, y - 0.05, z - 0.3), Vector3(STAIR.y - 0.1, y, z), "mahogany")
+	_part(Vector3(middle - 0.05, -1.3, z0), Vector3(middle + 0.05, 2.0, NORTH - 0.2), "dark_wood")
+	# O lance de cima continua por um vão escuro na parede do fundo
+	_part(Vector3(middle + 0.1, 1.8, z0 + 0.11), Vector3(STAIR.y - 0.15, H - 0.1, z0 + 0.13), "dark")
+	_part(Vector3(STAIR.x, -1.4, z0), Vector3(middle, -1.3, NORTH), "dark")
 	if present:
 		# A escada desabou: tábuas tortas e escombros no vão
 		for i in 5:

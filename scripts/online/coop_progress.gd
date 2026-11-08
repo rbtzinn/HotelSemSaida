@@ -10,7 +10,7 @@ const PAST_SWITCHES := [
 	"biblioteca.livro.guardado", "biblioteca.arquivo.aberto", "caldeiras.pressao.erro",
 	"saguao.cofre.aberto", "saguao.chave.entrada", "saguao.entrada.trava_1923", "saguao.livro.helena",
 	"quartos.pavimento.calcado", "quartos.cunha.pega", "quartos.bandeira.aberta", "quartos.chave_mestra.retirada",
-	"quartos.chave_mestra.escondida", "salao.partitura.guardada",
+	"quartos.chave_mestra.escondida", "salao.partitura.guardada", "salao.contrapeso.solto",
 ]
 const PRESENT_SWITCHES := [
 	"saguao.bolsa.marta", "cozinha.concluida", "manutencao.chave.pega", "biblioteca.porta.hoje",
@@ -18,7 +18,7 @@ const PRESENT_SWITCHES := [
 	"caldeiras.f2.inspecao.aberta", "caldeiras.limpeza.aberta", "caldeiras.concluida",
 	"saguao.chave.marta", "saguao.entrada.cadeado", "jogo.final", "jogo.encerrado",
 	"quartos.cabide.pego", "quartos.207.aberto", "quartos.diario.lido", "quartos.chave_mestra.pega",
-	"quartos.214.aberto", "quartos.concluido",
+	"quartos.214.aberto", "quartos.concluido", "salao.partitura.lida", "salao.concluido",
 ]
 const RANGES := {
 	"saguao.quadro.gancho": Vector2i(0, 12), "caldeiras.pressao.etapa": Vector2i(-1, 3),
@@ -26,7 +26,8 @@ const RANGES := {
 	"caldeiras.tiragem.chamine": Vector2i(0, 3),
 	"biblioteca.volume.0": Vector2i(1, 4), "biblioteca.volume.1": Vector2i(1, 4),
 	"biblioteca.volume.2": Vector2i(1, 4), "biblioteca.volume.3": Vector2i(1, 4),
-	"biblioteca.registro": Vector2i(0, 4), "quartos.diario.local": Vector2i(0, 4), "caldeiras.pressao.abertos": Vector2i(0, 7),
+	"biblioteca.registro": Vector2i(0, 4), "quartos.diario.local": Vector2i(0, 4),
+	"saguao.elevador.andar": Vector2i(1, 3), "caldeiras.pressao.abertos": Vector2i(0, 7),
 }
 
 static func allowed(era: int, key: String, value: Variant) -> bool:

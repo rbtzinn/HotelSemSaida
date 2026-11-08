@@ -2,14 +2,14 @@
 
 Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 4.7** por Roberto com o Claude Code e o Codex (GPT). Este arquivo é a **única** fonte de verdade sobre o projeto (o `AGENTS.md` do Codex só aponta para cá): leia-o inteiro antes de qualquer tarefa e atualize-o ao terminar uma etapa.
 
-## Estado atual (06/11/2026)
+## Estado atual (08/11/2026)
 
 - **Jogo 3D em primeira pessoa** é o jogo de verdade. O 2D (pixel art) continua no repositório como histórico e referência dos enigmas da Cozinha; não é mais desenvolvido. As seções sobre 2D mais abaixo valem só para os arquivos 2D.
 - Cena principal: `scenes/ui/entrada.tscn` (recepção: jogar solo, continuar solo, ou dupla online).
-- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d` (pasta `scenes/rooms/`).
+- Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: piano do Saguão, áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: piano do Saguão, torre do relógio, cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -211,6 +211,15 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Q1 cunha do carrinho calça a alavanca (`quartos.pavimento.calcado`): hoje a grade do pavimento abre. Q2 correntinha da bandeira do 207 (`quartos.bandeira.aberta`) + cabide da rouparia hoje abrem o 207 (`quartos.207.aberto`). Q3 diário: `quartos.diario.local` 0 escrivaninha, 1 gaveta, 2 guarda-roupa, 3 fundo falso da mala, 4 na mão de Helena; só na mala Lia o lê hoje (`quartos.diario.lido`, cutscene `helena_diary`). Q4 chave mestra da rouparia escondida atrás do espelho (`quartos.chave_mestra.*`) abre o 214 hoje; o caderno de Caio liga `quartos.concluido` e muda conforme `salao.partitura.guardada`.
 - Bolsa de Marta: examinar só lê (o verso aponta o 214); a chave miúda é o `ChaveMiuda` à parte, para Lia não subir com a mão ocupada.
 - Teste `tools/test_quartos_3d.gd`. Protocolo da dupla subiu para 4.
+
+## Salão de baile — 3º andar (08/11/2026; design no `GDD.md`, "Andares de cima")
+
+- Cena `scenes/rooms/salao_3d.tscn`: `BallroomRoom3D` (cenário fixo: vestíbulo com a escada principal e o poço nos mesmos x dos Quartos; salão alto com mesas, lustres e palco de 1,2 m; escadinha de 1923 com rampa invisível, que hoje desabou) e `BallroomLevel3D` (enigmas).
+- Cabine do elevador principal: `saguao.elevador.andar` (1 = 2º, 2 = 3º, 3 = casa de máquinas, padrão sem a flag). Helena a chama nas botoeiras do 2º (`GuestFloorLevel3D`) e do 3º andar; só funciona com `saguao.elevador.no_alto` (chave de Bento). `ElevatorCab3D` (`scripts/world3d/`) desenha a cabine parada no andar, nas duas épocas, sem colisão. Hoje, nos Quartos, `SubirPoco` só leva Lia ao Salão com a cabine no 2º (sai pelo alçapão do teto). Descer pelo poço sempre dá.
+- Helena sobe pela escada de 1923 dos Quartos (`SubirEscada`, lance leste do vão; `DescerEscada` ficou no lance oeste). Markers do Salão: `DaEscada`, `DoPoco`; voltam a `DaEscada` / `DoPoco` dos Quartos.
+- Contrapeso: em 1923 a malagueta solta o saco (`salao.contrapeso.solto`); hoje ele é o `MonteDeAreia` (0,6 m) encostado no palco, o degrau para Lia subir pulando.
+- Partitura (`partitura` na mão): estante ⇄ mão ⇄ banqueta (`salao.partitura.guardada`, ida e volta). Em 1923 a leitura mostra a pauta desenhada por `ScoreSheet` (`scripts/ui/score_sheet.gd`, imagem gerada por código); hoje, com a partitura guardada, a banqueta mostra os números de Caio (3 · 1 · 5 · 6 a partir da tecla de latão = dó) e liga `salao.partitura.lida` e `salao.concluido`, que toca a cutscene `ballroom_waltz` (luzes oscilando e teclas descendo; `Cutscene` aceita a chave `"call"` numa tomada).
+- Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5; o save da dupla aceita qualquer versão anterior.
 
 ## Cutscenes (07/11/2026)
 

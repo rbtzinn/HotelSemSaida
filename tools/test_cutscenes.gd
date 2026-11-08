@@ -68,7 +68,7 @@ func _run() -> void:
 		await process_frame
 	assert(_playing() == null, "Abertura só uma vez")
 	await _story_moments(state, eras)
-	print("PASS: cutscenes de abertura, primeira troca, fim de capítulos, bolsa de Marta e final; pular, câmera, época e HUD restaurados")
+	print("PASS: cutscenes de abertura, primeira troca, fim de capítulos (até o Salão), bolsa de Marta e final; pular, câmera, época e HUD restaurados")
 	quit()
 
 
@@ -93,6 +93,12 @@ func _story_moments(state: Node, eras: Node) -> void:
 	await _open("res://scenes/rooms/caldeiras_3d.tscn")
 	state.set_flag("caldeiras.concluida")
 	await _expect_and_skip("cena.fim_caldeiras", 1)
+	await _open("res://scenes/rooms/quartos_3d.tscn")
+	state.set_flag("quartos.diario.lido")
+	await _expect_and_skip("cena.fim_quartos", 1)
+	await _open("res://scenes/rooms/salao_3d.tscn")
+	state.set_flag("salao.concluido")
+	await _expect_and_skip("cena.fim_salao", 1)
 	await _open("res://scenes/rooms/saguao_3d.tscn")
 	state.set_flag("saguao.bolsa.marta")
 	await _expect_and_skip("cena.bolsa_marta", 1)

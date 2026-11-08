@@ -137,3 +137,21 @@ static func helena_diary(tree: SceneTree) -> Cutscene:
 			"from": trunk + Vector3(-1.2, 0.9, -1.0), "look_from": trunk,
 			"to": trunk + Vector3(-0.6, 0.5, -0.5), "look_to": trunk},
 	])
+
+
+## Fim do Salão: em 1923, às 3 h, o salão vazio, as luzes oscilando e o piano de palco tocando
+## sozinho as quatro notas. `effects` (da sala) anima as luzes e as teclas com o jogo pausado.
+static func ballroom_waltz(tree: SceneTree, effects: Callable) -> Cutscene:
+	var keys := Vector3(BallroomRoom3D.KEYBOARD_X - 0.1, BallroomRoom3D.STAGE_TOP + 0.74, BallroomRoom3D.KEYS_Z + 0.6)
+	return Cutscene.play(tree, "fim_salao", [
+		{"era": Era.Id.PAST_1923, "fade": true, "time": 5.5, "caption": "Três horas da madrugada. Ninguém no salão.",
+			"call": effects,
+			"from": Vector3(10, 2.0, 5.2), "look_from": Vector3(10, 1.6, 15),
+			"to": Vector3(10, 2.6, 9.5), "look_to": Vector3(12.5, 1.8, 15.5)},
+		{"era": Era.Id.PAST_1923, "time": 5.0, "caption": "Quatro notas. Sempre as mesmas.",
+			"from": keys + Vector3(-1.1, 0.7, -1.0), "look_from": keys,
+			"to": keys + Vector3(-0.6, 0.45, -0.5), "look_to": keys},
+		{"era": Era.Id.PAST_1923, "time": 5.0, "caption": "A Valsa da Aurora. Alguém, lá embaixo, também sabe tocá-la.",
+			"from": Vector3(16.5, 4.6, 16.8), "look_from": Vector3(8, 0.6, 7),
+			"to": Vector3(15.5, 4.0, 15.5), "look_to": Vector3(7, 0.8, 6)},
+	])

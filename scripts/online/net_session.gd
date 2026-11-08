@@ -6,12 +6,12 @@ enum Phase { OFF, HOSTING, JOINING, WAITING, PLAYING }
 const RULES := preload("res://scripts/online/coop_progress.gd")
 const PORT := 7777
 ## Suba a cada mudança nas regras de flags: versões diferentes não podem jogar juntas.
-const PROTOCOL := 4
+const PROTOCOL := 5
 const LOBBY := "res://scenes/ui/entrada.tscn"
 const HOTEL := "res://scenes/rooms/saguao_3d.tscn"
 const ROOMS := [HOTEL, "res://scenes/rooms/cozinha_3d.tscn", "res://scenes/rooms/manutencao_3d.tscn",
 	"res://scenes/rooms/biblioteca_3d.tscn", "res://scenes/rooms/caldeiras_3d.tscn",
-	"res://scenes/rooms/quartos_3d.tscn"]
+	"res://scenes/rooms/quartos_3d.tscn", "res://scenes/rooms/salao_3d.tscn"]
 const SAVE := "user://dupla.save"
 ## Teto contra arquivo adulterado; o jogo completo usa bem menos.
 const MAX_SAVED_FLAGS := 1000
@@ -168,8 +168,10 @@ static func _valid_spot(spot: Variant) -> bool:
 		and spot.get("pitch") is float and is_finite(spot.pitch)
 
 static func _valid_save(data: Dictionary) -> bool:
-	# Saves da versão 1 só têm flags que a versão atual também aceita
-	if data.get("version") not in [1, PROTOCOL] or not _valid_spot(data.get("Lia")) or not _valid_spot(data.get("Helena")):
+	# Saves de versões anteriores só têm flags que a versão atual também aceita
+	var version: Variant = data.get("version")
+	if not (version is int and version >= 1 and version <= PROTOCOL) \
+			or not _valid_spot(data.get("Lia")) or not _valid_spot(data.get("Helena")):
 		return false
 	var flags: Variant = data.get("flags")
 	if not flags is Dictionary or flags.size() > MAX_SAVED_FLAGS:
