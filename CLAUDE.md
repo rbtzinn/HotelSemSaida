@@ -208,7 +208,7 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 ## Quartos — 2º andar (08/11/2026; design aprovado no `GDD.md`, "Andares de cima")
 
 - Cena `scenes/rooms/quartos_3d.tscn`: `GuestFloorRoom3D` (cenário fixo: corredor, escada principal a oeste, rouparia, 214, 207, poço do elevador a leste no mesmo x do Saguão) e `GuestFloorLevel3D` (enigmas). Helena chega pela escada de 1923 (Saguão: `SubirEscada`, marker `DaEscada`); Lia pela escada do poço (Saguão: `SubirAndar`, exige `saguao.bolsa.marta`; marker `DoPoco`). Voltam a `DoAndar2Escada` / `DoAndar2Poco` no Saguão.
-- Q1 cunha do carrinho calça a alavanca (`quartos.pavimento.calcado`): hoje a grade do pavimento abre. Q2 correntinha da bandeira do 207 (`quartos.bandeira.aberta`) + cabide da rouparia hoje abrem o 207 (`quartos.207.aberto`). Q3 diário: `quartos.diario.local` 0 escrivaninha, 1 gaveta, 2 guarda-roupa, 3 fundo falso da mala, 4 na mão de Helena; só na mala Lia o lê hoje (`quartos.diario.lido`, cutscene `helena_diary`). Q4 chave mestra da rouparia escondida atrás do espelho (`quartos.chave_mestra.*`) abre o 214 hoje; o caderno de Caio liga `quartos.concluido` e muda conforme `salao.partitura.guardada`.
+- Q1 cunha do carrinho calça a alavanca (`quartos.pavimento.calcado`): hoje a grade do pavimento abre. Q2 correntinha da bandeira do 207 (`quartos.bandeira.aberta`) + cabide da rouparia hoje abrem o 207 (`quartos.207.aberto`). Q3 diário: `quartos.diario.local` 0 escrivaninha, 1 gaveta, 2 guarda-roupa, 3 fundo falso da mala, 4 na mão de Helena; só na mala Lia o lê hoje (`quartos.diario.lido`). Q4 chave mestra da rouparia escondida atrás do espelho (`quartos.chave_mestra.*`) abre o 214 hoje; o caderno de Caio liga `quartos.concluido` e muda conforme `salao.partitura.guardada`.
 - Bolsa de Marta: examinar só lê (o verso aponta o 214); a chave miúda é o `ChaveMiuda` à parte, para Lia não subir com a mão ocupada.
 - Teste `tools/test_quartos_3d.gd`. Protocolo da dupla subiu para 4.
 
@@ -218,7 +218,7 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Cabine do elevador principal: `saguao.elevador.andar` (1 = 2º, 2 = 3º, 3 = casa de máquinas, padrão sem a flag). Helena a chama nas botoeiras do 2º (`GuestFloorLevel3D`) e do 3º andar; só funciona com `saguao.elevador.no_alto` (chave de Bento). `ElevatorCab3D` (`scripts/world3d/`) desenha a cabine parada no andar, nas duas épocas, sem colisão. Hoje, nos Quartos, `SubirPoco` só leva Lia ao Salão com a cabine no 2º (sai pelo alçapão do teto). Descer pelo poço sempre dá.
 - Helena sobe pela escada de 1923 dos Quartos (`SubirEscada`, lance leste do vão; `DescerEscada` ficou no lance oeste). Markers do Salão: `DaEscada`, `DoPoco`; voltam a `DaEscada` / `DoPoco` dos Quartos.
 - Contrapeso: em 1923 a malagueta solta o saco (`salao.contrapeso.solto`); hoje ele é o `MonteDeAreia` (0,6 m) encostado no palco, o degrau para Lia subir pulando.
-- Partitura (`partitura` na mão): estante ⇄ mão ⇄ banqueta (`salao.partitura.guardada`, ida e volta). Em 1923 a leitura mostra a pauta desenhada por `ScoreSheet` (`scripts/ui/score_sheet.gd`, imagem gerada por código); hoje, com a partitura guardada, a banqueta mostra os números de Caio (3 · 1 · 5 · 6 a partir da tecla de latão = dó) e liga `salao.partitura.lida` e `salao.concluido`, que toca a cutscene `ballroom_waltz` (luzes oscilando e teclas descendo; `Cutscene` aceita a chave `"call"` numa tomada).
+- Partitura (`partitura` na mão): estante ⇄ mão ⇄ banqueta (`salao.partitura.guardada`, ida e volta). Em 1923 a leitura mostra a pauta desenhada por `ScoreSheet` (`scripts/ui/score_sheet.gd`, imagem gerada por código); hoje, com a partitura guardada, a banqueta mostra os números de Caio (3 · 1 · 5 · 6 a partir da tecla de latão = dó) e liga `salao.partitura.lida` e `salao.concluido`.
 - Teste `tools/test_salao_3d.gd`. Protocolo da dupla subiu para 5 (hoje 6); o save da dupla aceita qualquer versão anterior.
 
 ## Piano do Saguão (08/11/2026; design no `GDD.md`, "Piano do Saguão")
@@ -227,11 +227,9 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - A escada em caracol atrás do painel ainda só dá uma mensagem: a Torre vem na próxima etapa. O vão escuro ainda não tem passagem (a parede continua sólida atrás dele) e precisa virar porta para a Torre.
 - Teste `tools/test_piano_saguao_3d.gd`. Protocolo da dupla: 6.
 
-## Cutscenes (07/11/2026)
+## Sem cutscenes (08/11/2026)
 
-- `Cutscene` (`scripts/ui/cutscene.gd`): câmera própria no cenário 3D, faixas de cinema e legendas; pausa o jogo, esconde o HUD, troca a época por tomada (`"era"`) e no fim devolve a época e os olhos da personagem ativa. E, Enter ou Esc pulam. Toca uma vez: `cena.<id>` no WorldState (vai no save, nunca pela rede). Desligada sem janela (`Cutscene.enabled`), para os testes automáticos não pararem; `tools/test_cutscenes.gd` liga de novo.
-- `StoryCutscenes` (`scripts/story/story_cutscenes.gd`) guarda o roteiro: `opening` (jogo novo: `entrada.gd` e `NetSession._begin` ligam `cena.abertura.pendente`, o Saguão toca) e `first_switch` (`Room3D`, no primeiro Tab dentro da mesma sala, só no solo). Também `kitchen_end` (relógio de ponto, ao chegar à manutenção), `library_end`, `boilers_end`, `marta_bag`, `exit_return` (depois do clarão da entrada) e `knocks` (Helena em 1923; a tela de fim vem depois).
-- `StoryTrigger` (`scripts/story/story_trigger.gd`): filho da sala que toca uma cutscene quando a flag liga (`on_ready` toca também ao abrir a sala com a flag ligada). A cutscene espera bilhete, cadeado, troca de sala ou de época terminarem antes de começar. Nas tomadas de hoje a câmera leva uma lanterna.
+- Pedido do Roberto: **não há cutscenes no jogo, e não faça novas.** O sistema (`Cutscene`, `StoryCutscenes`, `StoryTrigger`, `tools/test_cutscenes.gd`) foi apagado; está no histórico do git (commits de 07–08/11/2026). Saves antigos podem ter flags `cena.*`: não fazem nada.
 
 ## Dupla online (05/11/2026)
 

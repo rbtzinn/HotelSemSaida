@@ -1,8 +1,8 @@
 class_name BallroomLevel3D
 extends ChapterRoom3D
-## Salão de baile (3º andar): cabine como degrau, contrapeso da cortina, partitura na banqueta e a
-## valsa das 3 h. Helena chega pela escada principal de 1923; Lia, pelo alçapão da cabine parada
-## no 2º andar e pela escada do poço. Solução no GDD ("Andares de cima").
+## Salão de baile (3º andar): cabine como degrau, contrapeso da cortina e partitura na banqueta.
+## Helena chega pela escada principal de 1923; Lia, pelo alçapão da cabine parada no 2º andar e
+## pela escada do poço. Solução no GDD ("Andares de cima").
 
 const ACTION := preload("res://scripts/interaction3d/interactable_3d.gd")
 const MESSAGE := preload("res://scripts/interaction3d/message_interactable_3d.gd")
@@ -20,8 +20,6 @@ const SCORE_SAVED := "salao.partitura.guardada"
 const SCORE_READ := "salao.partitura.lida"
 const DONE := "salao.concluido"
 const SCORE_ITEM := "partitura"
-## A introdução da valsa, em teclas a partir da de latão (1 = dó).
-const WALTZ := [3, 1, 5, 6]
 
 const ROOM := preload("res://scripts/puzzles/salao/ballroom_room_3d.gd")
 const SCORE_TITLE := "Valsa da Aurora"
@@ -37,12 +35,9 @@ var _mound: StaticBody3D
 var _score_on_stand: MeshInstance3D
 var _score_in_bench: MeshInstance3D
 var _dust: MeshInstance3D
-var _keys_1923: Array[Node3D] = []
 
 
 func _ready() -> void:
-	StoryTrigger.attach(self, DONE, func(tree: SceneTree) -> Cutscene:
-		return StoryCutscenes.ballroom_waltz(tree, _play_waltz))
 	for present: bool in [false, true]:
 		var world := make_world(ROOM, present)
 		_build_access(world, present)
@@ -238,7 +233,7 @@ func _bench_today(_by: FirstPersonMotor) -> void:
 	WorldState.set_flag(DONE)
 
 
-# --- Teclado do piano de palco (para a valsa) -----------------------------------------------
+# --- Teclado do piano de palco -----------------------------------------------
 
 func _build_keys(world: Node3D, present: bool) -> void:
 	var keyboard := Node3D.new()
@@ -251,31 +246,10 @@ func _build_keys(world: Node3D, present: bool) -> void:
 		box(key, Vector3.ZERO, Vector3(0.3, 0.025, ROOM.KEY_WIDTH - 0.012), "ivory", present)
 		if i == 0:
 			box(key, Vector3(-0.13, 0.014, 0), Vector3(0.03, 0.006, ROOM.KEY_WIDTH - 0.03), "brass", present)
-		if not present:
-			_keys_1923.append(key)
 	# Teclas pretas entre as brancas (dó#, ré#, fá#, sol#, lá#)
 	for i: int in [0, 1, 3, 4, 5]:
 		box(keyboard, Vector3(ROOM.KEYBOARD_X + 0.0, ROOM.STAGE_TOP + 0.755, ROOM.KEYS_Z + (i + 1) * ROOM.KEY_WIDTH),
 			Vector3(0.18, 0.03, 0.09), "lacquer", present)
-
-
-## A valsa das 3 h, com o jogo pausado pela cutscene: as luzes oscilam e as quatro teclas descem.
-func _play_waltz() -> void:
-	var lamps := get_tree().get_nodes_in_group(ROOM.LAMP_GROUP)
-	for lamp: Light3D in lamps:
-		var base := lamp.light_energy
-		var flicker := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-		for i in 24:
-			flicker.tween_property(lamp, "light_energy", base * randf_range(0.15, 0.6), randf_range(0.12, 0.35))
-			flicker.tween_property(lamp, "light_energy", base, randf_range(0.2, 0.6))
-	var keys := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	keys.tween_interval(1.2)
-	for repeat in 4:
-		for note: int in WALTZ:
-			var key := _keys_1923[note - 1]
-			keys.tween_property(key, "rotation_degrees:z", -4.0, 0.12)
-			keys.tween_property(key, "rotation_degrees:z", 0.0, 0.35)
-		keys.tween_interval(0.8)
 
 
 # --- Estado ---------------------------------------------------------------------------------

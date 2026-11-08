@@ -238,7 +238,7 @@ Escolhas do Roberto: três fases novas, **entre a bolsa de Marta e o final**; ac
 3. **Partitura na banqueta**. Em 1923, a partitura da «Valsa da Aurora» fica na estante do maestro, só com a pauta. Helena pode guardá-la na banqueta forrada do piano de palco. Hoje, se ela foi guardada, Lia a encontra com os números a lápis de Caio (1951): o dedilhado da introdução, **3 · 1 · 5 · 6** a partir da tecla marcada com latão. Se ficou na estante, virou pó. Em 1923, quem lê música pode deduzir as notas pela pauta, mas sem os números. Flags `salao.partitura.guardada`, `salao.partitura.lida`.
 Decisões do Roberto (08/11/2026): no 3º andar a porta de pavimento de hoje já está **arrombada** (o desafio do acesso é a cabine); Helena chama a cabine pelas botoeiras **do 2º e do 3º andar** (pode desfazer e refazer: se a deixar no 3º, Lia perde o degrau); a partitura vai e volta entre a estante, a mão de Helena e a banqueta, como o registro da Biblioteca; em 1923 a leitura mostra a **pauta desenhada** (mi, dó, sol, lá: quem lê música deduz as teclas a partir do dó de latão, sem precisar dos números de Caio). Descer pelo trecho quebrado da escada do poço sempre dá (pendurar e soltar); subir, só com a cabine no 2º andar.
 
-4. **A valsa às 3 h** (fecho e cutscene). Ao ler a partitura, a cutscene mostra o salão de 1923 vazio às 3 h, as luzes oscilando e o piano de palco tocando sozinho. Flag `salao.concluido`.
+4. **A valsa às 3 h** (fecho). Ler a partitura hoje fecha o Salão. Flag `salao.concluido`.
 
 #### Piano do Saguão (minigame de piano)
 
@@ -251,30 +251,17 @@ Decisões do Roberto (08/11/2026): no 3º andar a porta de pavimento de hoje já
 1. **Caixa d'água** (travessia). A escada em caracol sai no telhado. Hoje, o caminho até a torre passa por vigas podres. Em 1923, a boia da caixa d'água vaza sobre um dos lados do telhado; Helena fecha o registro. Hoje, as vigas do lado seco estão firmes e as do outro desabaram: Lia atravessa pelo lado seco. Sem o registro fechado, as duas passagens estão podres. Flag `torre.registro.fechado`.
 2. **Relógio parado**. Hoje, o relógio da torre está parado em **3h07**, e a janelinha da data mostra **14/03**, o mesmo dia em que o lustre se acendeu pela primeira vez. Em 1923, o relógio funciona.
 3. **Pêndulo e chave do gerente**. Em 1923, a caixa do pêndulo é trancada por um mecanismo que só cede com os ponteiros em 3h07. Helena move os ponteiros (minigame de dois ponteiros), a caixa abre e ela pega a **chave do gerente**. Os ponteiros ficam onde ela os deixou: se Helena puser outra hora, hoje o relógio mostra essa outra hora. Flags `torre.ponteiros` (minutos, 0 a 719), `torre.pendulo.aberto`, `torre.chave.gerente`.
-4. **Os nomes riscados** (fecho e cutscene). Hoje, dentro da caixa do pêndulo, Lia vê riscos na madeira: «H. 14/03/1923», «O. 1923», «C.F. 1951», «M.S. 1979», «T.R. 2003» e, embaixo, um risco novo que começa e não termina. Flag `torre.concluida`.
+4. **Os nomes riscados** (fecho). Hoje, dentro da caixa do pêndulo, Lia vê riscos na madeira: «H. 14/03/1923», «O. 1923», «C.F. 1951», «M.S. 1979», «T.R. 2003» e, embaixo, um risco novo que começa e não termina. Flag `torre.concluida`.
 
 #### O cofre com duas fechaduras (ajuste da S4)
 
 O cofre da gerência passa a ter também a fechadura do gerente: Helena precisa girar a chave do gerente (da torre) **e** acertar o segredo 1403 (coroa do lustre). Isso impede abrir o cofre antes das fases novas. O resto da S4 e o final continuam como aprovados.
 
-#### Cutscenes (no motor, com câmera, faixas de cinema e legendas, sem vozes)
+#### Cutscenes: retiradas (08/11/2026)
 
-A câmera sai dos olhos da personagem, percorre o cenário 3D e volta para onde ela estava. E, Enter ou Esc pulam a cutscene; cada uma toca só uma vez (`cena.<nome>`, entra no save).
+Pedido do Roberto: o jogo **não tem cutscenes**, e não se fazem novas. As que existiam (abertura, primeira troca, fins de capítulo, bolsa de Marta, valsa e final) foram tiradas do código; continuam só no histórico do git. Os fechos de capítulo ficam no que o jogador lê e vê no cenário (bilhetes, livro de hóspedes, clarão da saída, batidas na porta).
 
-| Momento | O que mostra |
-| --- | --- |
-| Abertura | Saguão em 1923: festa, lustre aceso, «Grand Hotel Aurora, março de 1923». Corte para o mesmo percurso hoje, em ruínas: «O mesmo hotel, cem anos depois. Lia não lembra de ter entrado.» Termina nos olhos de Helena. |
-| Primeira troca de época | Ao primeiro Tab, a câmera recua dos olhos de uma e entra nos da outra pela mesma planta: «Mesmo lugar. Outro tempo.» |
-| Fim da Cozinha | Lia chega à manutenção pelo piso. A câmera mostra o relógio de ponto em 1923, com saídas carimbadas, e a ficha de Otília hoje: «Otília, cozinheira. 1923. Entrou e não saiu.» |
-| Fim da Biblioteca | O dossiê aberto no arquivo, a ficha sem nome: «Dr. Caio Ferraz. 1951.» |
-| Fim das Caldeiras | A lanterna apagada de Tomás; a câmera sobe pelos canos até o Saguão: «Tomás Reis. 2003.» |
-| Bolsa de Marta | A foto da oficina e a correia na soleira: «Marta Siqueira. 1979.» |
-| Fim dos Quartos | O diário de Helena aberto sobre a mala: «Helena. Março de 1923.» |
-| Fim do Salão | A valsa das 3 h tocando sozinha no salão de 1923: as luzes oscilam e as quatro teclas do piano de palco descem sozinhas. |
-| Fim da Torre | Os nomes riscados e o risco novo, inacabado. |
-| Final | Lia empurra a porta, clarão, contracampo: ela está de novo no Saguão. Depois do livro, corte para Helena em 1923 diante da porta giratória, que treme com três batidas. Tela de fim. |
-
-**Flags novas** (todas entram em `coop_progress.gd`). Passado: `quartos.pavimento.calcado`, `quartos.bandeira.aberta`, `quartos.diario.local`, `quartos.chave_mestra.escondida`, `saguao.elevador.andar`, `salao.contrapeso.solto`, `salao.partitura.guardada`, `saguao.piano.valsa`, `torre.registro.fechado`, `torre.ponteiros`, `torre.pendulo.aberto`, `torre.chave.gerente`, `saguao.cofre.chave`. Presente: `quartos.cabide.pego`, `quartos.207.aberto`, `quartos.diario.lido`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`, `salao.partitura.lida`, `salao.concluido`, `torre.concluida`. As cutscenes (`cena.*`) são locais em cada máquina.
+**Flags novas** (todas entram em `coop_progress.gd`). Passado: `quartos.pavimento.calcado`, `quartos.bandeira.aberta`, `quartos.diario.local`, `quartos.chave_mestra.escondida`, `saguao.elevador.andar`, `salao.contrapeso.solto`, `salao.partitura.guardada`, `saguao.piano.valsa`, `torre.registro.fechado`, `torre.ponteiros`, `torre.pendulo.aberto`, `torre.chave.gerente`, `saguao.cofre.chave`. Presente: `quartos.cabide.pego`, `quartos.207.aberto`, `quartos.diario.lido`, `quartos.chave_mestra.pega`, `quartos.214.aberto`, `quartos.concluido`, `salao.partitura.lida`, `salao.concluido`, `torre.concluida`.
 
 ## Minigames
 

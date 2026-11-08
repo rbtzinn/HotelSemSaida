@@ -10,7 +10,6 @@ const KEY_TAKEN := "manutencao.chave.pega"
 
 
 func _ready() -> void:
-	StoryTrigger.attach(self, "cozinha.concluida", StoryCutscenes.kitchen_end, true)
 	for present: bool in [false, true]:
 		var world := make_world(preload("res://scripts/puzzles/cozinha/maintenance_room_3d.gd"), present)
 		_build_exits(world)

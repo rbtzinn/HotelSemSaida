@@ -39,7 +39,6 @@ var _drawer: Node3D
 
 
 func _ready() -> void:
-	StoryTrigger.attach(self, "biblioteca.concluida", StoryCutscenes.library_end)
 	for present: bool in [false, true]:
 		var world := make_world(preload("res://scripts/puzzles/biblioteca/library_room_3d.gd"), present)
 		_build_doors(world, present)

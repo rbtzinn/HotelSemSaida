@@ -58,7 +58,6 @@ var _caio_notebook: Area3D
 
 
 func _ready() -> void:
-	StoryTrigger.attach(self, DIARY_READ, StoryCutscenes.helena_diary)
 	for present: bool in [false, true]:
 		var world := make_world(preload("res://scripts/puzzles/quartos/guest_floor_room_3d.gd"), present)
 		_build_access(world, present)

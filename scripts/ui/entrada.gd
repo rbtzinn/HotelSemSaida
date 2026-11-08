@@ -72,7 +72,6 @@ func _ready() -> void:
 func _play_solo() -> void:
 	RoomManager.clear_away()
 	WorldState.clear()
-	WorldState.set_flag(StoryCutscenes.OPENING_PENDING)
 	EraManager.set_era(Era.Id.PAST_1923)
 	get_tree().change_scene_to_file(NetSession.HOTEL)
 

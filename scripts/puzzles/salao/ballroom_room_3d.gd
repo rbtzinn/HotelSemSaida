@@ -45,7 +45,6 @@ const TABLES: Array[Vector2] = [Vector2(2.8, 6.8), Vector2(2.8, 10.4), Vector2(1
 	Vector2(6.0, 12.0), Vector2(14.0, 12.0)]
 ## Hoje, o lustre do oeste caiu entre as mesas.
 const FALLEN_CHANDELIER := Vector3(6.0, 0, 8.6)
-const LAMP_GROUP := &"salao_lustre"
 
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
@@ -364,15 +363,12 @@ func _build_chandeliers() -> void:
 func _build_lights() -> void:
 	if not present:
 		for at: Vector3 in CHANDELIERS:
-			var lamp := _omni(at + Vector3(0, -0.3, 0), WARM, 3.2, 13.0, true)
-			lamp.add_to_group(LAMP_GROUP)
-		var stage := _spot(Vector3(10.0, 5.2, 11.0), Vector3(12.5, 1.2, 15.5), WARM, 3.0, 12.0, 40.0)
-		stage.add_to_group(LAMP_GROUP)
+			_omni(at + Vector3(0, -0.3, 0), WARM, 3.2, 13.0, true)
+		_spot(Vector3(10.0, 5.2, 11.0), Vector3(12.5, 1.2, 15.5), WARM, 3.0, 12.0, 40.0)
 		# Arandelas nas paredes laterais
 		for z: float in [5.6, 8.0, 11.0]:
 			for x: float in [WEST + 0.35, EAST - 0.35]:
-				var sconce := _omni(Vector3(x, 2.6, z), WARM, 0.9, 5.0)
-				sconce.add_to_group(LAMP_GROUP)
+				_omni(Vector3(x, 2.6, z), WARM, 0.9, 5.0)
 				var side := 1.0 if x < 10.0 else -1.0
 				_part(Vector3(x - side * 0.25 - 0.04, 2.45, z - 0.04), Vector3(x - side * 0.25 + 0.04, 2.7, z + 0.04), "brass")
 				_sphere(Vector3(x - side * 0.15, 2.72, z), 0.06, "bulb").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

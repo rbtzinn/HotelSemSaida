@@ -38,10 +38,4 @@ func _ready() -> void:
 	var piano := preload("res://scripts/puzzles/saguao/lobby_piano_3d.gd").new()
 	add_child(piano)
 	piano.install(self)
-	StoryTrigger.attach(self, "saguao.bolsa.marta", StoryCutscenes.marta_bag)
-	StoryTrigger.attach(self, "jogo.final", StoryCutscenes.exit_return)
-	StoryTrigger.attach(self, "jogo.encerrado", StoryCutscenes.knocks)
 	super()
-	if WorldState.is_set(StoryCutscenes.OPENING_PENDING):
-		WorldState.set_flag(StoryCutscenes.OPENING_PENDING, false)
-		StoryCutscenes.opening.call_deferred(get_tree())

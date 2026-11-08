@@ -12,26 +12,11 @@ func _ready() -> void:
 	get_tree().process_frame.connect(_update_mouse_mode)
 	# O fim pode chegar em qualquer sala (na dupla online, Helena pode estar longe do Saguão)
 	WorldState.flag_changed.connect(_on_world_flag)
-	EraManager.era_changed.connect(_on_era_changed)
 
 
 func _on_world_flag(key: String, value: Variant) -> void:
 	if key == EndScreen.ENDED and value:
 		EndScreen.open(get_tree())
-
-
-## Primeira troca de época feita pelo jogador (Tab), na mesma sala: cutscene curta.
-func _on_era_changed(new_era: Era.Id) -> void:
-	if not EraManager.is_switching() or Cutscene.seen("troca") or NetSession.phase != NetSession.Phase.OFF:
-		return
-	while EraManager.is_switching():
-		await get_tree().process_frame
-	if not is_inside_tree() or EraManager.current_era != new_era:
-		return
-	var from: FirstPersonMotor = get_node_or_null(Era.character_name(Era.other(new_era)))
-	var to: FirstPersonMotor = get_node_or_null(Era.character_name(new_era))
-	if from and to:
-		StoryCutscenes.first_switch(get_tree(), from, to)
 
 
 func _update_mouse_mode() -> void:
