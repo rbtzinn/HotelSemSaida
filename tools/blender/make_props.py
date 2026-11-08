@@ -925,6 +925,131 @@ def door(name, width, height, knob=1, double=False, swing=False, thickness=0.06)
     export(name)
 
 
+# --- Torre: mecanismo do relógio ------------------------------------------------------------
+
+def gear(name, center, radius, teeth, thickness, role, hub=True):
+    """Engrenagem de dentes retos no plano x-y (eixo ao longo de z), centrada em `center`."""
+    cx, cy, cz = center
+    def build(bm):
+        outline = []
+        depth = min(0.035, radius * 0.18)
+        for k in range(teeth * 4):
+            a = 2 * math.pi * k / (teeth * 4)
+            r = radius if (k % 4) in (1, 2) else radius - depth
+            outline.append((cx + math.cos(a) * r, cy + math.sin(a) * r))
+        front = [bm.verts.new(g(x, y, cz + thickness / 2)) for x, y in outline]
+        back = [bm.verts.new(g(x, y, cz - thickness / 2)) for x, y in outline]
+        n = len(outline)
+        bm.faces.new(front)
+        bm.faces.new(list(reversed(back)))
+        for k in range(n):
+            bm.faces.new((back[k], back[(k + 1) % n], front[(k + 1) % n], front[k]))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    obj = new_object(name, build, role)
+    if hub:
+        cylinder(name + "Cubo", (cx, cy, cz + thickness / 2 + 0.012), radius * 0.22, radius * 0.22, thickness + 0.024, role, segments=12, axis="z")
+        for k in range(4):
+            a = 2 * math.pi * k / 4 + 0.4
+            x2, y2 = cx + math.cos(a) * radius * 0.6, cy + math.sin(a) * radius * 0.6
+            box(name + "Raio", ((cx + x2) / 2, (cy + y2) / 2, cz), (0.02, radius * 0.75, thickness * 1.2), role)
+    return obj
+
+
+def clock_machine():
+    """Mecanismo do relógio da torre, 1,6 x 1,2 m, armação até 1,2 m e engrenagens até 1,65 m.
+    Origem no canto noroeste do piso (o mostrador de acerto fica na face z = 0, desenhado pela sala)."""
+    reset()
+    box("Base", (0.8, 0.06, 0.6), (1.6, 0.12, 1.2), "cast_iron", bevel=0.01)
+    box("Tampo", (0.8, 1.18, 0.6), (1.6, 0.05, 1.2), "cast_iron", bevel=0.008)
+    # Armação: duas chapas recortadas nas pontas (z) e colunas de latão nos cantos
+    for z in (0.12, 1.08):
+        box("Chapa", (0.8, 0.65, z), (1.4, 1.0, 0.04), "cast_iron", bevel=0.006)
+    for x in (0.08, 1.52):
+        for z in (0.08, 1.12):
+            cylinder("Coluna", (x, 0.12, z), 0.035, 0.035, 1.04, "brass", segments=10)
+            sphere("Pomo", (x, 1.22, z), 0.04, "brass", segments=10, rings=6)
+    # Trem de engrenagens entre as chapas (eixos ao longo de z)
+    for x, y, r, t in ((0.4, 0.55, 0.3, 40), (0.95, 0.75, 0.18, 24), (1.25, 0.45, 0.14, 18)):
+        gear("Roda", (x, y, 0.6), r, t, 0.025, "brass")
+        cylinder("Eixo", (x, y, 1.1), 0.012, 0.012, 1.0, "iron", segments=8, axis="z")
+    # Tambor do peso com o cabo
+    cylinder("Tambor", (0.4, 0.55, 0.95), 0.12, 0.12, 0.2, "cast_iron", segments=20, axis="z")
+    # Engrenagens de cima e o escape (âncora sobre a roda de escape)
+    for x, r, t in ((0.35, 0.22, 30), (0.8, 0.18, 24), (1.25, 0.14, 15)):
+        gear("Topo", (x, 1.21 + r + 0.02, 0.6), r, t, 0.035, "brass")
+        box("Mancal", (x, 1.21 + r * 0.5, 0.6), (0.05, r + 0.04, 0.05), "cast_iron")
+    tube("Ancora", [(1.08, 1.6, 0.6), (1.25, 1.52, 0.6), (1.42, 1.6, 0.6)], 0.012, "iron", sides=6)
+    cylinder("Pino", (1.25, 1.52, 0.66), 0.015, 0.015, 0.12, "iron", segments=8, axis="z")
+    # Volante de acerto na lateral leste e manivela
+    gear("Volante", (1.6, 0.85, 0.6), 0.1, 12, 0.02, "brass", hub=False)
+    turn(bpy.data.objects["Volante"], (1.6, 0.85, 0.6), 90, "y")
+    tube("Manivela", [(1.62, 0.85, 0.6), (1.66, 0.85, 0.6), (1.66, 0.95, 0.6)], 0.01, "iron", sides=6)
+    box("Placa", (0.8, 0.95, 1.105), (0.5, 0.12, 0.012), "lacquer", bevel=0.003)
+    export("mecanismo_relogio")
+
+
+# --- Manutenção: bancada, armário de ferramentas e aquecedor ---------------------------------
+
+def workbench():
+    """Bancada de oficina 3,2 x 0,9 m, tampo a 0,9 m; origem no centro do piso. Morsa na ponta
+    leste; o meio do tampo fica livre (a chave de 1951 fica ali)."""
+    reset()
+    box("Tampo", (0, 0.84, 0), (3.2, 0.12, 0.9), "oak", bevel=0.01)
+    for x in (-1.5, 1.5):
+        for z in (-0.38, 0.38):
+            box("Perna", (x, 0.39, z), (0.08, 0.78, 0.08), "iron", bevel=0.005)
+    box("Prateleira", (0, 0.18, 0), (3.0, 0.03, 0.78), "oak")
+    for x in (-1.5, 1.5):
+        box("Travessa", (x, 0.18, 0), (0.06, 0.05, 0.8), "iron")
+    box("Frente", (0, 0.72, 0.43), (3.1, 0.12, 0.02), "oak")
+    # Morsa
+    box("MorsaBase", (1.35, 0.93, 0.3), (0.22, 0.06, 0.2), "cast_iron", bevel=0.006)
+    box("MorsaFixa", (1.35, 1.02, 0.25), (0.22, 0.12, 0.06), "cast_iron", bevel=0.006)
+    box("MorsaMovel", (1.35, 1.02, 0.4), (0.22, 0.12, 0.05), "cast_iron", bevel=0.006)
+    cylinder("Fuso", (1.35, 1.0, 0.6), 0.015, 0.015, 0.22, "iron", segments=8, axis="z")
+    cylinder("Alavanca", (1.45, 1.0, 0.56), 0.008, 0.008, 0.2, "iron", segments=6, axis="x")
+    # Caixas e uma lata na prateleira de baixo
+    box("Caixa", (-1.0, 0.31, 0.0), (0.5, 0.22, 0.4), "plank", bevel=0.006)
+    cylinder("Lata", (0.6, 0.195, -0.1), 0.09, 0.09, 0.2, "iron", segments=12)
+    # Martelo e chave inglesa na ponta oeste do tampo
+    box("Cabo", (-1.25, 0.915, 0.1), (0.3, 0.025, 0.03), "oak")
+    box("Cabeca", (-1.1, 0.925, 0.1), (0.04, 0.04, 0.11), "iron")
+    box("ChaveInglesa", (-1.3, 0.908, -0.15), (0.26, 0.012, 0.03), "iron")
+    export("bancada_oficina")
+
+
+def tool_locker():
+    """Armário de aço de ferramentas, 1,3 x 2,1 x 0,7 m, duas portas para +z; origem no centro do piso."""
+    reset()
+    box("Corpo", (0, 1.05, 0), (1.3, 2.1, 0.7), "iron", bevel=0.01)
+    for x in (-0.32, 0.32):
+        box("Porta", (x, 1.07, 0.36), (0.6, 1.95, 0.02), "iron", bevel=0.004)
+        for k in range(6):
+            box("Veneziana", (x, 1.75 + k * 0.045, 0.373), (0.36, 0.012, 0.01), "dark")
+        box("Puxador", (x * 0.18, 1.0, 0.385), (0.025, 0.18, 0.025), "brass")
+    box("Rodape", (0, 0.04, 0.02), (1.32, 0.08, 0.7), "cast_iron")
+    box("Etiqueta", (-0.32, 1.45, 0.373), (0.16, 0.06, 0.004), "paper")
+    export("armario_ferramentas")
+
+
+def water_heater():
+    """Aquecedor de água de cobre: r 0,45, 2,1 m de corpo e tampo abaulado; origem no centro do piso."""
+    reset()
+    cylinder("Corpo", (0, 0.1, 0), 0.45, 0.45, 2.0, "copper", segments=28)
+    sphere("Tampo", (0, 2.1, 0), 0.45, "copper", scale=(1, 0.35, 1), segments=28, rings=10)
+    for y in (0.3, 1.0, 1.7):
+        torus("Cinta", (0, y, 0), 0.455, 0.018, "iron", segments=36, sides=6)
+    for k in range(3):
+        a = 2 * math.pi * k / 3
+        cylinder("Pe", (math.cos(a) * 0.33, 0, math.sin(a) * 0.33), 0.04, 0.04, 0.12, "iron", segments=8)
+    tube("Cano", [(0, 2.2, 0), (0, 2.45, 0), (-0.45, 2.45, 0), (-0.45, 3.6, 0)], 0.035, "copper", sides=10)
+    tube("Saida", [(0.45, 0.4, 0), (0.62, 0.4, 0), (0.62, 0.05, 0)], 0.03, "copper", sides=10)
+    cylinder("Manometro", (0.32, 1.4, 0.43), 0.08, 0.08, 0.12, "brass", segments=16, axis="z")
+    cylinder("Mostrador", (0.32, 1.4, 0.436), 0.065, 0.065, 0.004, "ivory", segments=16, axis="z")
+    torus("Registro", (0.45, 0.65, 0.2), 0.06, 0.008, "iron", segments=16, sides=6)
+    export("aquecedor")
+
+
 ALL = {
     "piano_cauda": lambda: grand_piano(),
     "lustre": lambda: chandelier(),
@@ -966,6 +1091,11 @@ ALL = {
     "porta_130x240": lambda: door("porta_130x240", 1.3, 2.4),
     "porta_150x240": lambda: door("porta_150x240", 1.5, 2.4, knob=-1),
     "porta_dupla_160x250": lambda: door("porta_dupla_160x250", 1.6, 2.5, double=True),
+    # Torre e manutenção
+    "mecanismo_relogio": lambda: clock_machine(),
+    "bancada_oficina": lambda: workbench(),
+    "armario_ferramentas": lambda: tool_locker(),
+    "aquecedor": lambda: water_heater(),
     "porta_vaivem_120x238": lambda: door("porta_vaivem_120x238", 1.2, 2.38, knob=1, swing=True, thickness=0.05),
 }
 

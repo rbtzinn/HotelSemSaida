@@ -43,6 +43,8 @@ const SERVICE_RADIUS: float = 0.17
 const CASE := Rect2(4.3, 18.3, 1.4, 0.6)
 const CASE_H: float = 2.4
 
+const MODELS := "res://art/models/"
+
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
 
@@ -195,12 +197,10 @@ func _build_tower() -> void:
 func _build_machine() -> void:
 	var r := MACHINE
 	var metal := "brass" if not present else "iron"
-	_part(Vector3(r.position.x, 0, r.position.y), Vector3(r.end.x, MACHINE_H, r.end.y), "cast_iron")
+	# Armação, trem de engrenagens e escape: modelo do Blender (hoje, o latão enferrujou)
+	_model(MODELS + "mecanismo_relogio.glb", Vector3(r.position.x, 0, r.position.y), Vector3.ZERO, 1.0,
+		{"brass": "iron"} if present else {})
 	_solid(Vector3(r.position.x, 0, r.position.y), Vector3(r.end.x, MACHINE_H + 0.5, r.end.y), "Machine")
-	# Engrenagens em cima do mecanismo
-	for i in 3:
-		var at := Vector3(r.position.x + 0.35 + i * 0.45, MACHINE_H + 0.25, r.position.y + 0.6)
-		_cylinder(at + Vector3(0, -0.25, 0), 0.22 - i * 0.04, 0.22 - i * 0.04, 0.04, metal, Vector3(90, 0, 0), 16)
 	# Mostrador de acerto (o disco; os ponteiros e a data são do nível)
 	_part(SERVICE_DIAL + Vector3(-0.24, -0.3, 0.0), SERVICE_DIAL + Vector3(0.24, 0.24, 0.03), metal)
 	_cylinder(SERVICE_DIAL + Vector3(0, 0, -0.005), SERVICE_RADIUS, SERVICE_RADIUS, 0.01, "ivory", Vector3(-90, 0, 0), 24)

@@ -12,6 +12,10 @@ const CORRIDOR_Z := Vector2(10.6, 12.2)
 const CORRIDOR_END: float = 27.0
 const CORRIDOR_HEIGHT: float = 2.8
 
+## Modelos do Blender (tools/blender/make_props.py); hoje, madeira velha e metal enferrujado.
+const MODELS := "res://art/models/"
+const AGED := {"oak": "plank", "brass": "iron", "copper": "iron"}
+
 func _build_room() -> void:
 	_part(Vector3(-0.3, -0.25, -0.3), Vector3(9.3, 0, 9.3), "stone")
 	_solid(Vector3(-0.3, -0.25, -0.3), Vector3(9.3, 0, 9.3), "Floor")
@@ -37,9 +41,8 @@ func _build_room() -> void:
 		_cylinder(Vector3(0.25, y, 0.1), 0.06, 0.06, 8.6, "copper", Vector3(90, 0, 0), 10)
 		for z: float in [1, 4, 7]:
 			_torus(Vector3(0.25, y, z), 0.065, 0.085, "iron", Vector3(90, 0, 0))
-	_part(Vector3(4.8, 0.78, 0.25), Vector3(8, 0.9, 1.15), "oak")
-	for x: float in [5, 7.8]:
-		_block(Vector3(x, 0.4, 0.7), Vector3(0.1, 0.8, 0.8), "iron")
+	# Bancada com morsa (o meio do tampo fica livre para a chave de 1951)
+	_model(MODELS + "bancada_oficina.glb", Vector3(6.4, 0, 0.7), Vector3.ZERO, 1.0, AGED if present else {})
 	_solid(Vector3(4.8, 0, 0.25), Vector3(8, 0.9, 1.15), "Workbench")
 	_label("MANUTENÇÃO", Vector3(6.4, 2.3, 0.04), 0.16, Color("#C9973B"))
 	# Painel elétrico, manômetro e ferramentas presas na parede.
@@ -59,11 +62,8 @@ func _build_room() -> void:
 		_torus(Vector3(x, 1.86, 0.08), 0.035, 0.05, "iron", Vector3(90, 0, 0))
 	# Armários de ferramentas e caixas; a chave fica na bancada livre.
 	for x: float in [1.5, 3.1]:
-		_block(Vector3(x, 1.05, 0.45), Vector3(1.3, 2.1, 0.7), "iron")
+		_model(MODELS + "armario_ferramentas.glb", Vector3(x, 0, 0.45), Vector3.ZERO, 1.0, AGED if present else {})
 		_solid(Vector3(x-0.65, 0, 0.1), Vector3(x+0.65, 2.1, 0.8), "Locker")
-		for y: float in [0.4, 1.7]:
-			_block(Vector3(x, y, 0.82), Vector3(0.9, 0.04, 0.03), "brass")
-		_sphere(Vector3(x+0.35, 1, 0.85), 0.035, "brass")
 	for i in 6:
 		var at := Vector3(7.8, 0.22+(i%2)*0.46, 3.0+(i/2)*0.7)
 		_block(at, Vector3(0.8, 0.44, 0.6), "plank", Vector3(0, _random(i)*6, 0))
@@ -172,11 +172,7 @@ func _build_time_clock() -> void:
 ## Boiler de água quente, estante de latas e balde no canto: a sala é de trabalho.
 func _build_storage() -> void:
 	var tank := Vector3(8.35, 0, 8.35)
-	_cylinder(tank, 0.45, 0.45, 2.1, "copper" if not present else "iron", Vector3.ZERO, 20)
-	_sphere(tank + Vector3(0, 2.1, 0), 0.45, "copper" if not present else "iron", Vector3(1, 0.35, 1))
-	for y: float in [0.3, 1.0, 1.7]:
-		_torus(tank + Vector3(0, y, 0), 0.44, 0.48, "iron")
-	_cylinder(tank + Vector3(-0.45, 1.6, 0), 0.04, 0.04, 2.0, "copper", Vector3(0, 0, 90), 8)
+	_model(MODELS + "aquecedor.glb", tank, Vector3.ZERO, 1.0, {"copper": "iron", "brass": "iron"} if present else {})
 	_solid_cylinder(tank, 0.48, 2.3, "Tank")
 	# Estante de latas na parede sul, ao lado do boiler
 	var frame := "dark_wood" if not present else "plank"
