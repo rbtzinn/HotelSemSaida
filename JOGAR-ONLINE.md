@@ -1,12 +1,48 @@
 # Jogar em dupla
 
-Os dois jogadores usam a mesma versão de **Hotel Sem Saída**. No Windows, extraia o ZIP e abra `HotelSemSaida.exe`. No projeto Godot, aperte **F5** para abrir a recepção.
+Os dois jogadores usam a mesma versão de **Hotel Sem Saída**. No Windows, extraia o ZIP inteiro (o `.exe` precisa das DLLs da Epic que vêm ao lado dele) e abra `HotelSemSaida.exe`.
 
-1. Quem vai hospedar escolhe Helena ou Lia e clica em **Criar sala**. O outro jogador fica com a personagem da outra época.
-2. No PC do anfitrião, abra o agente do Playit, vincule-o à sua conta e crie um túnel **UDP** de uma porta. Use `127.0.0.1` como endereço local e `7777` como porta local. Mantenha o agente aberto durante a partida. [Playit para Windows](https://playit.gg/download/windows)
-3. Copie o **endereço público completo** do túnel, incluindo a porta pública que o Playit atribuiu. Envie-o ao amigo. No lobby, ele cola esse endereço no campo **Endereço:porta** e clica em **Entrar**. Só o anfitrião precisa rodar o Playit. [Como funciona o Playit](https://playit.gg/)
-4. Quando aparecer **Dupla completa**, o anfitrião clica em **Começar no Saguão**. Na mesma rede Wi-Fi, o visitante também pode entrar usando o IPv4 local do anfitrião e a porta 7777.
+## Com código de sala (normal)
 
-Cada pessoa anda e lê na sua própria tela. As portas podem ser atravessadas separadamente. Quando Helena muda um objeto, Lia vê a consequência no presente. Esc pausa apenas a tela de quem apertou.
+1. Os dois escrevem o próprio nome no campo **Seu nome** (a outra pessoa vê).
+2. Quem vai hospedar escolhe Helena ou Lia e clica em **Criar sala**. Aparece um código de 6 letras e números (ex.: `K7M2QX`); **Copiar** o põe na área de transferência.
+3. O amigo digita o código em **Código da sala** e clica em **Entrar**. Maiúsculas, espaços e traços não importam.
+4. Na sala, o anfitrião ainda pode trocar de personagem; o amigo fica com a outra e vê a troca na hora.
+5. O anfitrião clica em **Novo jogo** ou, se já houver progresso da dupla, **Retomar save**. Ao retomar, vale a personagem escolhida agora; Helena e Lia voltam à sala e à posição salvas.
 
-Para guardar o progresso, o anfitrião usa **F2** ou **Esc → Salvar a dupla**. Na próxima sessão, os dois entram no lobby e o anfitrião escolhe **Retomar save da dupla**. Cada personagem volta à sala e à posição salvas. A dupla tem um arquivo de progresso separado do solo.
+Ninguém precisa de conta da Epic nem abrir portas no roteador: a conexão passa pelos servidores da Epic quando a ligação direta não dá. Redes de empresa ou faculdade podem bloquear; aí use o plano B.
+
+## Plano B: por endereço (Playit)
+
+Na recepção, clique em **Plano B: entrar por endereço (Playit)**.
+
+1. O anfitrião clica em **Criar sala por endereço (UDP 7777)**.
+2. No PC do anfitrião, abra o agente do Playit, vincule-o à sua conta e crie um túnel **UDP** com endereço local `127.0.0.1` e porta local `7777`. Mantenha-o aberto durante a partida. [Playit para Windows](https://playit.gg/download/windows)
+3. Envie ao amigo o **endereço público completo** do túnel (com a porta). Ele cola no campo **Endereço:porta** e clica em **Entrar**. Na mesma rede Wi-Fi, vale o IPv4 local do anfitrião com a porta 7777.
+
+## Durante a partida
+
+Cada pessoa anda e lê na sua própria tela; o Tab não troca de personagem no online. As portas podem ser atravessadas separadamente. Quando Helena muda um objeto, Lia vê a consequência no presente. Esc pausa apenas a tela de quem apertou.
+
+Para guardar o progresso, o anfitrião usa **F2** ou **Esc → Salvar a dupla**. O progresso da dupla fica num arquivo separado do solo, no PC do anfitrião.
+
+## Preparar a sala por código (uma vez, no projeto)
+
+O código de sala usa o **Epic Online Services** (grátis) pelo plugin **EOSG** (Epic Online Services Godot, MIT). Sem o plugin ou sem as chaves, a recepção avisa o que falta e o plano B continua funcionando.
+
+### 1. Plugin no Godot (não precisa de administrador)
+
+1. Abra o projeto no Godot, aba **AssetLib**, busque **Epic Online Services Godot** (de 3ddelano, versão 2.3.1 ou mais nova), **Download** e **Install** (instala em `addons/epic-online-services-godot/`).
+2. **Projeto > Configurações do Projeto > Plugins**: ligue **Epic Online Services Godot (EOSG)**. Isso adiciona os autoloads do plugin (`EOSGRuntime`, `HPlatform`, `HAuth`, `HLobbies`…).
+3. Faça commit e push da pasta `addons/` e do `project.godot`.
+
+### 2. Produto no Epic Developer Portal
+
+1. Entre em [dev.epicgames.com/portal](https://dev.epicgames.com/portal) (crie a organização se pedir) e **Create Product** com o nome *Hotel Sem Saida*.
+2. **Product Settings > Clients > Add new client policy**: tipo **Custom policy**, **User is required desligado**, e permita as ações de **Connect** (login), **Lobbies** e **P2P**. Salve.
+3. **Add new client** com essa policy (tipo *GameClient*).
+4. Em **Product Settings > SDK Download & Credentials** copie: Product ID, Sandbox ID e Deployment ID (use o sandbox *Dev* para testar), Client ID e Client Secret.
+
+### 3. Chaves no projeto
+
+Copie `epic_credentials.example.cfg` para `epic_credentials.cfg` na raiz do projeto e preencha. A *encryption_key* pode ser qualquer sequência de 64 caracteres hexadecimais. O arquivo fica fora do git (o repositório é público) e entra sozinho no `.exe` exportado.

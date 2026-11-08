@@ -8,7 +8,7 @@ GODOT="${GODOT:-/c/Users/roberto.gabriel/Ferramentas/Godot/Godot_v4.7.2-stable_w
 DATA="$(mktemp -d)"
 mkdir -p "$DATA/host" "$DATA/guest"
 status=0
-for mode in "" "retomar"; do
+for mode in "" "retomar" "codigo" "retomar codigo"; do
 	port=$((7790 + RANDOM % 100))
 	APPDATA="$(cygpath -w "$DATA/host")" timeout 90 "$GODOT" --headless --path . --fixed-fps 60 \
 		--script res://tools/test_dupla_online.gd -- host "$port" $mode > "$DATA/host.log" 2>&1 &

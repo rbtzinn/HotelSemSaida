@@ -31,7 +31,7 @@ const QUALITY_HIGH := 2
 
 func factory() -> Dictionary:
 	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true, "quality": QUALITY_MEDIUM,
-		"fps": 60, "volume": 0.8, "mute": false, "deadzone": 0.2,
+		"fps": 60, "volume": 0.8, "mute": false, "deadzone": 0.2, "player_name": "",
 		"bindings": defaults.duplicate(true)}
 
 func apply(values: Dictionary) -> void:

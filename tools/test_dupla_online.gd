@@ -1,6 +1,8 @@
 extends SceneTree
 ## Rode em dois processos com diretórios de dados temporários separados.
-## --script res://tools/test_dupla_online.gd -- host|guest PORTA [retomar]
+## --script res://tools/test_dupla_online.gd -- host|guest PORTA [retomar] [codigo]
+## Com "codigo", a sala abre pelo código (Epic trocada por tools/fake_rooms.gd), com nomes e
+## o anfitrião trocando de personagem depois que a outra pessoa entrou.
 const KITCHEN := "res://scenes/rooms/cozinha_3d.tscn"
 var net: Node
 var state: Node
@@ -33,15 +35,41 @@ func _run() -> void:
 	host = args[0] == "host"
 	var port := args[1].to_int()
 	var resume := "retomar" in args
+	var by_code := "codigo" in args
 	net = root.get_node("NetSession")
 	state = root.get_node("WorldState")
 	eras = root.get_node("EraManager")
+	root.get_node("Settings").data.player_name = "Ana" if host else "Bia"
+	if by_code:
+		var fake: Node = load("res://tools/fake_rooms.gd").new()
+		fake.port = port
+		net.rooms.queue_free()
+		net.rooms = fake
+		net.add_child(fake)
 	change_scene_to_file(net.LOBBY)
 	await scene_changed
-	if host:
-		net.host(0 if resume else 1, port)
+	var host_era: int = 0 if resume else 1
+	if host and by_code:
+		# Cria com a outra personagem e troca depois que a Bia entrar
+		net.host_room(1 - host_era)
+		await _wait_for(func() -> bool: return net.phase == net.Phase.HOSTING, "sala aberta")
+		assert(net.room_code == "TESTE2")
+		await _wait_for(func() -> bool: return net.phase == net.Phase.WAITING, "segundo jogador no lobby")
+		assert(net.partner_name == "Bia", net.partner_name)
+		net.choose_era(host_era)
+		assert(net.local_era == host_era)
+		net.start(resume)
+	elif host:
+		net.host(host_era, port)
 		await _wait_for(func() -> bool: return net.phase == net.Phase.WAITING, "segundo jogador no lobby")
 		net.start(resume)
+	elif by_code:
+		net.join_room("abc")
+		assert(net.phase == net.Phase.OFF, "código curto recusado")
+		await process_frame
+		net.join_room(" teste-2 ")
+		await _wait_for(func() -> bool: return net.phase in [net.Phase.WAITING, net.Phase.PLAYING], "entrar pelo código")
+		assert(net.partner_name == "Ana", net.partner_name)
 	else:
 		net.join("127.0.0.1:%d" % port)
 	var my_era: int = (0 if host else 1) if resume else (1 if host else 0)

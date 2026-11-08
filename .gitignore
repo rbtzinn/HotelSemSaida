@@ -5,3 +5,6 @@
 # Ferramentas locais
 graft/
 .ignore
+
+# Chaves da Epic (modelo em epic_credentials.example.cfg)
+epic_credentials.cfg

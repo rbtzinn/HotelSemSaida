@@ -9,7 +9,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d`, `torre_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: modelos do Blender nas peças dos enigmas (volantes, engrenagens) e testes de uma partida inteira por pessoas; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: instalar o plugin da Epic e as chaves (sala por código, ver "Dupla online"), modelos do Blender nas peças dos enigmas (volantes, engrenagens) e testes de uma partida inteira por pessoas; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -261,6 +261,9 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `NetSession` (autoload, `scripts/online/net_session.gd`): ENet UDP 7777; o anfitrião escolhe a época e o visitante fica com a outra. Cada máquina simula só a própria personagem; portas, leitura e pausa são locais. Roteiro do Playit em `JOGAR-ONLINE.md`.
 - Só as flags mudam pela rede, e só as que `scripts/online/coop_progress.gd` permite para cada época (passado: mecanismos; presente: leituras e progresso). **Toda flag nova de enigma precisa entrar lá**; `tools/test_coop_flags.gd` falha se alguma ficar de fora, e em modo debug o jogo avisa (`push_warning`).
 - Save da dupla separado do solo (`user://dupla.save`, só o anfitrião salva). Online, o Tab e o save solo ficam desligados; `EraLinked3D` reage a flags na hora.
+- **Sala por código (08/11/2026, pedido do Roberto)**: `NetSession.host_room(era)` / `join_room(código)` abrem a sala pelo Epic Online Services (`scripts/online/epic_online.gd`: login anônimo por Device ID, lobby de 2 vagas com id `HOTEL<código>`, `EOSGMultiplayerPeer` por baixo do multiplayer do Godot). Código de 6 caracteres sem O/0 e I/1. O plugin EOSG (`addons/epic-online-services-godot/`, AssetLib) e `epic_credentials.cfg` (fora do git; modelo `epic_credentials.example.cfg`) são opcionais: sem eles, `EpicOnline.missing()` diz o que falta. Nada no código do jogo cita as classes do plugin pelo nome (o projeto precisa abrir sem ele). Os autoloads do plugin (`EOSGRuntime`, `HPlatform`, `HAuth`, `HLobbies`…) são a exceção aceita à regra dos autoloads. Passo a passo do portal em `JOGAR-ONLINE.md`.
+- Recepção: nome do jogador (`Settings.data.player_name`, trocado no `_check_in`/`_welcome`), código grande com Copiar, o anfitrião troca de personagem até começar (`choose_era`, RPC `_assign`) e escolhe Novo jogo ou Retomar save (ao retomar, vale a escolha atual). O endereço:porta (ENet/Playit) virou o "Plano B". Protocolo 8.
+- Teste: `tools/run_dupla_online.sh` roda 4 modos (nova, retomar, codigo, retomar codigo); no modo `codigo` a Epic é trocada por `tools/fake_rooms.gd` (ENet local) via `NetSession.rooms`. A Epic de verdade só se testa com o plugin e as chaves.
 
 ## Versão para Windows (08/11/2026)
 

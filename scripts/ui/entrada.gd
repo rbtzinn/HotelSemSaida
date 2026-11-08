@@ -1,5 +1,7 @@
 extends Control
-## Recepção anterior à campanha. A sala particular só começa por ação do anfitrião.
+## Recepção anterior à campanha. A sala da dupla abre por código (Epic) ou, no plano B, por
+## endereço:porta. O anfitrião escolhe a personagem (pode trocar até começar) e decide entre
+## jogo novo e retomar o save da dupla.
 const INK := Color("#EAE2CF")
 const GOLD := Color("#D6B272")
 const FONT := preload("res://art/fonts/interface_font.tres")
@@ -7,13 +9,22 @@ const SIGN := preload("res://art/fonts/sign_font.tres")
 var _form := VBoxContainer.new()
 var _options := VBoxContainer.new()
 var _waiting := VBoxContainer.new()
+var _address_box := VBoxContainer.new()
 var _role := OptionButton.new()
+var _room_role := OptionButton.new()
+var _name := LineEdit.new()
+var _code := LineEdit.new()
 var _address := LineEdit.new()
 var _status := Label.new()
+var _room_title := Label.new()
+var _room_code := Label.new()
+var _copy: Button
+var _role_row := HBoxContainer.new()
 var _start: Button
 var _resume: Button
 var _cancel: Button
 var _solo: Button
+var _create: Button
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -39,27 +50,64 @@ func _ready() -> void:
 		_button(solo_row, "Continuar solo", SaveSystem.load_game)
 	_options.add_child(HSeparator.new())
 	_label(_options, "PARTIDA PARA DUAS PESSOAS", 10).modulate = GOLD
+	_name.placeholder_text = "Seu nome (a outra pessoa vê)"
+	_name.max_length = NetSession.MAX_NAME
+	_name.text = str(Settings.data.get("player_name", ""))
+	_options.add_child(_name)
 	var host_row := HBoxContainer.new()
 	_options.add_child(host_row)
-	_role.add_item("Helena · 1923", 0)
-	_role.add_item("Lia · Hoje", 1)
-	_role.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_role.tooltip_text = "Sua personagem ao criar a sala"
+	_fill_roles(_role)
+	_role.tooltip_text = "Sua personagem (dá para trocar até começar)"
 	host_row.add_child(_role)
-	_button(host_row, "Criar sala", func() -> void: NetSession.host(_role.get_selected_id()))
-	_label(_options, "Entrar na sala de um amigo", 12)
+	_create = _button(host_row, "Criar sala", _host_room)
 	var join_row := HBoxContainer.new()
 	_options.add_child(join_row)
+	_code.placeholder_text = "Código da sala"
+	_code.max_length = 12
+	_code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_code.text_submitted.connect(func(_v: String) -> void: _join_room())
+	join_row.add_child(_code)
+	_button(join_row, "Entrar", _join_room)
+	var more := _button(_options, "Plano B: entrar por endereço (Playit) ▸", func() -> void:
+		_address_box.visible = not _address_box.visible)
+	more.flat = true
+	more.add_theme_font_size_override("font_size", 10)
+	_options.add_child(_address_box)
+	_address_box.visible = false
+	var address_row := HBoxContainer.new()
+	_address_box.add_child(address_row)
 	_address.placeholder_text = "Endereço:porta"
 	_address.max_length = 255
 	_address.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_address.text_submitted.connect(func(_v: String) -> void: _join())
-	join_row.add_child(_address)
-	_button(join_row, "Entrar", _join)
+	address_row.add_child(_address)
+	_button(address_row, "Entrar", _join)
+	_button(_address_box, "Criar sala por endereço (UDP %d)" % NetSession.PORT, func() -> void:
+		_save_name()
+		NetSession.host(_role.get_selected_id()))
 	_form.add_child(_waiting)
-	_label(_waiting, "REGISTRO DA DUPLA", 10).modulate = GOLD
-	_start = _button(_waiting, "Começar no Saguão", NetSession.start)
-	_resume = _button(_waiting, "Retomar save da dupla", func() -> void: NetSession.start(true))
+	_waiting.add_theme_constant_override("separation", 5)
+	_label(_waiting, "SALA DA DUPLA", 10).modulate = GOLD
+	var code_row := HBoxContainer.new()
+	_waiting.add_child(code_row)
+	_room_title.add_theme_font_size_override("font_size", 11)
+	code_row.add_child(_room_title)
+	_room_code.add_theme_font_size_override("font_size", 24)
+	_room_code.add_theme_color_override("font_color", INK)
+	_room_code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	code_row.add_child(_room_code)
+	_copy = _button(code_row, "Copiar", _copy_code)
+	_copy.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_waiting.add_child(_role_row)
+	_label(_role_row, "Sua personagem:", 11)
+	_fill_roles(_room_role)
+	_room_role.item_selected.connect(func(index: int) -> void:
+		NetSession.choose_era(_room_role.get_item_id(index) as Era.Id))
+	_role_row.add_child(_room_role)
+	var start_row := HBoxContainer.new()
+	_waiting.add_child(start_row)
+	_start = _button(start_row, "Novo jogo", NetSession.start)
+	_resume = _button(start_row, "Retomar save", func() -> void: NetSession.start(true))
 	_cancel = _button(_waiting, "Voltar", NetSession.leave)
 	_status.custom_minimum_size.x = 294
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -69,22 +117,60 @@ func _ready() -> void:
 	NetSession.lobby_changed.connect(_refresh)
 	_refresh()
 
+func _fill_roles(button: OptionButton) -> void:
+	button.add_item("Helena · 1923", Era.Id.PAST_1923)
+	button.add_item("Lia · Hoje", Era.Id.PRESENT)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
 func _play_solo() -> void:
 	RoomManager.clear_away()
 	WorldState.clear()
 	EraManager.set_era(Era.Id.PAST_1923)
 	get_tree().change_scene_to_file(NetSession.HOTEL)
 
+func _save_name() -> void:
+	var name_text := NetSession.clean_name(_name.text)
+	if name_text != str(Settings.data.get("player_name", "")):
+		Settings.data.player_name = name_text
+		Settings.save()
+
+func _host_room() -> void:
+	_save_name()
+	NetSession.host_room(_role.get_selected_id() as Era.Id)
+
+func _join_room() -> void:
+	_save_name()
+	NetSession.join_room(_code.text)
+
 func _join() -> void:
+	_save_name()
 	NetSession.join(_address.text)
+
+func _copy_code() -> void:
+	DisplayServer.clipboard_set(NetSession.room_code)
+	_copy.text = "Copiado"
+	get_tree().create_timer(1.5).timeout.connect(func() -> void:
+		if is_instance_valid(_copy):
+			_copy.text = "Copiar")
 
 func _refresh() -> void:
 	var idle := NetSession.phase == NetSession.Phase.OFF
+	var host := NetSession.is_host
 	_options.visible = idle
 	_waiting.visible = not idle
-	_start.visible = NetSession.is_host
+	var has_code := NetSession.room_code != ""
+	if has_code:
+		_room_title.text = "Código:" if host else "Sala"
+		_room_code.text = NetSession.room_code
+	else:
+		_room_title.text = "Por endereço" if host else "Conectando"
+		_room_code.text = "UDP %d" % NetSession.PORT if host else ""
+	_copy.visible = host and has_code and NetSession.phase in [NetSession.Phase.HOSTING, NetSession.Phase.WAITING]
+	_role_row.visible = host
+	_room_role.select(_room_role.get_item_index(NetSession.local_era))
+	_start.visible = host
 	_start.disabled = NetSession.phase != NetSession.Phase.WAITING
-	_resume.visible = NetSession.is_host and FileAccess.file_exists(NetSession.SAVE)
+	_resume.visible = host and FileAccess.file_exists(NetSession.SAVE)
 	_resume.disabled = _start.disabled
 	_status.text = NetSession.status
 	if idle:

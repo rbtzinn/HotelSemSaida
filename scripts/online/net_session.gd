@@ -1,12 +1,17 @@
 extends Node
 ## Cada máquina simula apenas sua viajante. A rede transmite as mudanças de
 ## estado em ordem. Abrir um bilhete, andar ou passar por uma porta é local.
+## Duas formas de abrir a sala: por código (host_room/join_room, Epic Online Services em
+## `rooms`) ou, como plano B, por endereço:porta (host/join, ENet direto ou túnel do Playit).
 signal lobby_changed
-enum Phase { OFF, HOSTING, JOINING, WAITING, PLAYING }
+## OPENING: falando com a Epic antes de a sala existir.
+enum Phase { OFF, HOSTING, JOINING, WAITING, PLAYING, OPENING }
 const RULES := preload("res://scripts/online/coop_progress.gd")
+const EPIC := preload("res://scripts/online/epic_online.gd")
 const PORT := 7777
 ## Suba a cada mudança nas regras de flags: versões diferentes não podem jogar juntas.
-const PROTOCOL := 7
+const PROTOCOL := 8
+const MAX_NAME := 20
 const LOBBY := "res://scenes/ui/entrada.tscn"
 const HOTEL := "res://scenes/rooms/saguao_3d.tscn"
 const ROOMS := [HOTEL, "res://scenes/rooms/cozinha_3d.tscn", "res://scenes/rooms/manutencao_3d.tscn",
@@ -21,6 +26,12 @@ var local_era := Era.Id.PAST_1923
 var partner := 0
 var status := ""
 var is_host := false
+## Código da sala aberta pela Epic (vazio na sala por endereço).
+var room_code := ""
+var partner_name := ""
+## Quem abre as salas por código: open_room(nome), enter_room(código, nome), close_room().
+## Os testes trocam por um substituto local.
+var rooms: Node
 var _receiving := false
 var _deadline := 0
 var _saving := false
@@ -33,6 +44,74 @@ func _ready() -> void:
 	multiplayer.server_disconnected.connect(func() -> void: leave.call_deferred("O anfitrião encerrou a conexão.", false))
 	multiplayer.peer_disconnected.connect(_lost_peer)
 	WorldState.flag_changed.connect(_publish)
+	rooms = EPIC.new()
+	rooms.name = "Epic"
+	add_child(rooms)
+
+## Nome que a outra pessoa vê (Configurações; também vai para o login anônimo da Epic).
+func player_name() -> String:
+	var name_text := clean_name(str(Settings.data.get("player_name", "")))
+	return name_text if name_text != "" else "Hóspede"
+
+static func clean_name(text: String) -> String:
+	var name_text := ""
+	for character in text.strip_edges():
+		if character.unicode_at(0) >= 32:
+			name_text += character
+	return name_text.substr(0, MAX_NAME).strip_edges()
+
+## Cria a sala por código (Epic). O código aparece em `room_code`.
+func host_room(era: Era.Id) -> void:
+	if phase != Phase.OFF or _returning:
+		return
+	phase = Phase.OPENING
+	is_host = true
+	local_era = era
+	_message("Abrindo a sala…")
+	var result: Dictionary = await rooms.open_room(player_name())
+	if phase != Phase.OPENING:
+		# Voltou antes de a sala abrir
+		if result.has("peer"):
+			(result.peer as MultiplayerPeer).close()
+			rooms.close_room()
+		return
+	if result.has("error"):
+		phase = Phase.OFF
+		is_host = false
+		_message(result.error)
+		return
+	multiplayer.multiplayer_peer = result.peer
+	room_code = result.code
+	phase = Phase.HOSTING
+	_message("Sala aberta. Passe o código para a outra pessoa.")
+
+## Entra na sala de um código.
+func join_room(text: String) -> void:
+	if phase != Phase.OFF or _returning:
+		return
+	var code := EPIC.normalize_code(text)
+	if not EPIC.valid_code(code):
+		_message("O código tem %d letras e números, como K7M2QX." % EPIC.CODE_LENGTH)
+		return
+	phase = Phase.OPENING
+	is_host = false
+	room_code = code
+	_message("Procurando a sala %s…" % code)
+	var result: Dictionary = await rooms.enter_room(code, player_name())
+	if phase != Phase.OPENING:
+		if result.has("peer"):
+			(result.peer as MultiplayerPeer).close()
+			rooms.close_room()
+		return
+	if result.has("error"):
+		phase = Phase.OFF
+		room_code = ""
+		_message(result.error)
+		return
+	phase = Phase.JOINING
+	multiplayer.multiplayer_peer = result.peer
+	_deadline = Time.get_ticks_msec()+20000
+	_message("Sala encontrada. Conectando…")
 
 func host(era: Era.Id, port: int = PORT) -> void:
 	if phase != Phase.OFF or _returning:
@@ -74,10 +153,10 @@ func join(address: String) -> void:
 
 func _connected() -> void:
 	if phase == Phase.JOINING:
-		_check_in.rpc_id(1, PROTOCOL)
+		_check_in.rpc_id(1, PROTOCOL, player_name())
 
 @rpc("any_peer", "call_remote", "reliable")
-func _check_in(version: int) -> void:
+func _check_in(version: int, guest_name: String = "") -> void:
 	var guest := multiplayer.get_remote_sender_id()
 	if not is_host or phase != Phase.HOSTING or guest <= 1:
 		return
@@ -85,23 +164,57 @@ func _check_in(version: int) -> void:
 		_refuse.rpc_id(guest)
 		return
 	partner = guest
+	partner_name = _shown_name(guest_name)
 	phase = Phase.WAITING
-	_welcome.rpc_id(guest, Era.other(local_era))
-	_message("Dupla completa. Você joga com %s." % Era.character_name(local_era))
+	_welcome.rpc_id(guest, Era.other(local_era), player_name())
+	_message(_pair_text())
+
+static func _shown_name(text: Variant) -> String:
+	var name_text := clean_name(str(text)) if text is String else ""
+	return name_text if name_text != "" else "A outra pessoa"
+
+func _pair_text() -> String:
+	return "%s está na sala e fica com %s. Você fica com %s." % [partner_name,
+		_role_text(Era.other(local_era)), _role_text(local_era)]
+
+static func _role_text(era: Era.Id) -> String:
+	return "Helena (1923)" if era == Era.Id.PAST_1923 else "Lia (hoje)"
+
+## O anfitrião troca de personagem até começar; a outra pessoa recebe a outra na hora.
+func choose_era(era: Era.Id) -> void:
+	if not is_host or phase not in [Phase.HOSTING, Phase.WAITING, Phase.OPENING] or era == local_era:
+		return
+	local_era = era
+	if phase == Phase.WAITING:
+		_assign.rpc_id(partner, Era.other(era))
+		_message(_pair_text())
+	else:
+		lobby_changed.emit()
+
+@rpc("authority", "call_remote", "reliable")
+func _assign(era: int) -> void:
+	if phase != Phase.WAITING or is_host or era not in [0, 1]:
+		return
+	local_era = era as Era.Id
+	_message(_guest_text())
+
+func _guest_text() -> String:
+	return "Você está na sala de %s e fica com %s. Aguardando começar." % [partner_name, _role_text(local_era)]
 
 @rpc("authority", "call_remote", "reliable")
 func _refuse() -> void:
 	leave.call_deferred("As versões dos jogos são diferentes.", false)
 
 @rpc("authority", "call_remote", "reliable")
-func _welcome(era: int) -> void:
+func _welcome(era: int, host_name: String = "") -> void:
 	if phase != Phase.JOINING or era not in [0, 1]:
 		return
 	local_era = era as Era.Id
 	partner = 1
+	partner_name = _shown_name(host_name)
 	phase = Phase.WAITING
 	_deadline = 0
-	_message("Você joga com %s. Aguardando o anfitrião iniciar." % Era.character_name(local_era))
+	_message(_guest_text())
 
 func start(resume: bool = false) -> void:
 	if not is_host or phase != Phase.WAITING:
@@ -219,12 +332,20 @@ func _lost_peer(id: int) -> void:
 	if is_host and phase == Phase.WAITING:
 		partner = 0
 		phase = Phase.HOSTING
-		_message("O visitante saiu. Aguardando outra conexão.")
+		_message("%s saiu da sala. Aguardando outra pessoa." % partner_name)
+		partner_name = ""
 	elif phase == Phase.PLAYING:
-		leave.call_deferred("A outra pessoa saiu da partida.", false)
+		leave.call_deferred("%s saiu da partida." % partner_name, false)
 
 func leave(reason: String = "", notify_partner: bool = true) -> void:
 	if phase == Phase.OFF:
+		return
+	if phase == Phase.OPENING:
+		# A sala ainda está abrindo: host_room/join_room desfazem ao terminar
+		phase = Phase.OFF
+		is_host = false
+		room_code = ""
+		_message(reason)
 		return
 	if notify_partner and partner in multiplayer.get_peers():
 		_goodbye.rpc_id(partner)
@@ -232,6 +353,10 @@ func leave(reason: String = "", notify_partner: bool = true) -> void:
 		if peer and peer.host:
 			peer.host.flush()
 	var in_game := phase == Phase.PLAYING
+	if room_code != "":
+		rooms.close_room()
+	room_code = ""
+	partner_name = ""
 	phase = Phase.OFF
 	partner = 0
 	is_host = false
@@ -256,11 +381,11 @@ func _goodbye() -> void:
 		if is_host and phase == Phase.WAITING:
 			_lost_peer(partner)
 		else:
-			leave.call_deferred("A outra pessoa saiu da sala.", false)
+			leave.call_deferred("%s saiu da sala." % partner_name, false)
 
 func _process(_delta: float) -> void:
 	if phase == Phase.JOINING and Time.get_ticks_msec() >= _deadline:
-		leave("Sem resposta. Confira se a sala e o túnel UDP estão abertos.")
+		leave("Sem resposta do anfitrião. Confira o código ou, por endereço, se o túnel UDP está aberto.")
 
 func _message(text: String) -> void:
 	status = text
