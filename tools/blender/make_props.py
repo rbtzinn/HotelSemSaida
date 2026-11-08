@@ -393,8 +393,9 @@ def armchair():
     export("poltrona")
 
 
-def grandfather_clock():
-    """Relógio de carrilhão, 2,55 m; mostrador para +z. Ponteiros parados em 3h07."""
+def grandfather_clock(hours=3, minutes=7, name="relogio_carrilhao"):
+    """Relógio de carrilhão, 2,55 m; mostrador para +z. Hoje parado em 3h07; em 1923, 11h40
+    (a mesma hora da torre antes de Helena mexer)."""
     reset()
     box("Pedestal", (0, 0.15, 0), (0.62, 0.3, 0.38), "mahogany", bevel=0.02)
     box("Rodape", (0, 0.02, 0), (0.68, 0.04, 0.42), "dark_wood")
@@ -417,8 +418,9 @@ def grandfather_clock():
     for h in range(12):
         a = 2 * math.pi * h / 12
         box("Marca%d" % h, (math.sin(a) * 0.17, 2.15 + math.cos(a) * 0.17, 0.215), (0.012, 0.03, 0.004), "lacquer")
-    # Ponteiros em 3h07
-    for length, angle, width in ((0.1, 2 * math.pi * (3 + 7 / 60) / 12, 0.014), (0.16, 2 * math.pi * 7 / 60, 0.009)):
+    # Ponteiros na hora pedida
+    for length, angle, width in ((0.1, 2 * math.pi * (hours + minutes / 60) / 12, 0.014),
+                                 (0.16, 2 * math.pi * minutes / 60, 0.009)):
         cx = math.sin(angle) * length / 2
         cy = math.cos(angle) * length / 2
         hand = box("Ponteiro", (cx, 2.15 + cy, 0.222), (width, length, 0.004), "lacquer")
@@ -426,7 +428,7 @@ def grandfather_clock():
         hand.data.transform(Matrix.Translation(-g(cx, 2.15 + cy, 0.222)))
         hand.data.transform(Matrix.Rotation(angle, 4, "Y"))
         hand.data.transform(Matrix.Translation(g(cx, 2.15 + cy, 0.222)))
-    export("relogio_carrilhao")
+    export(name)
 
 
 # --- Quartos: cama, guarda-roupa, escrivaninha e baú --------------------------------------
@@ -932,6 +934,7 @@ ALL = {
     "sofa": lambda: sofa(),
     "poltrona": lambda: armchair(),
     "relogio_carrilhao": lambda: grandfather_clock(),
+    "relogio_carrilhao_1923": lambda: grandfather_clock(11, 40, "relogio_carrilhao_1923"),
     "cama": lambda: bed(),
     "guarda_roupa": lambda: wardrobe(),
     "escrivaninha": lambda: writing_desk(),

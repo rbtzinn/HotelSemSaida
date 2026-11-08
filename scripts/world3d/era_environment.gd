@@ -4,6 +4,10 @@ extends WorldEnvironment
 ## 1923, quente e brilhante, com névoa leve e brilho das lâmpadas;
 ## hoje, frio, escuro e com névoa volumétrica para os fachos de luar e da lanterna.
 
+## Cena a céu aberto (Torre): névoa e fundo de noite azulada em vez do marrom dos salões,
+## que tingia o céu e a silhueta da cidade de 1923.
+@export var outdoor: bool = false
+
 var _past: Environment
 var _present: Environment
 
@@ -37,6 +41,10 @@ func _make_past() -> Environment:
 	env.fog_light_color = Color("#3A2014")
 	env.fog_density = 0.008
 	env.adjustment_saturation = 1.08
+	if outdoor:
+		env.background_color = Color("#04060C")
+		env.fog_light_color = Color("#141A28")
+		env.fog_density = 0.004
 	return env
 
 
@@ -60,6 +68,8 @@ func _make_present() -> Environment:
 	env.volumetric_fog_length = 24.0
 	env.adjustment_saturation = 0.72
 	env.adjustment_contrast = 1.08
+	if outdoor:
+		env.background_color = Color("#030409")
 	return env
 
 

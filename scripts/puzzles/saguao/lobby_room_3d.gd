@@ -486,6 +486,8 @@ func _build_safe(base: Vector3) -> void:
 	_part(base + Vector3(-0.255, 0.33, 0.52), base + Vector3(-0.185, 0.47, 0.534), "brass")
 	_part(base + Vector3(-0.228, 0.36, 0.534), base + Vector3(-0.212, 0.42, 0.538), "dark")
 	if not present:
+		# Luz baixa de arandela sobre o cofre: sem ela a laca preta sumia na sombra do canto
+		_omni(base + Vector3(0, 1.45, 0.95), WARM, 1.0, 2.8)
 		# Frase riscada a lápis na porta: a senha é a data em que o lustre se acendeu
 		_label("o dia em que o Aurora se acendeu", base + Vector3(0, 0.88, 0.535), 0.055, Color("#2A2018"))
 		_block(base + Vector3(0, 0.885, 0.537), Vector3(0.82, 0.006, 0.002), "dark", Vector3(0, 0, 2))
@@ -818,7 +820,8 @@ func _palm(at: Vector3, index: int) -> void:
 func _grandfather_clock(wall: Vector3) -> void:
 	if not present:
 		var holder := _group(wall + Vector3(0, 0, 0.2), 0.0)
-		_model(MODELS + "relogio_carrilhao.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
+		# Em 1923 o relógio anda: marca 11h40, como a torre antes de Helena mexer
+		_model(MODELS + "relogio_carrilhao_1923.glb", Vector3.ZERO, Vector3.ZERO, 1.0, {}, holder)
 		_solid(wall + Vector3(-0.35, 0, 0), wall + Vector3(0.35, 2.6, 0.5), "Clock")
 		return
 	# Hoje tombou de lado, ao longo da parede, entre ela e o balcão (o mostrador ainda para o Saguão)
