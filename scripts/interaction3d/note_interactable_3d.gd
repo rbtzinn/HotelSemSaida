@@ -10,6 +10,10 @@ extends Interactable3D
 @export_multiline var extra_text: String = ""
 
 
+func _default_sound() -> String:
+	return "pagina_%d" % randi_range(1, 3)
+
+
 func _on_interact(_by: FirstPersonMotor) -> void:
 	var full := text
 	if extra_flag != "" and WorldState.is_set(extra_flag):

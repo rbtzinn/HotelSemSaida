@@ -22,6 +22,7 @@ WorldState="*res://scripts/world/world_state.gd"
 SaveSystem="*res://scripts/core/save_system.gd"
 RoomManager="*res://scripts/core/room_manager.gd"
 NetSession="*res://scripts/online/net_session.gd"
+Audio="*res://scripts/core/audio.gd"
 
 [display]
 

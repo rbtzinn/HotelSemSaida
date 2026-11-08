@@ -42,6 +42,7 @@ class Dial extends Control:
 var minutes := 0
 var _dial: Dial
 var _held := 0
+var _last_tick := 0
 
 
 static func open(tree: SceneTree, start: int) -> ClockUI:
@@ -99,11 +100,17 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Gira o ponteiro dos minutos (negativo volta). Usado também pelos testes.
 func turn(amount: int) -> void:
 	minutes = posmod(minutes + amount, DAY)
+	# Segurando, os ponteiros correm: um tique a cada 60 ms basta
+	var now := Time.get_ticks_msec()
+	if now - _last_tick > 60:
+		_last_tick = now
+		Audio.play("tique", -8.0)
 	_dial.minutes = minutes
 	_dial.queue_redraw()
 
 
 func confirm() -> void:
+	Audio.play("corda", -4.0)
 	confirmed.emit(minutes)
 	close()
 

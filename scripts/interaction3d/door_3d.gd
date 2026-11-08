@@ -14,5 +14,9 @@ func interact(by: FirstPersonMotor) -> void:
 	super(by)
 
 
+func _default_sound() -> String:
+	return "porta_abre"
+
+
 func _on_interact(by: FirstPersonMotor) -> void:
 	RoomManager.change_room_alone(target_scene, target_spawn, by.era)

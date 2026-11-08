@@ -10,6 +10,11 @@ extends Interactable3D
 @export var idle_message: String = "Nada acontece."
 
 
+## Som ao usar (ver Interactable3D.sound).
+func _default_sound() -> String:
+	return "pegar"
+
+
 func _ready() -> void:
 	if done_flag == "":
 		done_flag = result_flag

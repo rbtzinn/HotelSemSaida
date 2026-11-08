@@ -78,9 +78,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif _pressed(event, ["move_up", "ui_up"]):
 		_digits[_index] = (_digits[_index] + 1) % 10
 		_status.text = " "
+		Audio.play("tique", -8.0)
 	elif _pressed(event, ["move_down", "ui_down"]):
 		_digits[_index] = (_digits[_index] + 9) % 10
 		_status.text = " "
+		Audio.play("tique", -8.0)
 	elif _pressed(event, ["interact", "ui_accept"]):
 		_try_code()
 	elif _pressed(event, ["ui_cancel", "pause"]):
@@ -102,10 +104,12 @@ func close() -> void:
 func _try_code() -> void:
 	var attempt := "".join(_digits.map(func(d: int) -> String: return str(d)))
 	if attempt == _code:
+		Audio.play("fechadura_abre")
 		solved.emit()
 		close()
 	else:
 		_status.text = "Não abre."
+		Audio.play("porta_trancada", -6.0)
 
 
 func _refresh() -> void:

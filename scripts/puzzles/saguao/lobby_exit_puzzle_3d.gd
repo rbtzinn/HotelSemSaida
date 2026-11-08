@@ -196,7 +196,7 @@ func _open_safe() -> void:
 
 func _use_past_entrance(by: FirstPersonMotor) -> void:
 	if WorldState.is_set(FINAL):
-		_say(KNOCK)
+		_knock()
 	elif WorldState.is_set(LATCH_1923):
 		_say("As folhas não giram, como se alguém as segurasse do outro lado. Do outro lado do vidro, só a rua escura.")
 	elif by.get_held_item() == ENTRANCE_KEY:
@@ -282,7 +282,7 @@ func _leave(by: FirstPersonMotor) -> void:
 
 func _on_era_changed(era: Era.Id) -> void:
 	if era == Era.Id.PAST_1923 and WorldState.is_set(FINAL):
-		_say(KNOCK)
+		_knock()
 
 
 func _restore() -> void:
@@ -312,7 +312,12 @@ func _on_flag(key: String, _value: Variant) -> void:
 		_restore()
 	# Na dupla online, quem joga com Helena ouve as batidas quando Lia sai
 	if key == FINAL and EraManager.current_era == Era.Id.PAST_1923 and NetSession.phase == NetSession.Phase.PLAYING:
-		_say(KNOCK)
+		_knock()
+
+
+func _knock() -> void:
+	Audio.play("batidas", -2.0, 0.0)
+	_say(KNOCK)
 
 
 func _say(message: String) -> void:

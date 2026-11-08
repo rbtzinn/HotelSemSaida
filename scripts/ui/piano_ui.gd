@@ -127,6 +127,7 @@ func play(number: int) -> void:
 		return
 	var key := _keys[number - 1]
 	key.color = PRESSED
+	Audio.play("piano_%d" % number, -2.0, 0.0)
 	var release := create_tween()
 	release.tween_interval(0.15)
 	release.tween_property(key, "color", IVORY, 0.1)

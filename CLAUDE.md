@@ -9,7 +9,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d`, `torre_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: áudio, modelos do Blender na Torre, manutenção e peças dos enigmas; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: modelos do Blender na Torre, manutenção e peças dos enigmas; destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -124,7 +124,7 @@ Ações do Input Map (em `project.godot`):
 - Se Roberto encontrar erro na aba **Saída** ou **Depurador** do Godot, ele vai colar o texto aqui.
 - Não adicione plugins nem addons sem perguntar antes.
 - Salve `.tscn`, `.tres` e `.gd` com quebras de linha **LF**. Com CRLF, o `\r` vira linha em branco extra nos textos de várias linhas das cenas (bilhetes, cardápio).
-- Prefira código simples e legível a padrões complexos. Autoloads só para `Settings`, `EraManager`, `WorldState`, `SaveSystem` e `RoomManager` (e algo novo só com motivo claro).
+- Prefira código simples e legível a padrões complexos. Autoloads só para `Settings`, `EraManager`, `WorldState`, `SaveSystem`, `RoomManager`, `NetSession` e `Audio` (e algo novo só com motivo claro).
 - Antes de decisões de design que não estejam neste arquivo, **pergunte ao Roberto** em vez de decidir sozinho.
 
 ## Etapas do protótipo
@@ -242,6 +242,14 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Texturas CC0 do Poly Haven em `art/textures/` (créditos em `art/textures/CREDITOS.md`): `HotelMaterials.DETAIL` liga cada papel a uma textura (modo 0: a textura vira a cor, tingida para a média dela bater com a cor do papel na época; modo 1: só o brilho dela modula o padrão procedural, no mármore xadrez, metais e lonas). O shader projeta pelo plano da face, com normal map e rugosidade. As importadas vêm sem mipmaps, então `HotelMaterials._texture` gera os mipmaps ao carregar (não edite os `.import`). Papel de parede, tapete, quadros e peças lisas continuam procedurais.
 - Modelos do Blender em `art/models/` (piano de cauda, lustre, cadeira de café, mesa redonda), gerados por `tools/blender/make_props.py` (roda com `blender --background --python` ou com o pacote `bpy` do pip; Roberto não precisa abrir o Blender). O script junta as peças por material e dá a cada objeto o nome de um papel de `HotelMaterials`; `HotelBuilder3D._model(path, posição, rotação, escala)` troca pelo material da época e as peças entram na junção de malhas da sala. A colisão continua sendo `_solid`. Saguão, Salão e Quartos: piano de cauda, lustres, cadeira de café, mesa redonda, sofá, poltrona, relógio de carrilhão, cama, guarda-roupa, escrivaninha e baú. Biblioteca: estantes (três tamanhos, com versão `_hoje` de livros faltando e tombados), mesa de leitura, cadeira, luminária de banco e lustre. Caldeiras: caldeira rebitada e luminária industrial. Cozinha: fogão a lenha, geladeira de gelo, portas da bancada e estante da despensa. Portas: folhas almofadadas `porta_<largura>x<altura>` (cm), dupla e vaivém, também nas folhas que giram do 207 e do 214. `python tools/blender/make_props.py -- <nomes>` gera só alguns. Níveis usam `ChapterRoom3D.model` (mesmo `HotelBuilder3D.load_model`). Atenção: no script, `cylinder(axis="x"/"z")` cresce para -x/-z a partir da base. `_model` aceita `roles` (troca de papéis, ex.: madeira velha e panos com pó hoje) e `parent` (um grupo, como a poltrona tombada).
 - Qualidade gráfica nas Configurações (`Settings.data.quality`: 0 Baixa, 1 Média, 2 Alta): escala 3D 60/77/100% (FSR com nitidez 0,6; a nitidez 1,0 fazia os padrões cintilarem), MSAA 2x só na Alta, sombras 1024/2048/4096, SSAO e névoa volumétrica só a partir da Média (na Baixa, névoa comum). `EraEnvironment` remonta os ambientes quando a qualidade muda.
+
+## Áudio (08/11/2026)
+
+- Autoload `Audio` (`scripts/core/audio.gd`), justificado porque os ambientes continuam tocando entre as salas. Camadas em loop: `jazz` e `burburinho` (1923), `vento` e `goteiras` (hoje), `tique` (Torre, nas duas). `Audio.ROOMS` dá o volume de cada camada por cena (nome do `.tscn`); ao trocar de sala, os volumes mudam com fade. A troca de época toca `troca_epoca` e distorce o bus `Ambiente` por meio segundo (pedido do GDD).
+- Efeitos: `Audio.play("nome")` / `play_one_of("passo", 6)` tocam `art/audio/efeitos/<nome>.ogg` no bus `Efeitos`. `Interactable3D.sound` (vazio = `_default_sound()` da classe: clique em ações, página em leituras, porta em `Door3D`, chave/pegar em `ItemPickup3D`, nada em mensagens); `_on_interact` pode trocar `pending_sound` (porta trancada, destrancar). Também tocam: passos da personagem ativa (`FirstPersonMotor._footsteps`, a cada 0,7 m), dígitos e acerto do cadeado, teclas do piano, ponteiros e corda do relógio, batidas na porta do final.
+- Sons CC0 do OpenGameArt (créditos em `art/audio/CREDITOS.md`), preparados por `tools/prepare_audio.py` (ffmpeg + numpy: cortes, filtros, loops sem emenda). O piano é sintetizado no mesmo script (não havia notas soltas CC0).
+- Fechar o jogo passa por `Audio.quit()` (menu "Sair" e o X da janela): cala os sons e só sai depois de dois quadros, senão o Godot acusa recursos presos. O volume e o mudo continuam nas Configurações (bus Master).
+- Teste `tools/test_audio.gd`: todo som citado no código existe, toda sala tem perfil e as camadas seguem a época.
 
 ## Sem cutscenes (08/11/2026)
 

@@ -6,6 +6,11 @@ extends Interactable3D
 @export var path_root: NodePath
 
 
+## Som ao usar (ver Interactable3D.sound).
+func _default_sound() -> String:
+	return "madeira_range"
+
+
 func _on_interact(by: FirstPersonMotor) -> void:
 	var points := PackedVector3Array()
 	for marker in get_node(path_root).get_children():

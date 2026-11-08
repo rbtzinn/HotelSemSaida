@@ -19,6 +19,10 @@ func can_interact(by: FirstPersonMotor) -> bool:
 	return super(by) and by.get_held_item() == ""
 
 
+func _default_sound() -> String:
+	return "chave" if item_id.begins_with("chave") else "pegar"
+
+
 func _on_interact(by: FirstPersonMotor) -> void:
 	by.set_held_item(item_id)
 	if not infinite:

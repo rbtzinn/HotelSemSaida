@@ -46,7 +46,7 @@ func _ready() -> void:
 		_add_button(column, "Voltar à recepção", func() -> void:
 			get_tree().paused = false
 			get_tree().change_scene_to_file(NetSession.LOBBY))
-	_add_button(column, "Sair do jogo", func() -> void: get_tree().quit())
+	_add_button(column, "Sair do jogo", func() -> void: Audio.quit())
 
 
 func _unhandled_input(event: InputEvent) -> void:

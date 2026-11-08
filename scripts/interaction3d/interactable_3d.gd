@@ -22,6 +22,11 @@ const PROXIMITY_GROUP: StringName = &"proximity_interactables"
 ## Só aceita com os pés acima desta altura (ex.: a portinhola, que só se alcança de cima
 ## da prateleira). O padrão aceita de qualquer altura.
 @export var min_feet_height: float = -1000.0
+## Efeito tocado ao interagir (art/audio/efeitos/, sem extensão). Vazio usa o padrão da classe.
+@export var sound: String = ""
+
+## Som desta interação; `_on_interact` pode trocá-lo (ex.: porta trancada).
+var pending_sound: String = ""
 
 var _bodies: Array[FirstPersonMotor] = []
 
@@ -64,8 +69,15 @@ func can_interact(by: FirstPersonMotor) -> bool:
 func interact(by: FirstPersonMotor) -> void:
 	if not can_interact(by):
 		return
+	pending_sound = sound if sound != "" else _default_sound()
 	_on_interact(by)
 	interacted.emit(by)
+	Audio.play(pending_sound, -4.0)
+
+
+## Som padrão da classe: um clique de mecanismo. Leituras e portas sobrescrevem.
+func _default_sound() -> String:
+	return "botao"
 
 
 ## Sobrescreva nas subclasses.

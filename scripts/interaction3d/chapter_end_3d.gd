@@ -9,6 +9,11 @@ extends Interactable3D
 @export var descent: PackedVector3Array
 var _traveler: FirstPersonMotor
 
+## Som ao usar (ver Interactable3D.sound).
+func _default_sound() -> String:
+	return ""
+
+
 func _ready() -> void:
 	super()
 	set_physics_process(false)

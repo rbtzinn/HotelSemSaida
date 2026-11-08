@@ -8,9 +8,11 @@ extends Door3D
 func _on_interact(by: FirstPersonMotor) -> void:
 	if by.era == Era.Id.PRESENT and not WorldState.is_set(unlock_flag):
 		if by.get_held_item() != key_item:
+			pending_sound = "porta_trancada"
 			say("A fechadura tem o desenho de um livro aberto.")
 			return
 		WorldState.set_flag(unlock_flag)
 		by.set_held_item("")
 		say("A chave gira na fechadura.")
+		pending_sound = "destrancar"
 	super(by)

@@ -5,5 +5,9 @@ extends Interactable3D
 @export_multiline var message: String = ""
 
 
+func _default_sound() -> String:
+	return ""
+
+
 func _on_interact(_by: FirstPersonMotor) -> void:
 	get_tree().call_group("hud", "show_message", message)

@@ -8,6 +8,11 @@ extends Interactable3D
 @export var solved_message: String = "O cadeado abriu."
 
 
+## Som ao usar (ver Interactable3D.sound).
+func _default_sound() -> String:
+	return ""
+
+
 func _ready() -> void:
 	if done_flag == "":
 		done_flag = flag_key

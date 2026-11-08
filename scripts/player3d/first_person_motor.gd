@@ -26,6 +26,9 @@ const BODY_HEIGHT: float = 1.7
 const CHARACTER_LAYER: int = 1 << 1
 const INTERACT_LAYER: int = 1 << 3
 
+## Distância entre passos (m) e quanto já se andou desde o último.
+const STEP_LENGTH: float = 0.7
+var _step_distance: float = 0.0
 var input: CharacterInput = CharacterInput.new()
 ## Objeto na mira que aceita interação agora (null se nenhum).
 var focused: Interactable3D = null
@@ -130,10 +133,25 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y -= _gravity * delta
 	move_and_slide()
+	_footsteps(delta)
 
 	_update_focus()
 	if focused and input.is_interact_just_pressed():
 		focused.interact(self)
+
+
+## Um passo a cada STEP_LENGTH andados no chão, só da personagem que está sendo jogada.
+func _footsteps(delta: float) -> void:
+	if era != EraManager.current_era or not is_on_floor():
+		return
+	var speed := Vector2(velocity.x, velocity.z).length()
+	if speed < 0.5:
+		_step_distance = STEP_LENGTH * 0.6
+		return
+	_step_distance += speed * delta
+	if _step_distance >= STEP_LENGTH:
+		_step_distance = 0.0
+		Audio.play_one_of("passo", 6, -14.0, 0.08)
 
 
 # --- Objeto na mão ---------------------------------------------------------------------
