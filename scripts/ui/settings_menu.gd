@@ -139,6 +139,7 @@ func _video() -> void:
 	_choice(page, "Modo de exibição", "mode", ["Janela", "Tela cheia sem bordas", "Tela cheia exclusiva"], [0, 1, 2])
 	_choice(page, "Tamanho da janela", "resolution", ["1280 × 720", "1600 × 900", "1920 × 1080", "2560 × 1440"], [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440)])
 	_toggle(page, "Sincronização vertical (VSync)", "vsync")
+	_choice(page, "Qualidade gráfica", "quality", ["Baixa (gráfico integrado)", "Média", "Alta"], [0, 1, 2])
 	_choice(page, "Limite de quadros por segundo", "fps", ["30", "60", "120", "144", "Sem limite"], [30, 60, 120, 144, 0])
 	var hint := Label.new()
 	hint.text = "Vídeo: confirme em 15 segundos ou a alteração será revertida."

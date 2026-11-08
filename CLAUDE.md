@@ -9,7 +9,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 - Salas 3D: `saguao_3d` (hub), `cozinha_3d`, `manutencao_3d`, `biblioteca_3d`, `caldeiras_3d`, `quartos_3d`, `salao_3d`, `torre_3d` (pasta `scenes/rooms/`).
 - Ordem: Saguão → Cozinha → (buraco) manutenção → Biblioteca → Caldeiras → de volta ao Saguão (elevador e bolsa de Marta). Desaparecidos, um por geração: Otília (1923), Caio Ferraz (1951), Marta Siqueira (1979), Tomás (2003).
 - O jogo tem começo, meio e fim: depois das Caldeiras, a S4 (cofre e entrada principal) leva ao final desta versão (ver "Volta ao Saguão e final").
-- Falta: cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, opção de qualidade gráfica; destino de Helena e quebra do ciclo ficam para depois desta versão.
+- Falta: cofre com duas fechaduras (ver "Andares de cima" no GDD), áudio, texturas e modelos do Blender (etapas 2 e 3 do visual); destino de Helena e quebra do ciclo ficam para depois desta versão.
 
 ## O jogo em uma frase
 
@@ -185,7 +185,6 @@ Pedido do Roberto: manter mecânica e enigmas, mas jogar em primeira pessoa com 
   - Porta de serviço do Saguão 3D leva a `DoSaguao`; o buraco do piso e a porta da Cozinha voltam a `Pontos/DaCozinha`. Com `cozinha.concluida`, o livro de hoje mostra o nome de Otília.
   - Teste `tools/test_cozinha_3d.gd` (percurso completo; `-- --capture` sem `--headless` salva 4 vistas). Prévias em `art/previews/cozinha3d-*.png`.
 - **Só a ativa passa pela porta (decisão do Roberto, 04/11/2026)**: em 3D, `Door3D` e `ChapterEnd3D` usam `RoomManager.change_room_alone`; a outra fica onde foi deixada, na sala dela (`RoomManager._away`: sala, posição e direção do olhar). O Tab, com a outra em outra sala, abre a sala dela (`switch_to_away`, chamado pelo `EraManager`). O save guarda quem está fora em `"away"`. Cada cena continua com os dois nós de personagem; o da que está fora fica parado (época inativa) até ela voltar. Teste `tools/test_rooms_alone_3d.gd` (preserva o save real).
-- Falta: opção de qualidade gráfica.
 
 ## Capítulos 3D feitos depois da Cozinha (04–05/11/2026; design no `GDD.md`)
 
@@ -233,6 +232,13 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Passarelas: em 1923 as duas firmes; hoje dependem de `torre.registro.fechado` (oeste firme / leste caída; sem o registro, as duas podres). Podre ou caída: tábuas quebradas sólidas nas duas pontas, sem piso no meio. Cada estado é um nó com as próprias colisões (`_set_solid`).
 - Relógio: `torre.ponteiros` (0..719 minutos, 0 = 12h00). Sem a flag, 1923 marca 11h40 e hoje 3h07. `ClockUI` (`scripts/ui/clock_ui.gd`) gira os minutos e as horas juntos; confirmar em 3h07 liga `torre.pendulo.aberto` (fica aberta). Na caixa, Helena pega `chave_gerente` (`torre.chave.gerente`); hoje Lia lê os nomes riscados (`torre.concluida`).
 - Teste `tools/test_torre_3d.gd`. Protocolo da dupla: 7.
+
+## Visual: sem cintilação e com qualidade gráfica (08/11/2026)
+
+- Pedido do Roberto: deixar o jogo leve e bem mais bonito, sem texturas piscando. Etapas: 1) cintilação e qualidade; 2) texturas CC0 (Poly Haven / ambientCG); 3) modelos feitos por script no Blender (`tools/blender/`).
+- 1923 não tem mais o estilo PS1 (`retro` desligado em `HotelMaterials`): a diferença entre épocas fica na luz, nas cores e no estado do hotel.
+- `CoplanarFix` (`scripts/world3d/coplanar_fix.gd`): faces de materiais diferentes no mesmo plano (z-fighting) são separadas ao montar a sala; a menor fica 2 mm por cima. `HotelBuilder3D` corrige as próprias peças antes de juntar as malhas e guarda `surface_boxes`; `ChapterRoom3D._fix_surfaces` corrige as peças do nível contra elas. Ao escrever peças novas, não precisa compensar à mão. Teste `tools/test_coplanar.gd`.
+- Qualidade gráfica nas Configurações (`Settings.data.quality`: 0 Baixa, 1 Média, 2 Alta): escala 3D 60/77/100% (FSR com nitidez 0,6; a nitidez 1,0 fazia os padrões cintilarem), MSAA 2x só na Alta, sombras 1024/2048/4096, SSAO e névoa volumétrica só a partir da Média (na Baixa, névoa comum). `EraEnvironment` remonta os ambientes quando a qualidade muda.
 
 ## Sem cutscenes (08/11/2026)
 

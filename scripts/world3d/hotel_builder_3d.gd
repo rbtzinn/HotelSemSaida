@@ -18,6 +18,9 @@ const PX: float = 1.0 / 32.0
 
 ## Desligado, as peças criadas não projetam sombra (ex.: o lustre, que tem a luz por dentro).
 var _cast_shadows: bool = true
+## Caixas da malha fixa, já sem faces brigando entre si; o nível usa para acertar as peças dele
+## (ver CoplanarFix).
+var surface_boxes: Array[CoplanarFix.Box] = []
 
 
 func _ready() -> void:
@@ -252,6 +255,12 @@ func _add(node: Node) -> void:
 ## numa malha só. São centenas de caixas e cilindros; desenhar cada um separado custava
 ## centenas de chamadas de desenho por quadro, multiplicadas pelas sombras.
 func _merge_static_meshes() -> void:
+	# Antes de juntar: faces no mesmo plano com materiais diferentes piscariam
+	surface_boxes = CoplanarFix.collect(self, self, true, _is_generated)
+	CoplanarFix.resolve(surface_boxes, self)
+	for entry in surface_boxes:
+		entry.movable = false
+		entry.node = null
 	var tools := {}
 	var materials := {}
 	var parts: Array[MeshInstance3D] = []

@@ -9,9 +9,15 @@ var _present: Environment
 
 
 func _ready() -> void:
+	_rebuild()
+	EraManager.era_changed.connect(_apply)
+	Settings.changed.connect(_rebuild)
+
+
+## Monta os dois ambientes de novo (a qualidade gráfica liga ou desliga SSAO e névoa volumétrica).
+func _rebuild() -> void:
 	_past = _make_past()
 	_present = _make_present()
-	EraManager.era_changed.connect(_apply)
 	_apply(EraManager.current_era)
 
 
@@ -42,7 +48,11 @@ func _make_present() -> Environment:
 	env.ambient_light_energy = 0.95
 	env.tonemap_exposure = 1.15
 	env.glow_intensity = 0.55
-	env.volumetric_fog_enabled = true
+	# Sem névoa volumétrica (qualidade baixa), uma névoa comum fria faz o mesmo papel, mais barata
+	env.volumetric_fog_enabled = Settings.volumetric_fog_enabled()
+	env.fog_enabled = not env.volumetric_fog_enabled
+	env.fog_light_color = Color("#1E2630")
+	env.fog_density = 0.02
 	env.volumetric_fog_density = 0.012
 	# A névoa recebe um pouco da luz ambiente; sem isso ela só absorve e o salão some no preto
 	env.volumetric_fog_ambient_inject = 0.5
@@ -60,7 +70,7 @@ func _base() -> Environment:
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.glow_enabled = true
 	env.glow_hdr_threshold = 1.0
-	env.ssao_enabled = true
+	env.ssao_enabled = Settings.ssao_enabled()
 	env.ssao_radius = 1.2
 	env.ssao_intensity = 1.6
 	env.adjustment_enabled = true

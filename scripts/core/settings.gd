@@ -24,8 +24,13 @@ func _ready() -> void:
 				data[key] = value
 	apply(data)
 
+## Qualidade gráfica: 0 Baixa (gráfico integrado), 1 Média, 2 Alta.
+const QUALITY_LOW := 0
+const QUALITY_MEDIUM := 1
+const QUALITY_HIGH := 2
+
 func factory() -> Dictionary:
-	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true,
+	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true, "quality": QUALITY_MEDIUM,
 		"fps": 60, "volume": 0.8, "mute": false, "deadzone": 0.2,
 		"bindings": defaults.duplicate(true)}
 
@@ -38,6 +43,8 @@ func apply(values: Dictionary) -> void:
 	data.resolution = size
 	data.volume = clampf(float(data.volume),0,1)
 	data.deadzone = clampf(float(data.deadzone),0.05,0.8)
+	data.quality = clampi(int(data.quality),QUALITY_LOW,QUALITY_HIGH)
+	_apply_quality(int(data.quality))
 	if DisplayServer.get_name() != "headless":
 		var modes := [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
 		DisplayServer.window_set_mode(modes[data.mode])
@@ -65,6 +72,29 @@ func apply(values: Dictionary) -> void:
 		InputMap.action_add_event(action,event)
 		InputMap.action_set_deadzone(action,data.deadzone)
 	changed.emit()
+
+## Escala do 3D, suavização e sombras. SSAO e névoa volumétrica ficam com o EraEnvironment,
+## que lê `data.quality` (ver `ssao_enabled` / `volumetric_fog_enabled`).
+func _apply_quality(level: int) -> void:
+	var root := get_tree().root if is_inside_tree() else null
+	if root == null:
+		return
+	root.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if level < QUALITY_HIGH else Viewport.SCALING_3D_MODE_BILINEAR
+	root.scaling_3d_scale = [0.6, 0.77, 1.0][level]
+	# Nitidez baixa: o FSR afiado fazia os padrões finos do cenário cintilarem
+	root.fsr_sharpness = 0.6
+	root.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
+	root.msaa_3d = Viewport.MSAA_2X if level == QUALITY_HIGH else Viewport.MSAA_DISABLED
+	root.positional_shadow_atlas_size = [1024, 2048, 4096][level]
+	RenderingServer.directional_shadow_atlas_set_size([1024, 2048, 4096][level], true)
+	RenderingServer.positional_soft_shadow_filter_set_quality([RenderingServer.SHADOW_QUALITY_SOFT_VERY_LOW,
+		RenderingServer.SHADOW_QUALITY_SOFT_LOW, RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM][level])
+
+func ssao_enabled() -> bool:
+	return int(data.get("quality", QUALITY_MEDIUM)) >= QUALITY_MEDIUM
+
+func volumetric_fog_enabled() -> bool:
+	return int(data.get("quality", QUALITY_MEDIUM)) >= QUALITY_MEDIUM
 
 func save() -> Error:
 	var cfg := ConfigFile.new()

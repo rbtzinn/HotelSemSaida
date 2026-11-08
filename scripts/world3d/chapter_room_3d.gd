@@ -1,6 +1,22 @@
 class_name ChapterRoom3D
 extends Room3D
 ## Montagem das interações de salas 3D. As peças mutáveis ficam fora das malhas fixas.
+
+func _ready() -> void:
+	_fix_surfaces()
+	super()
+
+
+## Peças do nível (portas, objetos dos enigmas) encostadas no cenário fixo não podem piscar.
+func _fix_surfaces() -> void:
+	for world in get_children():
+		if not world is HotelBuilder3D:
+			continue
+		var builder := world as HotelBuilder3D
+		var boxes: Array[CoplanarFix.Box] = builder.surface_boxes.duplicate()
+		boxes.append_array(CoplanarFix.collect(builder, builder, true,
+			func(node: Node) -> bool: return node.name != "Merged" and not node.has_meta("generated")))
+		CoplanarFix.resolve(boxes, builder)
 func make_world(scene_script: Script, present: bool) -> Node3D:
 	var world: Node3D = scene_script.new()
 	world.name = "WorldToday" if present else "World1923"
