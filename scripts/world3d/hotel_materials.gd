@@ -79,7 +79,29 @@ const PRESENT_COLORS := {
 	"ham": ["#3A2A22", "#000000", "#000000"],
 }
 
+## Texturas de detalhe por papel: [pasta em art/textures, modo (0 cor, 1 só brilho), metros por
+## repetição, força do normal map]. Papéis fora daqui ficam só com o padrão procedural.
+const DETAIL := {
+	"mahogany": ["fine_grained_wood", 0, 1.2, 0.8], "dark_wood": ["fine_grained_wood", 0, 1.2, 0.8],
+	"panel": ["fine_grained_wood", 0, 1.4, 0.8], "wainscot": ["fine_grained_wood", 0, 1.4, 0.8],
+	"oak": ["fine_grained_wood", 0, 1.0, 0.8],
+	"floorboards": ["wood_floor", 0, 2.0, 1.0], "plank": ["old_planks_02", 0, 1.6, 1.0],
+	"ceiling": ["plastered_wall_02", 0, 2.5, 0.6], "coffer": ["plastered_wall_02", 0, 2.5, 0.6],
+	"plaster_cream": ["plastered_wall_02", 0, 2.0, 0.7], "stone": ["plastered_stone_wall", 0, 2.0, 1.0],
+	"rubble": ["chipped_concrete", 0, 1.5, 1.0], "petrified": ["chipped_concrete", 0, 1.0, 1.0],
+	"floor": ["marble_01", 1, 1.2, 0.5], "marble": ["marble_01", 1, 1.5, 0.5], "column": ["marble_01", 1, 1.5, 0.5],
+	"tile": ["marble_01", 1, 0.8, 0.4], "kitchen_floor": ["marble_01", 1, 1.0, 0.4],
+	"brass": ["metal_plate_02", 1, 0.8, 0.4], "iron": ["metal_plate_02", 1, 0.8, 0.6],
+	"copper": ["metal_plate_02", 1, 0.8, 0.4], "cast_iron": ["metal_plate_02", 1, 0.8, 0.6],
+	"velvet": ["velour_velvet", 0, 0.6, 0.8], "green_velvet": ["velour_velvet", 0, 0.6, 0.8],
+	"tarp": ["denim_fabric_03", 1, 0.6, 0.8], "flour": ["denim_fabric_03", 1, 0.5, 0.8],
+	"leather": ["brown_leather", 0, 0.5, 0.8],
+}
+const TEXTURES := "res://art/textures/%s/%s.jpg"
+
 static var _cache: Dictionary = {}
+static var _textures: Dictionary = {}
+static var _averages: Dictionary = {}
 
 
 static func get_material(role: String, present: bool) -> Material:
@@ -126,7 +148,49 @@ static func _surface(role: String, present: bool) -> ShaderMaterial:
 	material.set_shader_parameter("retro", false)
 	# Reboco que aparece sob o papel rasgado: escuro, para não brilhar no escuro
 	material.set_shader_parameter("bare_color", Color("#4A4842"))
+	if DETAIL.has(role):
+		_apply_detail(material, DETAIL[role], colors[0])
 	return material
+
+
+static func _apply_detail(material: ShaderMaterial, detail: Array, color: Color) -> void:
+	var folder: String = detail[0]
+	material.set_shader_parameter("use_detail", true)
+	material.set_shader_parameter("detail_mode", detail[1])
+	material.set_shader_parameter("detail_scale", detail[2])
+	material.set_shader_parameter("detail_normal_strength", detail[3])
+	material.set_shader_parameter("detail_albedo", _texture(folder, "albedo"))
+	material.set_shader_parameter("detail_normal", _texture(folder, "normal"))
+	material.set_shader_parameter("detail_rough", _texture(folder, "rough"))
+	var average: Color = _averages[folder]
+	if int(detail[1]) == 0:
+		# A média da textura vira a cor do papel na época
+		material.set_shader_parameter("detail_tint", Vector3(color.r / maxf(average.r, 0.02),
+			color.g / maxf(average.g, 0.02), color.b / maxf(average.b, 0.02)))
+	else:
+		var luma := average.r * 0.299 + average.g * 0.587 + average.b * 0.114
+		material.set_shader_parameter("detail_tint", Vector3.ONE / maxf(luma, 0.05))
+
+
+## Textura com mipmaps (as importadas vêm sem; sem mipmaps elas cintilam ao longe). Guardada
+## para todos os materiais que usam a mesma.
+static func _texture(folder: String, map: String) -> Texture2D:
+	var path := TEXTURES % [folder, map]
+	if _textures.has(path):
+		return _textures[path]
+	var image := (load(path) as Texture2D).get_image()
+	if image.is_compressed():
+		image.decompress()
+	if map == "albedo":
+		var small := image.duplicate() as Image
+		small.resize(1, 1, Image.INTERPOLATE_BILINEAR)
+		_averages[folder] = small.get_pixel(0, 0)
+	if map == "rough" and image.get_format() != Image.FORMAT_L8:
+		image.convert(Image.FORMAT_L8)
+	image.generate_mipmaps()
+	var texture := ImageTexture.create_from_image(image)
+	_textures[path] = texture
+	return texture
 
 
 ## O tapete precisa saber onde está para desenhar a borda e o medalhão.

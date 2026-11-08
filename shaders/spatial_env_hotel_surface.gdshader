@@ -5,8 +5,11 @@
 // `age` envelhece a mesma superfície em 100 anos (manchas, mofo, rasgos, rachaduras, ferrugem);
 // `retro` dá o ar de 1923 com cores levemente reduzidas (os texels grandes e o tremido de
 // vértices do PS1 foram retirados: em primeira pessoa faziam o cenário piscar).
+// Texturas CC0 (Poly Haven, `art/textures/`) dão o detalhe de madeira, reboco, pedra, mármore,
+// metal e tecidos: projetadas pelo plano da face (as peças são caixas alinhadas), tingidas para a
+// paleta de cada época, com mipmaps (sem cintilar ao longe) e normal map.
 // Alvo: Forward+ (cai para Compatibility sem mudanças). Orçamento: até ~2 fbm e 1 Voronoi por
-// pixel, sem texturas. O `if` sobre `pattern` é uniforme por material (todos os pixels seguem o
+// pixel, mais 3 leituras de textura nas superfícies com detalhe. O `if` sobre `pattern` é uniforme por material (todos os pixels seguem o
 // mesmo caminho), então não diverge.
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
@@ -45,6 +48,22 @@ uniform float age : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 stain_color : source_color = vec4(0.18, 0.15, 0.1, 1.0);
 uniform vec4 moss_color : source_color = vec4(0.22, 0.29, 0.16, 1.0);
 uniform vec4 bare_color : source_color = vec4(0.55, 0.53, 0.48, 1.0);
+group_uniforms;
+
+group_uniforms detail;
+// Liga a textura de detalhe. Modo 0: a textura vira a cor (tingida por detail_tint, que leva a
+// média dela até a cor do papel); modo 1: só o brilho dela modula o padrão (mármore, metal).
+uniform bool use_detail = false;
+uniform int detail_mode : hint_range(0, 1) = 0;
+uniform sampler2D detail_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D detail_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform sampler2D detail_rough : hint_roughness_gray, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform vec3 detail_tint = vec3(1.0);
+// Tamanho de uma repetição da textura, em metros.
+uniform float detail_scale : hint_range(0.1, 8.0) = 1.0;
+uniform float detail_normal_strength : hint_range(0.0, 2.0) = 1.0;
+// Quanto a rugosidade da textura substitui a do papel.
+uniform float detail_rough_mix : hint_range(0.0, 1.0) = 0.7;
 group_uniforms;
 
 group_uniforms retro;
@@ -215,6 +234,29 @@ void fragment() {
 		albedo = cloth(uv);
 	} else if (pattern == PATTERN_PAINTING) {
 		albedo = painting(uv);
+	}
+
+	if (use_detail) {
+		// Deslocamento por material, para peças vizinhas não repetirem a mesma emenda
+		vec2 detail_uv = uv / detail_scale + vec2(seed * 0.137, seed * 0.071);
+		vec3 sample_color = texture(detail_albedo, detail_uv).rgb;
+		const vec3 LUMA = vec3(0.299, 0.587, 0.114);
+		vec3 replaced = sample_color * detail_tint;
+		vec3 modulated = albedo * dot(sample_color, LUMA) * detail_tint.r;
+		albedo = detail_mode == 0 ? replaced : modulated;
+		roughness = mix(roughness, texture(detail_rough, detail_uv).r, detail_rough_mix);
+		// Tangentes do plano usado para projetar (o mesmo de planar_uv), no espaço da câmera
+		vec3 axis = abs(world_normal);
+		vec3 tangent = vec3(1.0, 0.0, 0.0);
+		vec3 binormal = vec3(0.0, 0.0, 1.0);
+		if (axis.y < axis.x || axis.y < axis.z) {
+			tangent = axis.x >= axis.z ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+			binormal = vec3(0.0, -1.0, 0.0);
+		}
+		TANGENT = normalize((VIEW_MATRIX * vec4(tangent, 0.0)).xyz);
+		BINORMAL = normalize((VIEW_MATRIX * vec4(binormal, 0.0)).xyz);
+		NORMAL_MAP = texture(detail_normal, detail_uv).rgb;
+		NORMAL_MAP_DEPTH = detail_normal_strength;
 	}
 
 	// Envelhecimento: tudo some sob camadas de pó, manchas, mofo e rachaduras.
