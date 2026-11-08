@@ -52,6 +52,11 @@ const ICEBOX := Vector2(13.0, 14.4)
 const POSTS: Array[Vector2] = [Vector2(9.0, 3.2), Vector2(14.5, 3.2)]
 const BEAM_Y: float = 3.85
 
+## Modelos do Blender (tools/blender/make_props.py).
+const MODELS := "res://art/models/"
+## Hoje: madeira velha e ferragens enferrujadas.
+const AGED := {"oak": "plank", "brass": "iron", "mahogany": "plank"}
+
 const WARM := Color("#F2D49B")
 const FIRE := Color("#FF8A3A")
 const COLD := Color("#9FB4C8")
@@ -305,8 +310,7 @@ func _build_counter() -> void:
 	var doors := int((x1 - COUNTER.x) / 0.75)
 	for i in doors:
 		var dx := COUNTER.x + 0.06 + i * 0.75
-		_part(Vector3(dx, K + 0.16, 0.66), Vector3(dx + 0.63, K + 0.74, 0.68), "panel")
-		_sphere(Vector3(dx + 0.55, K + 0.5, 0.7), 0.018, "brass")
+		_model(MODELS + "porta_armario.glb", Vector3(dx, K + 0.16, 0.66), Vector3.ZERO, 1.0, AGED if present else {})
 	_part(Vector3(COUNTER.x - 0.02, K + 0.82, 0), Vector3(x1 + 0.02, K + 0.9, 0.72), "marble")
 	_solid(Vector3(COUNTER.x, K, 0), Vector3(x1, K + 0.9, 0.72), "Counter")
 	# Pia de louça com torneiras de latão
@@ -358,35 +362,13 @@ func _build_stove_hood() -> void:
 	_part(Vector3(STOVE.x - 0.1, K, 0), Vector3(STOVE.y + 0.1, y0, 0.02), "tile")
 
 
-## Fogão a lenha de ferro (1923): forno aberto à esquerda, chapas e panelas em cima.
+## Fogão a lenha de ferro (1923, modelo do Blender): forno aberto à esquerda, chapas e panelas em cima.
 ## Hoje o fogão é um KitchenProp3D (desabado ou selado pela massa), na cena.
 func _build_stove() -> void:
 	var x0 := STOVE.x
 	var x1 := STOVE.y
 	var h := 0.85
-	for x: float in [x0 + 0.08, x1 - 0.08]:
-		for z: float in [0.12, 0.9]:
-			_part(Vector3(x - 0.04, K, z - 0.04), Vector3(x + 0.04, K + 0.12, z + 0.04), "cast_iron")
-	_part(Vector3(x0, K + 0.12, 0), Vector3(x1, K + h - 0.04, 1.0), "cast_iron")
-	_part(Vector3(x0 - 0.02, K + h - 0.04, 0), Vector3(x1 + 0.02, K + h, 1.02), "iron")
-	for ring: Vector2 in [Vector2(0.45, 0.4), Vector2(1.0, 0.55), Vector2(1.55, 0.4)]:
-		_torus(Vector3(x0 + ring.x, K + h + 0.005, ring.y), 0.1, 0.14, "cast_iron")
-	# Boca do forno (aberta, com brasa) e portas fechadas da fornalha
-	_part(Vector3(x0 + 0.15, K + 0.22, 1.0), Vector3(x0 + 0.85, K + 0.62, 1.006), "dark")
-	_part(Vector3(x0 + 0.15, K + 0.18, 1.0), Vector3(x0 + 0.85, K + 0.22, 1.32), "cast_iron")
-	_part(Vector3(x0 + 1.0, K + 0.22, 1.0), Vector3(x1 - 0.15, K + 0.62, 1.03), "cast_iron")
-	_part(Vector3(x0 + 1.05, K + 0.36, 1.03), Vector3(x1 - 0.2, K + 0.4, 1.045), "brass")
-	_part(Vector3(x0 + 1.0, K + 0.66, 1.0), Vector3(x1 - 0.15, K + 0.76, 1.03), "cast_iron")
-	_part(Vector3(x0 + 1.1, K + 0.68, 1.03), Vector3(x1 - 0.25, K + 0.74, 1.032), "bulb")
-	# Barra de latão da frente
-	_cylinder(Vector3(x0 - 0.05, K + 0.78, 1.12), 0.015, 0.015, x1 - x0 + 0.1, "brass", Vector3(0, 0, -90), 8)
-	for x: float in [x0 - 0.03, x1 + 0.03]:
-		_part(Vector3(x - 0.015, K + 0.76, 1.0), Vector3(x + 0.015, K + 0.8, 1.13), "brass")
-	# Panelas
-	_cylinder(Vector3(x0 + 1.0, K + h, 0.55), 0.17, 0.17, 0.24, "copper", Vector3.ZERO, 16)
-	_cylinder(Vector3(x0 + 1.0, K + h + 0.24, 0.55), 0.175, 0.175, 0.02, "copper", Vector3.ZERO, 16)
-	_cylinder(Vector3(x0 + 1.55, K + h, 0.4), 0.11, 0.08, 0.2, "enamel", Vector3.ZERO, 12)
-	_cylinder(Vector3(x0 + 1.67, K + h + 0.12, 0.4), 0.012, 0.012, 0.12, "enamel", Vector3(0, 0, -60), 6)
+	_model(MODELS + "fogao_lenha.glb", Vector3(x0, K, 0))
 	_solid(Vector3(x0, K, 0), Vector3(x1, K + h, 1.0), "Stove")
 
 
@@ -467,12 +449,8 @@ func _build_lobby_door() -> void:
 	_part(Vector3(x1, K, face - 0.06), Vector3(x1 + 0.12, K + 2.5, face), "dark_wood")
 	_part(Vector3(x0 - 0.12, K + 2.4, face - 0.08), Vector3(x1 + 0.12, K + 2.55, face), "dark_wood")
 	# Porta vaivém de serviço, com visor redondo
-	var leaf := "mahogany" if not present else "plank"
-	_part(Vector3(x0, K, face + 0.12), Vector3(x1, K + 2.38, face + 0.17), leaf)
-	_part(Vector3(x0 + 0.1, K + 0.2, face + 0.1), Vector3(x1 - 0.1, K + 0.3, face + 0.12), "brass")
-	_cylinder(Vector3((x0 + x1) / 2.0, K + 1.6, face + 0.1), 0.17, 0.17, 0.08, "brass", Vector3(90, 0, 0), 20)
-	_cylinder(Vector3((x0 + x1) / 2.0, K + 1.6, face + 0.095), 0.14, 0.14, 0.09, "glass", Vector3(90, 0, 0), 20)
-	_part(Vector3(x1 - 0.2, K + 1.0, face + 0.08), Vector3(x1 - 0.08, K + 1.3, face + 0.12), "brass")
+	_model(MODELS + "porta_vaivem_120x238.glb", Vector3((x0 + x1) / 2.0, K, face + 0.145), Vector3.ZERO, 1.0,
+		{"mahogany": "plank"} if present else {})
 	_label("SAGUÃO", Vector3((x0 + x1) / 2.0, K + 2.68, face - 0.01), 0.09, Color("#3A2A1A") if not present else Color("#2A2A26"), 180)
 	_solid(Vector3(x0, K, face + 0.1), Vector3(x1, K + 2.4, face + 0.2), "LobbyDoor")
 
@@ -588,14 +566,9 @@ func _build_shelves() -> void:
 	var x1 := SHELVES.y
 	var depth := 0.5
 	_solid(Vector3(x0, 0, 0), Vector3(x1, SHELF_BOARDS[-1] + 0.04, depth), "Shelves")
-	for x: float in [x0, (x0 + x1) / 2.0, x1 - 0.06]:
-		_part(Vector3(x, 0, 0), Vector3(x + 0.06, SHELF_BOARDS[-1] + 0.3, depth), "oak")
-	for b in SHELF_BOARDS.size():
-		var y: float = SHELF_BOARDS[b]
-		var tilt := 0.0
-		if present and b == 3:
-			tilt = -12.0
-		_part(Vector3(x0, y - 0.04, 0), Vector3(x1, y, depth), "oak", Vector3(0, 0, tilt))
+	# Montantes, tábuas e mãos-francesas (hoje a quarta tábua cedeu numa ponta)
+	_model(MODELS + ("estante_despensa_hoje.glb" if present else "estante_despensa.glb"), Vector3(x0, 0, 0),
+		Vector3.ZERO, 1.0, AGED if present else {})
 	# Mantimentos: potes de conserva, latas e caixas (hoje, poucos e quebrados)
 	for b in [0, 1, 2, 3]:
 		var y: float = SHELF_BOARDS[b]
@@ -622,23 +595,14 @@ func _build_icebox() -> void:
 	var x0 := ICEBOX.x
 	var x1 := ICEBOX.y
 	var depth := 0.9
-	var body := "oak" if not present else "plank"
-	_part(Vector3(x0, 0.08, 0), Vector3(x1, 1.6, depth), body)
-	for x: float in [x0 + 0.05, x1 - 0.05]:
-		_part(Vector3(x - 0.04, 0, depth - 0.1), Vector3(x + 0.04, 0.08, depth - 0.02), "brass" if not present else "iron")
-	# Portas: em cima (gelo) e embaixo (alimentos), com dobradiças e trincos de latão
-	var door_y: Array[Vector2] = [Vector2(0.95, 1.52), Vector2(0.16, 0.85)]
-	for y in door_y:
-		_part(Vector3(x0 + 0.08, y.x, depth), Vector3(x1 - 0.08, y.y, depth + 0.04), "panel")
-		_part(Vector3(x1 - 0.22, (y.x + y.y) / 2.0 - 0.06, depth + 0.04), Vector3(x1 - 0.12, (y.x + y.y) / 2.0 + 0.06, depth + 0.07), "brass" if not present else "iron")
-		for hy: float in [y.x + 0.08, y.y - 0.08]:
-			_part(Vector3(x0 + 0.04, hy - 0.04, depth), Vector3(x0 + 0.12, hy + 0.04, depth + 0.05), "brass" if not present else "iron")
-	_part(Vector3(x0 - 0.03, 1.6, -0.0), Vector3(x1 + 0.03, 1.66, depth + 0.03), "dark_wood")
-	_label("GELO", Vector3((x0 + x1) / 2.0, 1.4, depth + 0.045), 0.06, Color("#C9973B") if not present else Color("#4A463E"))
+	var icebox := _model(MODELS + "geladeira.glb", Vector3(x0, 0, 0), Vector3.ZERO, 1.0, AGED if present else {})
+	if present:
+		# A bandeja de cobre (que recolhia a água do gelo) não está mais lá
+		var tray := icebox.find_child("copper", true, false)
+		if tray:
+			tray.free()
+	_label("GELO", Vector3((x0 + x1) / 2.0, 1.4, depth + 0.05), 0.06, Color("#C9973B") if not present else Color("#4A463E"))
 	_solid(Vector3(x0, 0, 0), Vector3(x1, 1.66, depth + 0.05), "Icebox")
-	if not present:
-		# Água do gelo pingando numa bandeja
-		_part(Vector3(x0 + 0.3, 0, depth + 0.05), Vector3(x1 - 0.3, 0.05, depth + 0.35), "copper")
 
 
 ## Sacos de farinha, barris e caixotes, encostados nas paredes (o centro fica livre).

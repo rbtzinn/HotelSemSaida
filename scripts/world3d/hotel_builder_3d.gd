@@ -241,26 +241,33 @@ func _child_cylinder(holder: Node3D, center: Vector3, radius: float, height: flo
 ## grupo da sala (ex.: a poltrona tombada hoje).
 func _model(path: String, at: Vector3, rotation_deg: Vector3 = Vector3.ZERO, scale_factor: float = 1.0,
 		roles: Dictionary = {}, parent: Node3D = null) -> Node3D:
-	var model := (load(path) as PackedScene).instantiate() as Node3D
+	var model := load_model(path, present, roles, _cast_shadows)
 	model.position = at
 	model.rotation_degrees = rotation_deg
 	model.scale = Vector3.ONE * scale_factor
-	for node in model.find_children("*", "MeshInstance3D", true, false):
-		var instance := node as MeshInstance3D
-		# O script do Blender junta as peças por material e dá ao objeto o nome do papel
-		var source := instance.mesh.surface_get_material(0)
-		var role := String(instance.name)
-		if source and source.resource_name != "":
-			role = source.resource_name
-		role = roles.get(role, role)
-		instance.material_override = _material(role)
-		if not _cast_shadows or role in ["bulb", "glass"]:
-			instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if parent:
 		model.set_meta("generated", true)
 		parent.add_child(model)
 	else:
 		_add(model)
+	return model
+
+
+## Instancia um modelo do Blender com os materiais da época. Cada objeto do .glb tem o nome
+## de um papel de HotelMaterials (o script do Blender junta as peças por material); `roles`
+## troca papéis (ex.: madeira velha hoje). Usado também pelos níveis (ChapterRoom3D.model).
+static func load_model(path: String, era_present: bool, roles: Dictionary = {}, shadows: bool = true) -> Node3D:
+	var model := (load(path) as PackedScene).instantiate() as Node3D
+	for node in model.find_children("*", "MeshInstance3D", true, false):
+		var instance := node as MeshInstance3D
+		var source := instance.mesh.surface_get_material(0)
+		var role := String(instance.name)
+		if source and source.resource_name != "":
+			role = source.resource_name
+		role = roles.get(role, role)
+		instance.material_override = HotelMaterials.get_material(role, era_present)
+		if not shadows or role in ["bulb", "glass"]:
+			instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return model
 
 

@@ -9,6 +9,7 @@ const MESSAGE := preload("res://scripts/interaction3d/message_interactable_3d.gd
 const NOTE := preload("res://scripts/interaction3d/note_interactable_3d.gd")
 const DOOR := preload("res://scripts/interaction3d/door_3d.gd")
 const PICKUP := preload("res://scripts/interaction3d/item_pickup_3d.gd")
+const DOOR_MODEL := "res://art/models/porta_100x230.glb"
 const LOBBY := "res://scenes/rooms/saguao_3d.tscn"
 const BALLROOM := "res://scenes/rooms/salao_3d.tscn"
 ## Andar da cabine do elevador principal quando ela está parada aqui (ver BallroomLevel3D).
@@ -179,8 +180,8 @@ func _build_room_207(world: Node3D, present: bool) -> void:
 	hinge.name = "Folha207"
 	hinge.position = Vector3(gap.x, 0, GuestFloorRoom3D.SOUTH)
 	world.add_child(hinge)
-	box(hinge, Vector3(0.5, GuestFloorRoom3D.DOOR_TOP / 2.0, 0), Vector3(1.0, GuestFloorRoom3D.DOOR_TOP, 0.06), "mahogany", present)
-	box(hinge, Vector3(0.85, 1.0, -0.05), Vector3(0.06, 0.06, 0.04), "brass", present)
+	# Mesma folha almofadada das outras portas do andar (a maçaneta fica longe da dobradiça)
+	model(hinge, DOOR_MODEL, Vector3(0.5, 0, 0), Vector3.ZERO, present)
 	var body := StaticBody3D.new()
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(1.0, GuestFloorRoom3D.DOOR_TOP, 0.08)
@@ -353,8 +354,8 @@ func _build_room_214(world: Node3D, present: bool) -> void:
 	hinge.name = "Folha214"
 	hinge.position = Vector3(gap.x, 0, GuestFloorRoom3D.NORTH)
 	world.add_child(hinge)
-	box(hinge, Vector3(0.5, GuestFloorRoom3D.DOOR_TOP / 2.0, 0), Vector3(1.0, GuestFloorRoom3D.DOOR_TOP, 0.06), "mahogany", present)
-	box(hinge, Vector3(0.85, 1.0, 0.05), Vector3(0.06, 0.06, 0.04), "brass", present)
+	# Mesma folha almofadada das outras portas do andar (a maçaneta fica longe da dobradiça)
+	model(hinge, DOOR_MODEL, Vector3(0.5, 0, 0), Vector3.ZERO, present)
 	var body := StaticBody3D.new()
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(1.0, GuestFloorRoom3D.DOOR_TOP, 0.08)

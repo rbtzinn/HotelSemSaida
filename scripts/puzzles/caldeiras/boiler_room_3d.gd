@@ -12,6 +12,8 @@ const SUPPLY_X := 3.95
 const RETURN_X := 4.47
 const SUMP := Rect2(9.8, 4.2, 3.6, 4.8)
 const GALLERY_DOOR := Vector2(5.8, 7.8)
+## Modelos do Blender (tools/blender/make_props.py).
+const MODELS := "res://art/models/"
 
 
 func _build_room() -> void:
@@ -36,9 +38,7 @@ func _build_room() -> void:
 		_block(Vector3(7.5, 5.12, z), Vector3(15, 0.35, 0.13), "cast_iron")
 		_block(Vector3(7.5, 4.92, z), Vector3(15, 0.07, 0.31), "iron")
 		_window(z)
-		_cylinder(Vector3(6.4, 4.35, z), 0.018, 0.018, 0.54, "iron")
-		_cylinder(Vector3(6.4, 4.18, z), 0.24, 0.06, 0.17, "enamel")
-		_sphere(Vector3(6.4, 4.16, z), 0.085, "bulb")
+		_model(MODELS + "luminaria_industrial.glb", Vector3(6.4, 4.18, z))
 		if not present:
 			_omni(Vector3(6.4, 3.88, z), Color("#FFCE8B"), 2.5, 10)
 	for z: float in [0.95, 6.15]:
@@ -59,11 +59,10 @@ func _build_room() -> void:
 		Vector3(5.22, 3.4, 0.4), Vector3(5.22, 0.66, 0.4)], 0.10)
 	_pipe_run([Vector3(RETURN_X, 4.38, 0.4), Vector3(RETURN_X, 3.85, 0.4),
 		Vector3(11.52, 3.85, 0.4), Vector3(11.52, 0.66, 0.4)], 0.10)
-	_block(Vector3(6, 1.22, 11.94), Vector3(1.6, 2.44, 0.12), "dark_wood")
+	_model(MODELS + "porta_dupla_160x250.glb", Vector3(6, 0, 11.97), Vector3.ZERO, 0.976, {"mahogany": "dark_wood"})
 	for x: float in [5.15, 6.85]:
 		_block(Vector3(x, 1.3, 11.86), Vector3(0.12, 2.6, 0.14), "iron")
 	_block(Vector3(6, 2.56, 11.86), Vector3(1.82, 0.12, 0.14), "iron")
-	_sphere(Vector3(6.59, 1.08, 11.83), 0.055, "brass")
 	_label("ARQUIVO", Vector3(6, 1.86, 11.87), 0.11, GOLD, 180)
 	if present:
 		_omni(Vector3(7.6, 3.8, 4), Color("#8BA8BE"), 0.95, 14)
@@ -77,7 +76,8 @@ func _masonry(start: Vector3, end: Vector3, role: String) -> void:
 func _furnace(z: float) -> void:
 	var front := z + 3.1
 	_masonry(Vector3(0.85, 0, z-0.05), Vector3(3.45, 0.52, front+0.08), "stone")
-	_cylinder(Vector3(2.15, 1.47, z), 1.08, 1.08, 3.1, "cast_iron", Vector3(90, 0, 0), 28)
+	# Casco rebitado, fornalha, domo e chaminé: modelo do Blender (a grelha apaga hoje)
+	_model(MODELS + "caldeira.glb", Vector3(2.15, 1.47, z), Vector3.ZERO, 1.0, {"street": "dark"} if present else {})
 	var shell := _solid_cylinder(Vector3.ZERO, 1.08, 3.1, "Boiler")
 	shell.rotation.x = PI/2
 	shell.position = Vector3(2.15, 1.47, z+1.55)
@@ -89,18 +89,6 @@ func _furnace(z: float) -> void:
 		var elbow_y := 3.12 if header_x == SUPPLY_X else 3.52
 		_pipe_run([Vector3(2.45, 2.47, port_z), Vector3(2.45, elbow_y, port_z),
 			Vector3(header_x, elbow_y, port_z), Vector3(header_x, 4.38, port_z)], 0.085)
-	for offset: float in [0.12, 1.08, 2.12, 3.05]:
-		_torus(Vector3(2.15, 1.47, z+offset), 1.055, 1.105, "copper", Vector3(90, 0, 0))
-	_cylinder(Vector3(2.15, 2.48, z+0.5), 0.31, 0.31, 2.92, "iron")
-	_torus(Vector3(2.15, 2.74, z+0.5), 0.29, 0.35, "brass")
-	_cylinder(Vector3(2.15, 1.4, front), 0.62, 0.62, 0.075, "iron", Vector3(90, 0, 0))
-	_torus(Vector3(2.15, 1.4, front+0.08), 0.52, 0.62, "copper", Vector3(90, 0, 0))
-	for i in 5:
-		var x := 2.15 + (i - 2) * 0.145
-		_block(Vector3(x, 1.4, front+0.081), Vector3(0.073, 0.54-abs(i-2)*0.1, 0.008), "dark" if present else "street")
-	for i in 10:
-		var a := TAU * i / 10.0
-		_sphere(Vector3(2.15+cos(a)*0.9, 1.47+sin(a)*0.9, front+0.015), 0.045, "brass")
 	if not present:
 		_omni(Vector3(2.15, 1.25, front+0.45), Color("#E78242"), 1.6, 4)
 

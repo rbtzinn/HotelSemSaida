@@ -10,6 +10,14 @@ const NICHE_ORIGIN := Vector3(2.2, 0, 10.9)
 ## A Biblioteca ocupa a ala nordeste; a porta do Saguão fica ao lado do elevador, e o poço
 ## dele sobe por este canto. Aqui é só a alvenaria revestida, sem porta.
 const SHAFT := Rect2(5.55, 10.5, 2.0, 2.5)
+## Modelos do Blender (tools/blender/make_props.py). As estantes têm uma versão de hoje,
+## com livros faltando e tombados.
+const MODELS := "res://art/models/"
+const SHELF_MODELS := {
+	Vector2(2.2, 3.7): ["estante_alta_a", "estante_alta_b"],
+	Vector2(2.0, 3.1): ["estante_baixa"],
+	Vector2(2.2, 2.7): ["estante_arquivo"],
+}
 
 func _build_room() -> void:
 	_part(Vector3(-0.3, -0.25, -3.3), Vector3(W+0.3, 0, D+0.3), "floorboards")
@@ -56,10 +64,9 @@ func _build_room() -> void:
 		for z: float in [5.5, 8.2]:
 			_chair(Vector3(x, 0, z), 0 if z<6 else 180)
 		if not present:
-			_cylinder(Vector3(x+0.5, 0.96, 6.6), 0.15, 0.12, 0.04, "brass")
-			_cylinder(Vector3(x+0.5, 1, 6.6), 0.02, 0.02, 0.4, "brass")
-			_block(Vector3(x+0.5, 1.45, 6.6), Vector3(0.42, 0.18, 0.22), "green_velvet")
-			_omni(Vector3(x+0.5, 1.33, 6.6), Color("#F2D49B"), 0.9, 4.0)
+			# Luminária de banco sobre o feltro (o feltro termina em 0,972)
+			_model(MODELS + "luminaria_banco.glb", Vector3(x+0.5, 0.973, 6.6))
+			_omni(Vector3(x+0.5, 1.36, 6.68), Color("#F2D49B"), 0.9, 4.0)
 	# Tapete comprido na passagem central.
 	var rug := HotelMaterials.rug_material("runner", present, Vector2(9, 7), Vector2(1.4, 4.4))
 	_part(Vector3(7.6, 0.008, 2.6), Vector3(10.4, 0.02, 11.4), "rug", Vector3.ZERO, rug)
@@ -89,7 +96,7 @@ func _build_room() -> void:
 			_spot(Vector3(17.4, 4.6, z), Vector3(9, 0, z-1), Color("#9FB4C8"), 3.0, 14, 20)
 	_build_lift_shaft()
 	# Entrada com letreiro e moldura, em frente ao corredor central.
-	_block(Vector3(9, 1.25, 12.92), Vector3(1.6, 2.5, 0.1), "mahogany")
+	_model(MODELS + "porta_dupla_160x250.glb", Vector3(9, 0, 12.94))
 	for x: float in [8.08, 9.92]:
 		_block(Vector3(x, 1.35, 12.85), Vector3(0.14, 2.7, 0.18), "brass")
 	_block(Vector3(9, 2.7, 12.85), Vector3(2, 0.15, 0.18), "brass")
@@ -107,12 +114,7 @@ func _build_room() -> void:
 	_sphere(Vector3(7.46, 1.07, -2.80), 0.054, "brass")
 	_label("ARQUIVO RESERVADO", Vector3(9, 2.6, -2.94), 0.12, Color("#C9973B"))
 	for z: float in [3.0, 8.7]:
-		_cylinder(Vector3(9, H-0.8, z), 0.025, 0.025, 0.8, "brass")
-		_torus(Vector3(9, H-0.95, z), 0.45, 0.5, "brass")
-		for i in 6:
-			var a := TAU*i/6.0
-			var at := Vector3(9+cos(a)*0.45, H-1.05, z+sin(a)*0.45)
-			_sphere(at, 0.07, "bulb")
+		_model(MODELS + "lustre_biblioteca.glb", Vector3(9, H, z))
 		if not present:
 			_omni(Vector3(9, H-1.2, z), Color("#F2D49B"), 2.4, 10, true)
 	if present:
@@ -127,41 +129,18 @@ func _build_room() -> void:
 		_omni(Vector3(4.3, 2.8, 2.0), Color("#F2D49B"), 0.85, 4.5)
 
 func _shelf(at: Vector3, yaw: float, width: float, height: float, seed_index: int) -> void:
-	var holder := _group(at, yaw)
-	_child_box(holder, Vector3(0, height/2, -0.28), Vector3(width, height, 0.08), "dark_wood")
-	for side: float in [-1, 1]:
-		_child_box(holder, Vector3(side*width/2, height/2, 0), Vector3(0.12, height, 0.65), "mahogany")
-	for row in 5:
-		var y := 0.12+row*(height-0.25)/4
-		_child_box(holder, Vector3(0, y, 0), Vector3(width, 0.07, 0.7), "mahogany")
-		if row==4:
-			continue
-		for i in 9:
-			if present and (i+row+seed_index)%4==0:
-				continue
-			var book_h := 0.3+_random(i+row*11, seed_index)*0.22
-			var role: String = ["green_velvet", "mahogany", "velvet", "oak"][posmod(i+row+seed_index, 4)]
-			var x := -width/2+0.22+i*(width-0.4)/9
-			_child_box(holder, Vector3(x, y+0.035+book_h/2, 0.08), Vector3(0.12, book_h, 0.3), role)
-			_child_box(holder, Vector3(x, y+0.12, 0.237), Vector3(0.1, 0.012, 0.01), "brass")
+	var names: Array = SHELF_MODELS[Vector2(width, height)]
+	var model_name: String = names[seed_index % names.size()] + ("_hoje" if present else "")
+	_model(MODELS + model_name + ".glb", at, Vector3(0, yaw, 0))
 	var body := _solid(Vector3(-width/2, 0, -0.35), Vector3(width/2, height, 0.35), "Bookcase")
-	body.transform = holder.transform * body.transform
+	body.transform = Transform3D(Basis(Vector3.UP, deg_to_rad(yaw)), at) * body.transform
 
 func _table(at: Vector3) -> void:
-	_block(at+Vector3(0, 0.92, 0), Vector3(2.9, 0.1, 1.2), "mahogany")
-	_block(at+Vector3(0, 0.98, 0), Vector3(2.6, 0.025, 1), "green_velvet")
-	for x: float in [-1.25, 1.25]:
-		for z: float in [-0.4, 0.4]:
-			_cylinder(at+Vector3(x, 0, z), 0.055, 0.08, 0.9, "mahogany")
+	_model(MODELS + "mesa_leitura.glb", at)
 	_solid(at+Vector3(-1.45, 0, -0.6), at+Vector3(1.45, 0.99, 0.6), "ReadingTable")
 
 func _chair(at: Vector3, yaw: float) -> void:
-	var holder := _group(at, yaw)
-	_child_box(holder, Vector3(0, 0.48, 0), Vector3(0.55, 0.13, 0.55), "green_velvet")
-	_child_box(holder, Vector3(0, 0.93, -0.25), Vector3(0.55, 0.8, 0.1), "mahogany")
-	for x: float in [-0.22, 0.22]:
-		for z: float in [-0.22, 0.22]:
-			_child_cylinder(holder, Vector3(x, 0.225, z), 0.025, 0.45, "mahogany")
+	_model(MODELS + "cadeira_biblioteca.glb", at, Vector3(0, yaw, 0))
 	_solid(at+Vector3(-0.3, 0, -0.3), at+Vector3(0.3, 1.35, 0.3), "Chair")
 
 

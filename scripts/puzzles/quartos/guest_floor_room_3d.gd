@@ -112,9 +112,8 @@ func _build_corridor() -> void:
 	# Portas de outros quartos, fechadas nas duas épocas (sólidas)
 	for i in DECOR_DOORS.size():
 		var gap: Vector2 = DECOR_DOORS[i]
-		_part(Vector3(gap.x, 0, SOUTH - 0.05), Vector3(gap.y, DOOR_TOP, SOUTH + 0.05), "mahogany")
+		_model(MODELS + "porta_100x230.glb", Vector3((gap.x + gap.y) / 2.0, 0, SOUTH))
 		_solid(Vector3(gap.x, 0, SOUTH - 0.1), Vector3(gap.y, DOOR_TOP, SOUTH + 0.1), "ClosedDoor")
-		_cylinder(Vector3(gap.y - 0.15, 1.0, SOUTH - 0.07), 0.035, 0.035, 0.05, "brass", Vector3(90, 0, 0), 10)
 		_label(DECOR_NUMBERS[i], Vector3((gap.x + gap.y) / 2.0, 1.75, SOUTH - 0.06), 0.09,
 			Color("#C9973B") if not present else Color("#6E5A34"), 180.0)
 	_label("207", Vector3(ROOM_207.y + 0.35, 1.6, SOUTH - 0.12), 0.09,

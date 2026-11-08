@@ -51,6 +51,16 @@ func box(parent: Node3D, at: Vector3, size: Vector3, role: String, present: bool
 	parent.add_child(result)
 	return result
 
+## Modelo do Blender (art/models/) dentro de uma peça do nível, com os materiais da época.
+func model(parent: Node3D, path: String, at: Vector3, rotation_deg: Vector3, present: bool,
+		roles: Dictionary = {}) -> Node3D:
+	var result := HotelBuilder3D.load_model(path, present, roles)
+	result.position = at
+	result.rotation_degrees = rotation_deg
+	parent.add_child(result)
+	return result
+
+
 func label(parent: Node3D, value: String, at: Vector3, size: int = 30) -> Label3D:
 	var result := Label3D.new()
 	result.font = preload("res://art/fonts/sign_font.tres")

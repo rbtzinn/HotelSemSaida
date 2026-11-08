@@ -24,17 +24,13 @@ func _run() -> void:
 		var room := RawLibrary.new()
 		room.present = present
 		root.add_child(room)
+		# As cadeiras são o modelo do Blender (pés modelados até o assento), apoiadas no piso
 		var chairs := 0
 		for child in room.get_children():
-			var legs := 0
-			for part in child.get_children():
-				if part is MeshInstance3D and part.mesh is CylinderMesh:
-					assert(part.position.y-part.mesh.height/2 >= -0.001, "Pé acima do piso")
-					assert(part.position.y+part.mesh.height/2 >= 0.415, "Pé encosta no assento")
-					legs += 1
-			if legs == 4:
+			if child is Node3D and child.scene_file_path.ends_with("cadeira_biblioteca.glb"):
+				assert(absf(child.position.y) < 0.001, "Cadeira apoiada no piso")
 				chairs += 1
-		assert(chairs == 4, "Quatro cadeiras com pés conectados")
+		assert(chairs == 4, "Quatro cadeiras")
 		var niche = room.find_child("NicheBase", false, false)
 		var niche_size: Vector3 = niche.get_child(0).shape.size
 		var niche_box: AABB = niche.transform * AABB(-niche_size/2, niche_size)

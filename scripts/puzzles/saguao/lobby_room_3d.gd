@@ -607,13 +607,11 @@ func _build_library_door() -> void:
 	# A entrada pública de 1923; hoje, trancada até Lia achar a chave na manutenção.
 	var x0 := LIBRARY_DOOR.x
 	var x1 := LIBRARY_DOOR.y
-	_part(Vector3(x0, 0, NORTH + 0.01), Vector3(x1, 2.4, NORTH + 0.07), "mahogany" if not present else "plank")
+	_model(MODELS + "porta_130x240.glb", Vector3((x0 + x1) / 2.0, 0, NORTH + 0.04), Vector3(0, 180, 0), 1.0,
+		{"mahogany": "plank"} if present else {})
 	for x: float in [x0 - 0.1, x1]:
 		_part(Vector3(x, 0, NORTH), Vector3(x + 0.1, 2.55, NORTH + 0.13), "brass")
 	_part(Vector3(x0 - 0.1, 2.4, NORTH), Vector3(x1 + 0.1, 2.57, NORTH + 0.13), "brass")
-	for y: float in [0.2, 1.2]:
-		_part(Vector3(x0 + 0.12, y, NORTH + 0.07), Vector3(x1 - 0.12, y + 0.85, NORTH + 0.09), "panel")
-	_sphere(Vector3(x0 + 0.18, 1.05, NORTH + 0.12), 0.04, "brass")
 	_label("BIBLIOTECA", Vector3((x0 + x1) / 2.0, 2.18, NORTH + 0.14), 0.10, Color("#C9973B"))
 
 
@@ -625,12 +623,9 @@ func _build_kitchen_door() -> void:
 	_part(Vector3(face, 0, z0 - 0.15), Vector3(face + 0.07, 2.55, z0), "dark_wood")
 	_part(Vector3(face, 0, z1), Vector3(face + 0.07, 2.55, z1 + 0.15), "dark_wood")
 	_part(Vector3(face, 2.4, z0 - 0.15), Vector3(face + 0.09, 2.6, z1 + 0.15), "dark_wood")
-	# Folha almofadada (recuada no vão)
-	var leaf := "mahogany" if not present else "plank"
-	_part(Vector3(face - 0.2, 0, z0), Vector3(face - 0.15, 2.4, z1), leaf)
-	for y: Vector2 in [Vector2(0.2, 1.05), Vector2(1.25, 2.2)]:
-		_part(Vector3(face - 0.15, y.x, z0 + 0.15), Vector3(face - 0.12, y.y, z1 - 0.15), "panel")
-	_sphere(Vector3(face - 0.1, 1.05, z0 + 0.15), 0.04, "brass")
+	# Folha almofadada (recuada no vão), com a maçaneta do lado de z0
+	_model(MODELS + "porta_150x240.glb", Vector3(face - 0.175, 0, (z0 + z1) / 2.0), Vector3(0, -90, 0), 1.0,
+		{"mahogany": "plank"} if present else {})
 	_part(Vector3(face - 0.15, 1.95, 7.0), Vector3(face - 0.13, 2.08, 7.5), "brass")
 	_label("SERVIÇO", Vector3(face - 0.125, 2.015, 7.25), 0.08, Color("#2A1A10"), 90)
 	if present:

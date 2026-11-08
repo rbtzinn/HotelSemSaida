@@ -67,7 +67,8 @@ def box(name, center, size, role, bevel=0.0):
 
 
 def cylinder(name, base, radius_bottom, radius_top, height, role, segments=24, axis="y"):
-    """Cilindro (ou cone) com a base em `base`, ao longo do eixo y do Godot (ou x / z)."""
+    """Cilindro (ou cone) com a base em `base`, ao longo do eixo y do Godot (ou x / z).
+    Atenção: com axis="x" ou "z" ele cresce para -x / -z a partir da base."""
     def build(bm):
         bmesh.ops.create_cone(bm, cap_ends=True, segments=segments, radius1=radius_bottom,
                               radius2=radius_top, depth=height)
@@ -523,16 +524,451 @@ def trunk():
     export("bau")
 
 
+# --- Utilidades para peças giradas ------------------------------------------------------------
+
+def turn(obj, pivot, angle, axis="z"):
+    """Gira a malha em torno de `pivot` (espaço do Godot). `axis` é o eixo do Godot."""
+    blender_axis = {"x": "X", "y": "Z", "z": "Y"}[axis]
+    # O eixo z do Godot vira -y no Blender: o sinal inverte
+    if axis == "z":
+        angle = -angle
+    center = g(*pivot)
+    obj.data.transform(Matrix.Translation(-center))
+    obj.data.transform(Matrix.Rotation(math.radians(angle), 4, blender_axis))
+    obj.data.transform(Matrix.Translation(center))
+    return obj
+
+
+# --- Biblioteca: estantes, mesa de leitura, cadeira, luminária e lustre ---------------------
+
+BOOK_ROLES = ["green_velvet", "mahogany", "velvet", "oak", "leather", "green_velvet", "velvet"]
+
+
+def book_row(rng, x0, x1, y, room, present):
+    """Uma fileira de livros entre x0 e x1, apoiada em y, com a lombada para +z. `room` é a
+    altura livre até a prateleira de cima. Hoje faltam livros e alguns caíram de lado."""
+    x = x0
+    while x < x1 - 0.04:
+        w = rng.uniform(0.035, 0.075)
+        h = min(room - 0.04, rng.uniform(0.2, 0.34))
+        depth = rng.uniform(0.2, 0.27)
+        role = rng.choice(BOOK_ROLES)
+        if present and rng.random() < 0.33:
+            x += w + 0.01
+            continue
+        if rng.random() < 0.06 and x + 0.3 < x1:
+            # Pilha deitada
+            for k in range(rng.randint(2, 4)):
+                bh = rng.uniform(0.03, 0.05)
+                box("Deitado", (x + 0.14, y + 0.025 + k * 0.045, 0.13 - depth / 2 + 0.02),
+                    (rng.uniform(0.22, 0.27), bh, depth - 0.02), rng.choice(BOOK_ROLES))
+            x += 0.3
+            continue
+        book = box("Livro", (x + w / 2, y + h / 2, 0.2 - depth / 2), (w, h, depth), role)
+        if rng.random() < 0.5:
+            box("Friso", (x + w / 2, y + h * 0.82, 0.201), (w * 0.9, 0.012, 0.004), "brass")
+        lean = 0.0
+        if present and rng.random() < 0.25:
+            lean = rng.uniform(8, 22) * rng.choice((-1, 1))
+        elif rng.random() < 0.04:
+            lean = rng.uniform(5, 10)
+        if lean:
+            pivot = (x + (w if lean < 0 else 0.0), y, 0.0)
+            turn(book, pivot, lean, "z")
+            x += h * math.sin(math.radians(abs(lean)))
+        x += w + rng.uniform(0.0, 0.006)
+
+
+def bookcase(name, width, height, seed, present):
+    """Estante com a frente para +z, ocupando x ±width/2, z ±0,35 e y 0..height (a colisão)."""
+    import random
+    reset()
+    rng = random.Random(seed)
+    box("Fundo", (0, height / 2, -0.29), (width - 0.1, height - 0.1, 0.06), "dark_wood")
+    for side in (-1, 1):
+        box("Lateral", (side * (width / 2 - 0.05), height / 2, 0), (0.1, height, 0.66), "mahogany", bevel=0.008)
+        box("Pilastra", (side * (width / 2 - 0.05), height / 2, 0.335), (0.12, height - 0.3, 0.02), "mahogany", bevel=0.004)
+    box("Rodape", (0, 0.06, 0.01), (width, 0.12, 0.68), "mahogany", bevel=0.008)
+    box("Cornija", (0, height - 0.05, 0.005), (width, 0.1, 0.69), "mahogany", bevel=0.012)
+    box("Friso", (0, height - 0.13, 0.33), (width - 0.2, 0.05, 0.02), "dark_wood", bevel=0.004)
+    rows = 4
+    step = (height - 0.25) / rows
+    for row in range(rows + 1):
+        y = 0.12 + row * step
+        box("Prateleira", (0, y, 0.0), (width - 0.2, 0.05, 0.62), "mahogany", bevel=0.004)
+        box("Borda", (0, y - 0.005, 0.315), (width - 0.2, 0.06, 0.02), "mahogany")
+        if row < rows:
+            book_row(rng, -width / 2 + 0.12, width / 2 - 0.12, y + 0.025, step - 0.03, present)
+    export(name)
+
+
+def reading_table():
+    """Mesa de leitura de 2,9 x 1,2 m, tampo a 0,97 m com feltro verde (colisão até 0,99)."""
+    reset()
+    box("Tampo", (0, 0.92, 0), (2.9, 0.08, 1.2), "mahogany", bevel=0.015)
+    box("Feltro", (0, 0.966, 0), (2.6, 0.012, 1.0), "green_velvet")
+    box("Saia", (0, 0.8, 0), (2.6, 0.16, 0.95), "mahogany", bevel=0.006)
+    for z in (-0.476, 0.476):
+        for x in (-0.65, 0.65):
+            box("Gaveta", (x, 0.8, z), (0.7, 0.11, 0.01), "dark_wood", bevel=0.003)
+            sphere("Puxador", (x, 0.8, z * 1.025), 0.016, "brass", segments=8, rings=6)
+    for x in (-1.25, 1.25):
+        for z in (-0.4, 0.4):
+            cylinder("Perna", (x, 0.0, z), 0.05, 0.06, 0.1, "mahogany", segments=12)
+            cylinder("Perna", (x, 0.1, z), 0.06, 0.045, 0.45, "mahogany", segments=12)
+            sphere("Anel", (x, 0.58, z), 0.065, "mahogany", scale=(1, 0.6, 1), segments=12, rings=6)
+            cylinder("Perna", (x, 0.6, z), 0.045, 0.06, 0.12, "mahogany", segments=12)
+            box("Topo", (x, 0.79, z), (0.13, 0.18, 0.13), "mahogany", bevel=0.006)
+    box("Travessa", (0, 0.2, 0), (2.5, 0.05, 0.06), "mahogany", bevel=0.006)
+    for x in (-1.25, 1.25):
+        box("Travessa", (x, 0.2, 0), (0.06, 0.05, 0.8), "mahogany", bevel=0.006)
+    export("mesa_leitura")
+
+
+def library_chair():
+    """Cadeira de biblioteca com assento estofado e encosto de travessas; encosto em -z."""
+    reset()
+    box("Assento", (0, 0.47, 0.01), (0.52, 0.08, 0.5), "green_velvet", bevel=0.03)
+    box("Quadro", (0, 0.42, 0), (0.55, 0.05, 0.55), "mahogany", bevel=0.008)
+    for x in (-0.24, 0.24):
+        cylinder("PernaFrente", (x, 0, 0.24), 0.022, 0.03, 0.42, "mahogany", segments=10)
+        tube("PernaTras", [(x, 0, -0.27), (x, 0.42, -0.24), (x * 0.96, 0.95, -0.27), (x * 0.94, 1.3, -0.3)], 0.025, "mahogany")
+    box("Travessa", (0, 1.24, -0.29), (0.5, 0.1, 0.04), "mahogany", bevel=0.01)
+    box("Travessa", (0, 0.66, -0.25), (0.48, 0.05, 0.03), "mahogany", bevel=0.006)
+    for x in (-0.12, 0.0, 0.12):
+        box("Ripa", (x, 0.95, -0.27), (0.05, 0.55, 0.02), "mahogany", bevel=0.004)
+    for z in (-0.24, 0.24):
+        box("Trave", (0, 0.15, z), (0.46, 0.03, 0.03), "mahogany")
+    export("cadeira_biblioteca")
+
+
+def bankers_lamp():
+    """Luminária de mesa com cúpula verde. A base fica em y = 0 (sobre o tampo)."""
+    reset()
+    cylinder("Base", (0, 0, 0), 0.15, 0.12, 0.035, "brass", segments=24)
+    cylinder("Haste", (0, 0.035, 0), 0.016, 0.016, 0.42, "brass", segments=10)
+    tube("Arco", [(0, 0.45, 0), (0, 0.48, 0.03), (0, 0.49, 0.08)], 0.012, "brass", sides=6)
+    # Cúpula meia-cana, comprida no eixo x
+    def shade(bm):
+        segs = 12
+        length = 0.42
+        rings = []
+        for side in (-1, 1):
+            ring = []
+            for i in range(segs + 1):
+                a = math.pi * i / segs
+                ring.append(bm.verts.new(g(side * length / 2, 0.42 + 0.1 * math.sin(a), 0.08 + 0.12 * math.cos(a))))
+            rings.append(ring)
+        for i in range(segs):
+            bm.faces.new((rings[0][i], rings[1][i], rings[1][i + 1], rings[0][i + 1]))
+        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.006)
+    new_object("Cupula", shade, "green_velvet", smooth=True)
+    for x in (-0.211, 0.211):
+        box("Tampa", (x, 0.46, 0.08), (0.006, 0.08, 0.2), "brass")
+    cylinder("Lampada", (0.12, 0.44, 0.08), 0.022, 0.022, 0.24, "bulb", segments=8, axis="x")
+    sphere("Corrente", (0.05, 0.37, 0.12), 0.01, "brass", segments=6, rings=4)
+    export("luminaria_banco")
+
+
+def library_chandelier():
+    """Lustre da Biblioteca: aro com seis globos foscos. O topo (y = 0) é o forro; desce 1,2 m."""
+    reset()
+    cylinder("Haste", (0, -0.85, 0), 0.02, 0.02, 0.85, "brass", segments=10)
+    cylinder("Canopla", (0, -0.06, 0), 0.1, 0.06, 0.06, "brass", segments=16)
+    torus("Aro", (0, -0.95, 0), 0.47, 0.02, "brass", segments=48)
+    sphere("Centro", (0, -0.97, 0), 0.07, "brass", scale=(1, 1.4, 1))
+    cylinder("Pinha", (0, -1.12, 0), 0.01, 0.04, 0.1, "brass", segments=10)
+    for i in range(6):
+        a = 2 * math.pi * i / 6
+        dx, dz = math.cos(a), math.sin(a)
+        tube("Raio", [(0, -0.9, 0), (dx * 0.25, -0.93, dz * 0.25), (dx * 0.47, -0.95, dz * 0.47)], 0.01, "brass", sides=6)
+        cylinder("Bocal", (dx * 0.47, -0.97, dz * 0.47), 0.03, 0.035, 0.04, "brass", segments=10)
+        sphere("Globo", (dx * 0.47, -1.04, dz * 0.47), 0.075, "bulb", segments=12, rings=8)
+    export("lustre_biblioteca")
+
+
+# --- Caldeiras ---------------------------------------------------------------------------------
+
+def boiler():
+    """Caldeira horizontal: casco de 1,08 m de raio e 3,1 m de comprimento ao longo de +z, a partir
+    da origem (centro do fundo). Fornalha na frente (+z) e chaminé que sobe até o forro (y = 3,93)."""
+    reset()
+    cylinder("Casco", (0, 0, 3.1), 1.08, 1.08, 3.1, "cast_iron", segments=36, axis="z")
+    for z in (0.12, 1.08, 2.12, 3.05):
+        cylinder("Cinta", (0, 0, z + 0.03), 1.105, 1.105, 0.06, "copper", segments=36, axis="z")
+        for i in range(28):
+            a = 2 * math.pi * i / 28
+            sphere("Rebite", (math.cos(a) * 1.11, math.sin(a) * 1.11, z), 0.016, "iron", segments=6, rings=4)
+    # Costura longitudinal de rebites no alto
+    for k in range(24):
+        z = 0.2 + k * 0.115
+        for a in (math.radians(80), math.radians(100)):
+            sphere("Rebite", (math.cos(a) * 1.085, math.sin(a) * 1.085, z), 0.014, "iron", segments=6, rings=4)
+    # Frente: espelho, porta da fornalha com grelha e parafusos
+    cylinder("Espelho", (0, 0, 3.13), 1.0, 1.0, 0.03, "iron", segments=36, axis="z")
+    cylinder("Porta", (0, -0.07, 3.175), 0.62, 0.62, 0.075, "iron", segments=28, axis="z")
+    torus("Moldura", (0, -0.07, 3.18), 0.57, 0.05, "copper", segments=32, sides=6, tilt=90)
+    for i in range(5):
+        x = (i - 2) * 0.145
+        box("Grelha", (x, -0.07, 3.18), (0.073, 0.54 - abs(i - 2) * 0.1, 0.008), "street")
+    for i in range(10):
+        a = 2 * math.pi * i / 10
+        sphere("Parafuso", (math.cos(a) * 0.9, math.sin(a) * 0.9, 3.13), 0.045, "brass", segments=8, rings=5)
+    box("Trinco", (0.5, -0.07, 3.2), (0.2, 0.05, 0.04), "brass", bevel=0.008)
+    cylinder("Dobradica", (-0.64, -0.3, 3.15), 0.03, 0.03, 0.46, "iron", segments=8)
+    # Manômetro pequeno e visor de nível
+    cylinder("Manometro", (0.62, 0.55, 3.17), 0.11, 0.11, 0.05, "brass", segments=20, axis="z")
+    cylinder("Mostrador", (0.62, 0.55, 3.176), 0.09, 0.09, 0.006, "enamel", segments=20, axis="z")
+    box("Ponteiro", (0.64, 0.57, 3.178), (0.008, 0.07, 0.003), "dark")
+    cylinder("Visor", (-0.6, 0.25, 3.12), 0.025, 0.025, 0.4, "glass", segments=8)
+    for y in (0.25, 0.65):
+        box("Suporte", (-0.6, y, 3.14), (0.07, 0.04, 0.06), "brass")
+    box("Placa", (0, 0.72, 3.12), (0.5, 0.14, 0.02), "lacquer", bevel=0.004)
+    # Domo de vapor e válvula de segurança no alto
+    cylinder("Domo", (0, 0.95, 2.1), 0.26, 0.26, 0.32, "cast_iron", segments=20)
+    sphere("Tampa", (0, 1.27, 2.1), 0.26, "cast_iron", scale=(1, 0.35, 1), segments=20, rings=8)
+    cylinder("Valvula", (0.35, 1.0, 2.6), 0.05, 0.05, 0.3, "brass", segments=10)
+    tube("Alavanca", [(0.35, 1.3, 2.6), (0.35, 1.33, 2.85)], 0.012, "brass", sides=6)
+    sphere("Peso", (0.35, 1.31, 2.88), 0.05, "iron", segments=8, rings=6)
+    # Chaminé até o forro
+    cylinder("Chamine", (0, 1.0, 0.5), 0.31, 0.31, 2.93, "iron", segments=20)
+    cylinder("Gola", (0, 1.0, 0.5), 0.36, 0.36, 0.1, "iron", segments=20)
+    torus("Anel", (0, 1.27, 0.5), 0.32, 0.03, "brass", segments=24, sides=6)
+    torus("Anel", (0, 2.9, 0.5), 0.32, 0.025, "iron", segments=24, sides=6)
+    export("caldeira")
+
+
+def industrial_lamp():
+    """Luminária pendente de esmalte. Origem na boca da cúpula; a haste sobe 0,74 m."""
+    reset()
+    cylinder("Haste", (0, 0.17, 0), 0.016, 0.016, 0.57, "iron", segments=8)
+    cylinder("Canopla", (0, 0.68, 0), 0.06, 0.04, 0.06, "iron", segments=12)
+    def shade(bm):
+        segs = 24
+        profile = [(0.25, 0.0), (0.22, 0.04), (0.14, 0.11), (0.07, 0.16), (0.045, 0.19)]
+        rings = []
+        for r, y in profile:
+            ring = []
+            for i in range(segs):
+                a = 2 * math.pi * i / segs
+                ring.append(bm.verts.new(g(math.cos(a) * r, y, math.sin(a) * r)))
+            rings.append(ring)
+        for k in range(len(rings) - 1):
+            for i in range(segs):
+                j = (i + 1) % segs
+                bm.faces.new((rings[k][i], rings[k][j], rings[k + 1][j], rings[k + 1][i]))
+        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.006)
+    new_object("Cupula", shade, "enamel", smooth=True)
+    torus("Borda", (0, 0.0, 0), 0.25, 0.008, "iron", segments=32, sides=6)
+    cylinder("Bocal", (0, 0.1, 0), 0.04, 0.04, 0.1, "iron", segments=12)
+    sphere("Lampada", (0, 0.05, 0), 0.07, "bulb", segments=12, rings=8)
+    export("luminaria_industrial")
+
+
+# --- Cozinha: fogão a lenha, geladeira de gelo, portas da bancada e estante da despensa -------
+
+def wood_stove():
+    """Fogão a lenha de ferro, 2 x 1 m, chapa a 0,85 m. Origem no canto oeste do fundo; a frente
+    fica em z = 1 (forno aberto à esquerda, fornalha à direita)."""
+    reset()
+    for x in (0.08, 1.92):
+        for z in (0.12, 0.9):
+            cylinder("Pe", (x, 0, z), 0.05, 0.035, 0.13, "cast_iron", segments=10)
+    box("Corpo", (1.0, 0.475, 0.5), (2.0, 0.71, 1.0), "cast_iron", bevel=0.01)
+    box("Chapa", (1.0, 0.83, 0.51), (2.04, 0.04, 1.02), "iron", bevel=0.004)
+    for x, z in ((0.45, 0.4), (1.0, 0.55), (1.55, 0.4)):
+        torus("Boca", (x, 0.852, z), 0.12, 0.018, "cast_iron", segments=24, sides=6)
+        cylinder("Tampa", (x, 0.845, z), 0.1, 0.1, 0.01, "iron", segments=20)
+    box("Frisos", (1.0, 0.13, 1.005), (2.0, 0.02, 0.01), "brass")
+    # Forno aberto: boca escura, porta caída para a frente
+    box("BocaForno", (0.5, 0.42, 1.002), (0.7, 0.4, 0.006), "dark")
+    box("PortaForno", (0.5, 0.2, 1.16), (0.7, 0.04, 0.32), "cast_iron", bevel=0.006)
+    box("PuxadorForno", (0.5, 0.215, 1.31), (0.4, 0.02, 0.02), "brass")
+    for x in (0.18, 0.82):
+        box("Dobradica", (x, 0.2, 1.0), (0.05, 0.05, 0.04), "iron")
+    # Fornalha: duas portinholas e a fresta com brasa
+    box("Fornalha", (1.425, 0.42, 1.015), (0.85, 0.4, 0.03), "cast_iron", bevel=0.005)
+    box("Trinco", (1.425, 0.38, 1.037), (0.75, 0.04, 0.015), "brass")
+    box("Cinzeiro", (1.425, 0.71, 1.015), (0.85, 0.1, 0.03), "cast_iron", bevel=0.004)
+    box("Brasa", (1.4, 0.71, 1.031), (0.6, 0.06, 0.003), "bulb")
+    for x in (1.1, 1.75):
+        sphere("Botao", (x, 0.55, 1.04), 0.022, "brass", segments=8, rings=5)
+    # Barra de latão na frente
+    cylinder("Barra", (2.05, 0.78, 1.12), 0.015, 0.015, 2.1, "brass", segments=8, axis="x")
+    for x in (-0.03, 2.03):
+        box("Suporte", (x, 0.78, 1.065), (0.03, 0.04, 0.13), "brass")
+    # Panelas
+    cylinder("Panela", (1.0, 0.85, 0.55), 0.17, 0.17, 0.24, "copper", segments=20)
+    cylinder("TampaPanela", (1.0, 1.09, 0.55), 0.175, 0.175, 0.02, "copper", segments=20)
+    sphere("Pegador", (1.0, 1.12, 0.55), 0.025, "brass", segments=8, rings=5)
+    for side in (-1, 1):
+        torus("Alca", (1.0 + side * 0.19, 1.0, 0.55), 0.03, 0.008, "copper", segments=10, sides=4, tilt=90)
+    cylinder("Chaleira", (1.55, 0.85, 0.4), 0.11, 0.08, 0.2, "enamel", segments=16)
+    tube("Bico", [(1.62, 0.92, 0.4), (1.7, 1.0, 0.4), (1.74, 1.05, 0.4)], 0.012, "enamel", sides=6)
+    tube("AlcaChaleira", [(1.47, 1.04, 0.4), (1.55, 1.12, 0.4), (1.63, 1.04, 0.4)], 0.008, "iron", sides=5)
+    export("fogao_lenha")
+
+
+def icebox():
+    """Geladeira de gelo de carvalho: 1,4 x 0,9 m, 1,66 m de altura. Origem no canto oeste do
+    fundo; portas para +z (z = 0,9). O letreiro GELO é desenhado pela sala."""
+    reset()
+    box("Corpo", (0.7, 0.84, 0.45), (1.4, 1.52, 0.9), "oak", bevel=0.01)
+    box("Tampo", (0.7, 1.63, 0.465), (1.46, 0.06, 0.93), "dark_wood", bevel=0.01)
+    box("Base", (0.7, 0.1, 0.45), (1.42, 0.06, 0.92), "dark_wood", bevel=0.006)
+    for x in (0.05, 1.35):
+        cylinder("Pe", (x, 0, 0.84), 0.035, 0.03, 0.08, "brass", segments=10)
+    for y0, y1 in ((0.95, 1.52), (0.16, 0.85)):
+        box("Porta", (0.7, (y0 + y1) / 2, 0.92), (1.24, y1 - y0, 0.04), "panel", bevel=0.006)
+        # Moldura das bordas: o centro fica liso para o letreiro
+        h = y1 - y0
+        for dy in (-h / 2 + 0.04, h / 2 - 0.04):
+            box("Moldura", (0.7, (y0 + y1) / 2 + dy, 0.945), (1.12, 0.025, 0.012), "oak")
+        for dx in (-0.56, 0.56):
+            box("Moldura", (0.7 + dx, (y0 + y1) / 2, 0.945), (0.025, h - 0.06, 0.012), "oak")
+        box("Trinco", (1.18, (y0 + y1) / 2, 0.955), (0.1, 0.12, 0.03), "brass", bevel=0.005)
+        cylinder("Alavanca", (1.18, (y0 + y1) / 2, 1.02), 0.015, 0.015, 0.05, "brass", segments=8, axis="z")
+        for hy in (y0 + 0.08, y1 - 0.08):
+            box("Dobradica", (0.08, hy, 0.925), (0.08, 0.08, 0.05), "brass")
+    box("Bandeja", (0.7, 0.025, 1.1), (0.8, 0.05, 0.3), "copper", bevel=0.006)
+    export("geladeira")
+    # Hoje: a mesma geladeira sem a bandeja (some com o gelo)
+
+
+def cabinet_door():
+    """Porta de armário da bancada, 0,63 x 0,58 m. Origem no canto de baixo à esquerda, no
+    plano do corpo; a frente fica em +z."""
+    reset()
+    box("Folha", (0.315, 0.29, 0.012), (0.63, 0.58, 0.024), "panel", bevel=0.004)
+    for y in (0.05, 0.53):
+        box("Moldura", (0.315, y, 0.028), (0.55, 0.025, 0.01), "oak")
+    for x in (0.04, 0.59):
+        box("Moldura", (x, 0.29, 0.028), (0.025, 0.5, 0.01), "oak")
+    sphere("Puxador", (0.55, 0.34, 0.04), 0.018, "brass", segments=8, rings=6)
+    export("porta_armario")
+
+
+def pantry_shelves(present):
+    """Estante da despensa: 5 x 0,5 m, cinco tábuas de 0,3 a 1,98 m; origem no canto oeste do
+    fundo. Hoje a quarta tábua cedeu numa ponta."""
+    reset()
+    length = 5.0
+    boards = [0.3, 0.72, 1.14, 1.56, 1.98]
+    for x in (0.03, length / 2, length - 0.03):
+        for z in (0.04, 0.46):
+            box("Montante", (x, 1.14, z), (0.06, 2.28, 0.06), "oak", bevel=0.006)
+        box("Travessa", (x, 0.06, 0.25), (0.05, 0.06, 0.45), "oak")
+    for x0 in (0.06, length / 2 + 0.03):
+        # Mão-francesa em X no fundo
+        for sign in (-1, 1):
+            brace = box("Diagonal", (x0 + 1.21, 1.14, 0.015), (2.6, 0.04, 0.02), "plank")
+            turn(brace, (x0 + 1.21, 1.14, 0.015), sign * 36, "z")
+    for i, y in enumerate(boards):
+        board = box("Tabua", (length / 2, y - 0.02, 0.25), (length, 0.04, 0.5), "oak", bevel=0.004)
+        box("Borda", (length / 2, y - 0.03, 0.495), (length, 0.06, 0.012), "oak")
+        if present and i == 3:
+            turn(board, (length / 2, y - 0.02, 0.25), -12, "z")
+    export("estante_despensa_hoje" if present else "estante_despensa")
+
+
+# --- Portas ---------------------------------------------------------------------------------
+
+def door_leaf(prefix, cx, width, height, thickness, knob, swing=False):
+    """Uma folha almofadada centrada em x = cx, de 0 a height, espessura no eixo z (centrada).
+    As almofadas e a maçaneta ficam nas duas faces; `knob` é o lado da maçaneta (-1 / 1)."""
+    box(prefix + "Folha", (cx, height / 2, 0), (width, height, thickness), "mahogany", bevel=0.006)
+    margin = 0.13
+    inner = width - 2 * margin
+    if swing:
+        layout = [(0.18, height * 0.42)]
+    elif width > 0.9:
+        layout = [(0.2, height * 0.42), (height * 0.48, height - 0.2)]
+    else:
+        layout = [(0.18, height * 0.42), (height * 0.47, height - 0.18)]
+    for face in (-1, 1):
+        z = face * thickness / 2
+        for y0, y1 in layout:
+            cols = 2 if inner > 0.85 and not swing else 1
+            w = (inner - (cols - 1) * 0.1) / cols
+            for c in range(cols):
+                x = cx - inner / 2 + w / 2 + c * (w + 0.1)
+                box(prefix + "Almofada", (x, (y0 + y1) / 2, z + face * 0.006), (w, y1 - y0, 0.012), "panel", bevel=0.004)
+                for dy in (-(y1 - y0) / 2, (y1 - y0) / 2):
+                    box(prefix + "Moldura", (x, (y0 + y1) / 2 + dy, z + face * 0.012), (w + 0.03, 0.025, 0.014), "mahogany")
+                for dx in (-w / 2, w / 2):
+                    box(prefix + "Moldura", (x + dx, (y0 + y1) / 2, z + face * 0.012), (0.025, y1 - y0 + 0.03, 0.014), "mahogany")
+        if swing:
+            # Visor redondo e placas de latão de empurrar e de chute
+            cylinder(prefix + "Visor", (cx, 1.6, z + max(face, 0) * 0.03), 0.17, 0.17, 0.03, "brass", segments=24, axis="z")
+            cylinder(prefix + "Vidro", (cx, 1.6, z + face * 0.03 + max(face, 0) * 0.004), 0.14, 0.14, 0.004, "glass", segments=24, axis="z")
+            box(prefix + "Chute", (cx, 0.25, z + face * 0.008), (width - 0.2, 0.12, 0.016), "brass")
+            box(prefix + "Empurrar", (cx + knob * (width / 2 - 0.14), 1.15, z + face * 0.008), (0.1, 0.3, 0.016), "brass")
+        else:
+            kx = cx + knob * (width / 2 - 0.13)
+            box(prefix + "Espelho", (kx, 1.0, z + face * 0.006), (0.05, 0.2, 0.012), "brass", bevel=0.003)
+            cylinder(prefix + "Haste", (kx, 1.03, z + max(face, 0) * 0.05), 0.008, 0.008, 0.05, "brass", segments=8, axis="z")
+            sphere(prefix + "Macaneta", (kx, 1.03, z + face * 0.06), 0.028, "brass", segments=10, rings=6)
+            box(prefix + "Fechadura", (kx, 0.92, z + face * 0.0125), (0.012, 0.03, 0.003), "dark")
+
+
+def door(name, width, height, knob=1, double=False, swing=False, thickness=0.06):
+    """Folha de porta (sem batente): x ±width/2, y 0..height, z ±thickness/2."""
+    reset()
+    if double:
+        half = width / 2
+        door_leaf("E", -half / 2, half - 0.004, height, thickness, 1)
+        door_leaf("D", half / 2, half - 0.004, height, thickness, -1)
+    else:
+        door_leaf("", 0.0, width, height, thickness, knob, swing)
+    export(name)
+
+
+ALL = {
+    "piano_cauda": lambda: grand_piano(),
+    "lustre": lambda: chandelier(),
+    "cadeira_cafe": lambda: cafe_chair(),
+    "mesa_redonda": lambda: round_table(),
+    "lustre_saguao": lambda: grand_chandelier(),
+    "sofa": lambda: sofa(),
+    "poltrona": lambda: armchair(),
+    "relogio_carrilhao": lambda: grandfather_clock(),
+    "cama": lambda: bed(),
+    "guarda_roupa": lambda: wardrobe(),
+    "escrivaninha": lambda: writing_desk(),
+    "bau": lambda: trunk(),
+    # Biblioteca: duas arrumações da estante alta para as fileiras não se repetirem
+    "estante_alta_a": lambda: bookcase("estante_alta_a", 2.2, 3.7, 11, False),
+    "estante_alta_b": lambda: bookcase("estante_alta_b", 2.2, 3.7, 23, False),
+    "estante_baixa": lambda: bookcase("estante_baixa", 2.0, 3.1, 37, False),
+    "estante_arquivo": lambda: bookcase("estante_arquivo", 2.2, 2.7, 41, False),
+    "estante_alta_a_hoje": lambda: bookcase("estante_alta_a_hoje", 2.2, 3.7, 11, True),
+    "estante_alta_b_hoje": lambda: bookcase("estante_alta_b_hoje", 2.2, 3.7, 23, True),
+    "estante_baixa_hoje": lambda: bookcase("estante_baixa_hoje", 2.0, 3.1, 37, True),
+    "estante_arquivo_hoje": lambda: bookcase("estante_arquivo_hoje", 2.2, 2.7, 41, True),
+    "mesa_leitura": lambda: reading_table(),
+    "cadeira_biblioteca": lambda: library_chair(),
+    "luminaria_banco": lambda: bankers_lamp(),
+    "lustre_biblioteca": lambda: library_chandelier(),
+    # Caldeiras
+    "caldeira": lambda: boiler(),
+    "luminaria_industrial": lambda: industrial_lamp(),
+    # Cozinha
+    "fogao_lenha": lambda: wood_stove(),
+    "geladeira": lambda: icebox(),
+    "porta_armario": lambda: cabinet_door(),
+    "estante_despensa": lambda: pantry_shelves(False),
+    "estante_despensa_hoje": lambda: pantry_shelves(True),
+    # Portas (largura x altura em cm)
+    "porta_100x230": lambda: door("porta_100x230", 1.0, 2.3),
+    "porta_130x240": lambda: door("porta_130x240", 1.3, 2.4),
+    "porta_150x240": lambda: door("porta_150x240", 1.5, 2.4, knob=-1),
+    "porta_dupla_160x250": lambda: door("porta_dupla_160x250", 1.6, 2.5, double=True),
+    "porta_vaivem_120x238": lambda: door("porta_vaivem_120x238", 1.2, 2.38, knob=1, swing=True, thickness=0.05),
+}
+
+
 if __name__ == "__main__":
-    grand_piano()
-    chandelier()
-    cafe_chair()
-    round_table()
-    grand_chandelier()
-    sofa()
-    armchair()
-    grandfather_clock()
-    bed()
-    wardrobe()
-    writing_desk()
-    trunk()
+    # Sem argumentos gera tudo; com nomes depois de "--", só esses
+    wanted = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else list(ALL)
+    for key in wanted:
+        ALL[key]()
