@@ -262,6 +262,11 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Só as flags mudam pela rede, e só as que `scripts/online/coop_progress.gd` permite para cada época (passado: mecanismos; presente: leituras e progresso). **Toda flag nova de enigma precisa entrar lá**; `tools/test_coop_flags.gd` falha se alguma ficar de fora, e em modo debug o jogo avisa (`push_warning`).
 - Save da dupla separado do solo (`user://dupla.save`, só o anfitrião salva). Online, o Tab e o save solo ficam desligados; `EraLinked3D` reage a flags na hora.
 
+## Versão para Windows (08/11/2026)
+
+- `export_presets.cfg` tem o preset "Windows x64" (pck embutido no `.exe`; ficam de fora `tools/`, prévias e fontes de arte). Precisa dos modelos de exportação do Godot 4.7.2 (Editor > Gerenciar modelos de exportação > Baixar; ~1 GB uma vez só).
+- Gerar: no Godot, Projeto > Exportar > Windows x64 > Exportar projeto; ou sem janela: `Godot --headless --path . --export-release "Windows x64" build/HotelSemSaida.exe`. Sai um `.exe` de ~140 MB que roda sozinho (sem instalar).
+
 ## Testes
 
 `tools/test_*.gd`, cada um com `Godot_console.exe --headless --path . --fixed-fps 60 --script res://tools/<teste>.gd`. A dupla online roda em dois processos: `tools/run_dupla_online.sh` (Git Bash). Rodados sozinhos, os testes que precisam de argumentos imprimem `SKIP`.

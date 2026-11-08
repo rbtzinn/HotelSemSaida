@@ -278,7 +278,7 @@ As duas épocas têm paletas opostas, para que o jogador saiba onde está só de
 
 - **1923:** dourado, vinho e verde-escuro; luz quente de lustres; personagens vivos ao fundo.
 - **Hoje:** cinza, azul frio e verde-musgo; poeira, mofo e lanterna; vazio e silêncio.
-- **Áudio:** em 1923, um jazz abafado e burburinho; hoje, ruído de vento e goteiras. A troca de época corta o som com um efeito de distorção.
+- **Áudio:** em 1923, um jazz abafado e burburinho; hoje, ruído de vento e goteiras. A troca de época corta o som com um efeito de distorção. (Feito em 08/11/2026 com sons CC0; créditos em `art/audio/CREDITOS.md`.)
 - **Resolução base:** 640×360 (escala inteira para 1280×720, 1920×1080 e 4K).
 - **Sprites:** packs prontos do itch.io, adaptados às paletas das duas épocas. Personagens com 24×48 px.
 - **Controles (teclado e controle):** mover, interagir, trocar de personagem e pausar. Nada além disso: a dificuldade fica na lógica, não nos reflexos.
@@ -302,9 +302,9 @@ Cada etapa gera uma versão jogável, que você testa antes de seguirmos para a 
 
 - [ ] Quais packs do itch.io usar (licença comercial para a Steam)?
 - [ ] Quais enigmas propostos ficam, saem ou mudam?
-- [ ] Quais melodias o piano do saguão vai ter e o que cada uma abre?
+- [x] Quais melodias o piano do saguão vai ter e o que cada uma abre? (uma valsa, 3 · 1 · 5 · 6, que abre o painel da escada da torre; ver "Piano do Saguão")
 - [x] Como o jogador percebe que está no fim de um andar? (fade ao Saguão e novidade no livro)
 - [x] Quantos hóspedes desaparecidos existem e quem são? (um por geração, ver "História e personagens")
-- [ ] O elevador principal leva aos andares em 1923? Hoje a cabine fica no alto para sempre; decidir antes da Biblioteca.
+- [x] O elevador principal leva aos andares em 1923? (Helena chama a cabine nas botoeiras do 2º e do 3º andar; hoje Lia usa o poço; ver "Andares de cima")
 - [ ] Qual é o nome definitivo do jogo?
 - [ ] Como serão o final e a revelação da reviravolta? (ver "Volta ao Saguão e final desta versão"; o destino de Helena fica para depois)
