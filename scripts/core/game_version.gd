@@ -3,7 +3,7 @@ class_name GameVersion
 ## A "base" é a versão do ZIP instalado (application/config/version no project.godot): ela só muda
 ## numa versão completa. Um remendo traz este arquivo novo, então VERSION mostra a versão com o remendo.
 
-const VERSION := "1.0.0"
+const VERSION := "1.0.1"
 
 
 ## Versão do ZIP instalado (o remendo não muda as configurações do projeto).
