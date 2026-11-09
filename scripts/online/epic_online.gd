@@ -9,7 +9,8 @@ extends Node
 const ADDON := "res://addons/epic-online-services-godot/"
 ## Chaves do Epic Developer Portal (fora do git; modelo em epic_credentials.example.cfg).
 const CREDENTIALS := "res://epic_credentials.cfg"
-const SOCKET := "hotel_sem_saida"
+## Só letras e números, até 32 (regra do EOSGMultiplayerPeer)
+const SOCKET := "hotelsemsaida"
 const LOBBY_PREFIX := "HOTEL"
 ## Sem O/0 e I/1, para ninguém confundir ao ditar o código.
 const CODE_CHARS := "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -128,7 +129,9 @@ func _login(player_name: String) -> String:
 			return "Não foi possível ler epic_credentials.cfg."
 		var hcreds: Variant = load(ADDON + "heos/hcredentials.gd").new()
 		hcreds.product_name = "Hotel Sem Saida"
-		hcreds.product_version = str(ProjectSettings.get_setting("application/config/version", "1.0"))
+		# O Godot 4 registra application/config/version com "" por padrão; vazio, a Epic recusa (InvalidParameters)
+		var version := str(ProjectSettings.get_setting("application/config/version", "")).strip_edges()
+		hcreds.product_version = version if version != "" else "1.0"
 		for key: String in ["product_id", "sandbox_id", "deployment_id", "client_id", "client_secret",
 				"encryption_key"]:
 			hcreds.set(key, str(creds.get_value("epic", key, "")).strip_edges())

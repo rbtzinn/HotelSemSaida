@@ -41,8 +41,16 @@ O código de sala usa o **Epic Online Services** (grátis) pelo plugin **EOSG** 
 1. Entre em [dev.epicgames.com/portal](https://dev.epicgames.com/portal) (crie a organização se pedir) e **Create Product** com o nome *Hotel Sem Saida*.
 2. **Product Settings > Clients > Add new client policy**: tipo **Custom policy**, **User is required desligado**, e permita as ações de **Connect** (login), **Lobbies** e **P2P**. Salve.
 3. **Add new client** com essa policy (tipo *GameClient*).
-4. Em **Product Settings > SDK Download & Credentials** copie: Product ID, Sandbox ID e Deployment ID (use o sandbox *Dev* para testar), Client ID e Client Secret.
+4. Em **Product Settings > SDK Download & Credentials** copie: Product ID, Sandbox ID e Deployment ID, Client ID e Client Secret. O produto do Hotel só tem o sandbox *Live*, e funciona com ele.
+
+No produto do Hotel, a policy usada é a pronta **Peer2Peer** (permite o login anônimo, os lobbies e o P2P); uma policy própria só precisa dessas mesmas permissões.
 
 ### 3. Chaves no projeto
 
 Copie `epic_credentials.example.cfg` para `epic_credentials.cfg` na raiz do projeto e preencha. A *encryption_key* pode ser qualquer sequência de 64 caracteres hexadecimais. O arquivo fica fora do git (o repositório é público) e entra sozinho no `.exe` exportado.
+
+### 4. Testar e gerar a versão
+
+- **No mesmo PC**: abra duas cópias do jogo (ou rode duas vezes o `.exe`); uma cria a sala e a outra entra com o código. Cada cópia ganha uma identidade anônima própria na Epic, então não precisa de outro PC nem da DevAuthTool. Sem janela: `Godot_console.exe --headless --path . --script res://tools/test_epic_sala.gd -- criar` num terminal e `-- entrar CODIGO` em outro.
+- **Com o amigo**: mande o ZIP e teste pela internet de verdade (é o que confere a rede dele).
+- **Gerar o `.exe`**: Projeto > Exportar > Windows x64 > Exportar projeto, numa pasta vazia (ex.: `build/`). Saem o `HotelSemSaida.exe` e três DLLs: `libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll` e `xaudio2_9redist.dll`. Zipe a pasta inteira; sem as DLLs, o jogo abre mas a sala por código diz que falta o plugin.
