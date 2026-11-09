@@ -148,22 +148,26 @@ func _video() -> void:
 
 func _audio() -> void:
 	var page := _page("Áudio")
-	var row := _row(page, "Volume geral")
+	_volume(page, "Volume geral", "volume")
+	_volume(page, "Música (jazz de 1923)", "music")
+	_toggle(page, "Silenciar todo o áudio", "mute")
+
+func _volume(page: Control, caption: String, key: String) -> void:
+	var row := _row(page, caption)
 	var slider := HSlider.new()
 	slider.custom_minimum_size.x = 210
 	slider.min_value = 0
 	slider.max_value = 100
 	slider.step = 1
-	slider.value = draft.volume * 100
+	slider.value = float(draft.get(key, 1.0)) * 100
 	var value := Label.new()
 	value.text = "%d%%" % slider.value
 	value.custom_minimum_size.x = 45
 	slider.value_changed.connect(func(v: float) -> void:
-		draft.volume = v/100.0
+		draft[key] = v/100.0
 		value.text = "%d%%" % v)
 	row.add_child(slider)
 	row.add_child(value)
-	_toggle(page, "Silenciar todo o áudio", "mute")
 
 func _controls() -> void:
 	var page := _page("Controles")

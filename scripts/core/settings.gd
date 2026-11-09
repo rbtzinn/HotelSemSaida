@@ -31,8 +31,14 @@ const QUALITY_HIGH := 2
 
 func factory() -> Dictionary:
 	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true, "quality": QUALITY_MEDIUM,
-		"fps": 60, "volume": 0.8, "mute": false, "deadzone": 0.2, "player_name": "",
+		"fps": 60, "volume": 0.8, "music": 1.0, "mute": false, "deadzone": 0.2, "player_name": "",
 		"bindings": defaults.duplicate(true)}
+
+## Volume da música (bus "Musica", criado pelo Audio; antes dele existir, não faz nada).
+func apply_music() -> void:
+	var bus := AudioServer.get_bus_index(&"Musica")
+	if bus >= 0:
+		AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(0.0001, float(data.get("music", 1.0)))))
 
 func apply(values: Dictionary) -> void:
 	data = values.duplicate(true)
@@ -42,6 +48,7 @@ func apply(values: Dictionary) -> void:
 	size.y = clampi(size.y,360,4320)
 	data.resolution = size
 	data.volume = clampf(float(data.volume),0,1)
+	data.music = clampf(float(data.get("music", 1.0)),0,1)
 	data.deadzone = clampf(float(data.deadzone),0.05,0.8)
 	data.quality = clampi(int(data.quality),QUALITY_LOW,QUALITY_HIGH)
 	_apply_quality(int(data.quality))
@@ -55,6 +62,7 @@ func apply(values: Dictionary) -> void:
 	Engine.max_fps = maxi(0,int(data.fps))
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(0.0001,data.volume)))
 	AudioServer.set_bus_mute(0,data.mute)
+	apply_music()
 	for action in ACTIONS:
 		for event in InputMap.action_get_events(action):
 			if event is InputEventKey or event is InputEventMouseButton:

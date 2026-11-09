@@ -29,6 +29,11 @@ const LAYERS := {
 const SILENT := -60.0
 const FADE := 1.2
 const AMBIENT_BUS := &"Ambiente"
+## Música (o jazz de 1923): passa pelo Ambiente (e pela distorção da troca de época); o volume é o
+## "Música" das Configurações (Settings.data.music).
+const MUSIC_BUS := &"Musica"
+## Camadas que são música (as outras são ambiente).
+const MUSIC_LAYERS := ["jazz"]
 const EFFECTS_BUS := &"Efeitos"
 
 var _layers: Dictionary = {}
@@ -45,7 +50,7 @@ func _ready() -> void:
 	for layer: String in LAYERS:
 		var player := AudioStreamPlayer.new()
 		player.name = layer
-		player.bus = AMBIENT_BUS
+		player.bus = MUSIC_BUS if layer in MUSIC_LAYERS else AMBIENT_BUS
 		player.volume_db = SILENT
 		var stream := load(AMBIENT + str(LAYERS[layer][0]) + ".ogg") as AudioStreamOggVorbis
 		stream.loop = true
@@ -92,12 +97,13 @@ func _effect(sound: String) -> AudioStream:
 
 
 func _make_buses() -> void:
-	for bus_name: StringName in [AMBIENT_BUS, EFFECTS_BUS]:
+	for bus_name: StringName in [AMBIENT_BUS, EFFECTS_BUS, MUSIC_BUS]:
 		if AudioServer.get_bus_index(bus_name) == -1:
 			AudioServer.add_bus()
 			var index := AudioServer.bus_count - 1
 			AudioServer.set_bus_name(index, bus_name)
-			AudioServer.set_bus_send(index, &"Master")
+			AudioServer.set_bus_send(index, AMBIENT_BUS if bus_name == MUSIC_BUS else &"Master")
+	Settings.apply_music()
 	_distortion = AudioEffectDistortion.new()
 	_distortion.mode = AudioEffectDistortion.MODE_LOFI
 	_distortion.drive = 0.0

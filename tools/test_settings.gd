@@ -30,12 +30,17 @@ func _run() -> void:
 	menu._input(click)
 	assert(menu.draft.bindings.interact.kind == "mouse")
 	menu.draft.volume = 0.35
+	menu.draft.music = 0.5
 	menu.draft.mute = true
 	menu.draft.fps = 120
 	menu._apply()
 	assert(Engine.max_fps == 120)
 	assert(AudioServer.is_bus_mute(0))
 	assert(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(0)), 0.35))
+	var music_bus := AudioServer.get_bus_index(&"Musica")
+	assert(music_bus >= 0 and is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(music_bus)), 0.5), "volume da música")
+	assert(AudioServer.get_bus_send(music_bus) == &"Ambiente", "música passa pelo Ambiente")
+	assert(root.get_node("Audio").get_node("jazz").bus == &"Musica", "jazz no bus da música")
 	var has_mouse := false
 	var has_controller := false
 	for event in InputMap.action_get_events("interact"):
@@ -57,5 +62,5 @@ func _run() -> void:
 	settings.config_path = settings.PATH
 	paused = false
 	await process_frame
-	print("PASS: menu, mouse, controle preservado, volume/mute, FPS, persistencia, reversao")
+	print("PASS: menu, mouse, controle preservado, volume/música/mute, FPS, persistencia, reversao")
 	quit()

@@ -28,6 +28,9 @@ var _create: Button
 var _version := Label.new()
 var _update: Button
 var _updater := Updater.new()
+## Capa da esquerda: 0 = 1923, 1 = hoje (em ruínas). Segue a personagem escolhida (Lia = hoje).
+var _cover := 0.0
+var _cover_tween: Tween
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -51,6 +54,7 @@ func _ready() -> void:
 	_solo = _button(solo_row, "Jogar solo", _play_solo)
 	if SaveSystem.has_save():
 		_button(solo_row, "Continuar solo", SaveSystem.load_game)
+	_button(solo_row, "Configurações", _open_settings)
 	_options.add_child(HSeparator.new())
 	_label(_options, "PARTIDA PARA DUAS PESSOAS", 10).modulate = GOLD
 	_name.placeholder_text = "Seu nome (a outra pessoa vê)"
@@ -61,6 +65,7 @@ func _ready() -> void:
 	_options.add_child(host_row)
 	_fill_roles(_role)
 	_role.tooltip_text = "Sua personagem (dá para trocar até começar)"
+	_role.item_selected.connect(func(_index: int) -> void: _update_cover())
 	host_row.add_child(_role)
 	_create = _button(host_row, "Criar sala", _host_room)
 	var join_row := HBoxContainer.new()
@@ -194,6 +199,24 @@ func _fill_roles(button: OptionButton) -> void:
 	button.add_item("Lia · Hoje", Era.Id.PRESENT)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
+func _open_settings() -> void:
+	var menu := preload("res://scripts/ui/settings_menu.gd").new()
+	menu.closed.connect(func() -> void: _solo.grab_focus())
+	get_tree().root.add_child(menu)
+
+## A capa passa para a de hoje com Lia e volta para a de 1923 com Helena.
+func _update_cover() -> void:
+	var era: int = _role.get_selected_id() if NetSession.phase == NetSession.Phase.OFF else NetSession.local_era
+	var target := 1.0 if era == Era.Id.PRESENT else 0.0
+	if is_equal_approx(target, _cover) or not is_inside_tree():
+		return
+	if _cover_tween:
+		_cover_tween.kill()
+	_cover_tween = create_tween()
+	_cover_tween.tween_method(func(value: float) -> void:
+		_cover = value
+		queue_redraw(), _cover, target, 0.6)
+
 func _play_solo() -> void:
 	RoomManager.clear_away()
 	WorldState.clear()
@@ -245,6 +268,7 @@ func _refresh() -> void:
 	_resume.visible = host and FileAccess.file_exists(NetSession.SAVE)
 	_resume.disabled = _start.disabled
 	_status.text = NetSession.status
+	_update_cover()
 	if idle:
 		_solo.grab_focus()
 	elif _start.visible and not _start.disabled:
@@ -271,6 +295,12 @@ func _label(parent: Container, caption: String, font_size: int) -> Label:
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("#192527"))
 	var w := size.x*0.39
+	if _cover < 1.0:
+		_draw_cover_1923(w)
+	if _cover > 0.0:
+		_draw_cover_today(w, _cover)
+
+func _draw_cover_1923(w: float) -> void:
 	var mid := Vector2(w*0.5, size.y*0.5)
 	draw_rect(Rect2(0, 0, w, size.y), Color("#311E23"))
 	for inset: int in [9, 13]:
@@ -282,3 +312,76 @@ func _draw() -> void:
 	draw_string(SIGN, Vector2(0, mid.y+7), "GRAND HOTEL", HORIZONTAL_ALIGNMENT_CENTER, w, 19, GOLD)
 	draw_string(SIGN, Vector2(0, mid.y+44), "AURORA", HORIZONTAL_ALIGNMENT_CENTER, w, 33, INK)
 	draw_string(FONT, Vector2(0, size.y-31), "1923    ◆    HOJE", HORIZONTAL_ALIGNMENT_CENTER, w, 11, GOLD)
+
+## A mesma capa cem anos depois: madeira azulada, moldura partida, raios caídos e letras faltando
+## (como a placa do Saguão de hoje). Desenhada por cima da de 1923 com a opacidade `alpha`.
+func _draw_cover_today(w: float, alpha: float) -> void:
+	var fade := func(color: Color) -> Color: return Color(color, color.a*alpha)
+	var mid := Vector2(w*0.5, size.y*0.5)
+	var sun := mid + Vector2(0, -29)
+	var detail := Color("#3A4A58")
+	var cold := Color("#9fb6c4")
+	var dull := Color("#6E8596")
+	draw_rect(Rect2(0, 0, w, size.y), fade.call(Color("#1C2630")))
+	# Manchas de umidade
+	# Manchas de umidade: círculos sobrepostos bem fracos, mais escuros no meio
+	for stain: Array in [[Vector2(0.2, 0.14), 0.13], [Vector2(0.72, 0.72), 0.14], [Vector2(0.3, 0.9), 0.09]]:
+		for ring in 6:
+			draw_circle(Vector2(w*stain[0].x, size.y*stain[0].y), w*stain[1]*(1.0 - ring/7.0),
+					fade.call(Color("#10171e", 0.09)))
+	# Moldura partida: cada lado em pedaços, com falhas
+	for inset: int in [9, 13]:
+		var r := Rect2(inset, inset, w-2*inset, size.y-2*inset)
+		var corners := [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]
+		for side in 4:
+			var a: Vector2 = corners[side]
+			var b: Vector2 = corners[(side + 1) % 4]
+			for piece: Vector2 in [Vector2(0.0, 0.22), Vector2(0.27, 0.55), Vector2(0.61, 0.83), Vector2(0.9, 1.0)]:
+				if (side + inset) % 3 == 0 and piece.x > 0.5 and piece.x < 0.7:
+					continue
+				draw_line(a.lerp(b, piece.x), a.lerp(b, piece.y), fade.call(detail), 1)
+	# Arco rachado em três pedaços, um deles caído
+	draw_arc(sun, w*0.35, PI, PI*1.38, 24, fade.call(dull), 1, true)
+	draw_arc(sun, w*0.35, PI*1.44, PI*1.8, 24, fade.call(dull), 1, true)
+	draw_arc(sun + Vector2(6, 9), w*0.35, PI*1.84, TAU*0.985, 12, fade.call(dull), 1, true)
+	for i in 11:
+		if i in [2, 5, 9]:
+			continue  # raios que caíram
+		var direction := Vector2.from_angle(PI+i*PI/10)
+		var length := w*(0.32 if i % 4 != 1 else 0.22)
+		draw_line(sun+direction*18, sun+direction*length, fade.call(Color(detail, 0.9)), 1, true)
+	# Os raios caídos, no chão da capa
+	draw_line(sun+Vector2(-w*0.2, w*0.06), sun+Vector2(-w*0.03, w*0.1), fade.call(detail), 1, true)
+	draw_line(sun+Vector2(w*0.08, w*0.08), sun+Vector2(w*0.27, w*0.05), fade.call(detail), 1, true)
+	# Rachaduras
+	for crack: PackedVector2Array in [
+			PackedVector2Array([Vector2(w, size.y*0.08), Vector2(w*0.86, size.y*0.15), Vector2(w*0.9, size.y*0.24),
+					Vector2(w*0.78, size.y*0.31)]),
+			PackedVector2Array([Vector2(0, size.y*0.62), Vector2(w*0.1, size.y*0.66), Vector2(w*0.07, size.y*0.74),
+					Vector2(w*0.19, size.y*0.79)])]:
+		draw_polyline(crack, fade.call(Color("#0f161c")), 1.5, true)
+	_draw_worn(Vector2(0, mid.y+7), w, "GRAND HOTEL", 19, cold, [9], alpha)
+	_draw_worn(Vector2(0, mid.y+44), w, "AURORA", 33, Color("#cfd6d4"), [3, 5], alpha)
+	draw_string(FONT, Vector2(0, size.y-31), "1923    ◆    HOJE", HORIZONTAL_ALIGNMENT_CENTER, w, 11,
+			fade.call(dull))
+
+## Texto centralizado letra por letra; as letras de `missing` caíram (só sobra a marca na parede) e uma
+## ficou torta.
+func _draw_worn(at: Vector2, w: float, text: String, font_size: int, color: Color, missing: Array,
+		alpha: float) -> void:
+	var x := (w - SIGN.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)*0.5
+	for i in text.length():
+		var letter := text[i]
+		var advance := SIGN.get_string_size(letter, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		if i in missing:
+			draw_string(SIGN, Vector2(x, at.y), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size,
+					Color("#141c24", 0.8*alpha))
+		elif i == 1:
+			draw_set_transform(Vector2(x + advance*0.5, at.y), 0.12)
+			draw_string(SIGN, Vector2(-advance*0.5, 2), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size,
+					Color(color, color.a*alpha))
+			draw_set_transform(Vector2.ZERO)
+		else:
+			draw_string(SIGN, Vector2(x, at.y), letter, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size,
+					Color(color, color.a*alpha))
+		x += advance
