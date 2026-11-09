@@ -2,7 +2,7 @@
 
 Os dois jogadores usam a mesma versão de **Hotel Sem Saída**. No Windows, extraia o ZIP inteiro (o `.exe` precisa do `HotelSemSaida.pck` e das DLLs da Epic que vêm ao lado dele) e abra `HotelSemSaida.exe`. Se o Windows avisar "O Windows protegeu o computador", clique em **Mais informações > Executar assim mesmo**.
 
-A versão aparece embaixo, na recepção. Quando sair uma nova, clique em **Atualizar** e depois em **Reiniciar o jogo**; não precisa baixar o ZIP de novo. Na dupla, os dois precisam estar na mesma versão.
+A versão aparece embaixo, na recepção. Quando sair uma nova, clique em **Atualizar** e depois em **Reiniciar o jogo**; o ZIP é só para instalar a primeira vez. Se a pasta do jogo não aceitar gravação (ex.: dentro de Arquivos de Programas), o botão abre a página para baixar a versão nova. Na dupla, os dois precisam estar na mesma versão.
 
 ## Com código de sala (normal)
 

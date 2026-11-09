@@ -152,8 +152,12 @@ func _refresh_update() -> void:
 		Updater.State.PATCH:
 			caption = "Atualizar para %s (%s MB)" % [next, ("%.1f" % _updater.patch_megabytes()).replace(".", ",")]
 		Updater.State.NEW_ZIP:
-			text += ". A %s precisa do jogo novo (ZIP)." % next
-			caption = "Baixar a versão %s" % next
+			if _updater.can_install_full():
+				var size := _updater.full_megabytes()
+				caption = "Atualizar para %s" % next + (" (%d MB)" % maxi(1, roundi(size)) if size > 0.0 else "")
+			else:
+				text += ". A %s precisa do jogo novo (ZIP)." % next
+				caption = "Baixar a versão %s" % next
 		Updater.State.DOWNLOADING:
 			text = "Baixando a versão %s… %d%%" % [next, roundi(_updater.progress()*100.0)]
 		Updater.State.READY:
@@ -174,7 +178,10 @@ func _on_update() -> void:
 		Updater.State.PATCH:
 			_updater.download()
 		Updater.State.NEW_ZIP:
-			_updater.open_page()
+			if _updater.can_install_full():
+				_updater.download_full()
+			else:
+				_updater.open_page()
 		Updater.State.READY:
 			_updater.restart()
 		Updater.State.FAILED:

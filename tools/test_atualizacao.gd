@@ -21,9 +21,7 @@ func _check(ok: bool, what: String) -> bool:
 func _finish(code: int) -> void:
 	_serving = false
 	_server.stop()
-	for file in DirAccess.get_files_at(FOLDER):
-		DirAccess.remove_absolute(FOLDER + file)
-	DirAccess.remove_absolute(FOLDER)
+	Updater._remove_tree(FOLDER.trim_suffix("/"))
 	quit(code)
 
 func _run() -> void:
@@ -102,7 +100,9 @@ func _run() -> void:
 	if not _check(LOADER.load_patch(FOLDER) == "" and not FileAccess.file_exists(FOLDER + LOADER.PACK),
 			"remendo de outra base é apagado"):
 		return
-	print("PASS: versões, decisão, download com sha256 e instalação do remendo")
+	if not await _full_update(url, base):
+		return
+	print("PASS: versões, decisão, remendo (download, sha256, instalação) e versão completa pelo jogo")
 	_finish(0)
 
 ## Responde GET com _files (um pedido por conexão).
@@ -128,3 +128,80 @@ func _answer(peer: StreamPeerTCP) -> void:
 	peer.put_data(("HTTP/1.1 %s\r\nContent-Length: %d\r\nConnection: close\r\n\r\n" % [status, body.size()]).to_utf8_buffer())
 	peer.put_data(body)
 	peer.disconnect_from_host()
+
+
+func _write(path: String, text: String) -> void:
+	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(text)
+	file.close()
+
+func _entry(url: String, name: String, text: String) -> Dictionary:
+	var bytes := text.to_utf8_buffer()
+	_files["/" + name] = bytes
+	var temp := FOLDER + "hash.tmp"
+	_write(temp, text)
+	var sha := FileAccess.get_sha256(temp)
+	DirAccess.remove_absolute(temp)
+	return {"name": name, "size": bytes.size(), "sha256": sha, "url": url + name}
+
+## Versão completa: só os arquivos que mudaram vão para jogo-novo/, e o instalar.ps1 os copia por cima.
+## Depois, sem a lista, o ZIP inteiro.
+func _full_update(url: String, base: String) -> bool:
+	var game := FOLDER + "instalado/"
+	_write(game + "HotelSemSaida.exe", "motor igual")
+	_write(game + "HotelSemSaida.pck", "jogo velho")
+	var files := [_entry(url, "HotelSemSaida.exe", "motor igual"), _entry(url, "HotelSemSaida.pck", "jogo novo"),
+			_entry(url, "nova.dll", "dll nova")]
+	_files["/versao.json"] = JSON.stringify({"version": "99.0.0", "base": "99.0.0", "patch": null,
+			"zip": url + "jogo.zip", "files": files}).to_utf8_buffer()
+	var updater := Updater.new()
+	updater.folder = FOLDER
+	updater.game_dir = ProjectSettings.globalize_path(game).trim_suffix("/")
+	updater.manifest_url = url + "versao.json"
+	root.add_child(updater)
+	updater.check()
+	await updater.changed
+	var names := updater.needed.map(func(entry: Dictionary) -> String: return entry.name)
+	if not _check(updater.state == Updater.State.NEW_ZIP and updater.can_install_full()
+			and names == ["HotelSemSaida.pck", "nova.dll"], "completa: só o que mudou (%s)" % [names]):
+		return false
+	updater.download_full()
+	while updater.state == Updater.State.DOWNLOADING:  # um aviso por arquivo
+		await updater.changed
+	var fresh := FOLDER + Updater.NEW_GAME
+	if not _check(updater.state == Updater.State.READY and not FileAccess.file_exists(fresh + "HotelSemSaida.exe")
+			and FileAccess.get_file_as_string(fresh + "HotelSemSaida.pck") == "jogo novo"
+			and FileAccess.file_exists(FOLDER + Updater.INSTALLER), "completa: baixar os arquivos"):
+		return false
+	# O instalador de verdade, sem esperar este processo e sem abrir o jogo
+	updater.write_installer(999999, false)
+	var output := []
+	var code := OS.execute("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+			ProjectSettings.globalize_path(FOLDER + Updater.INSTALLER)], output, true)
+	if not _check(code == 0 and FileAccess.get_file_as_string(game + "HotelSemSaida.pck") == "jogo novo"
+			and FileAccess.get_file_as_string(game + "nova.dll") == "dll nova"
+			and FileAccess.get_file_as_string(game + "HotelSemSaida.exe") == "motor igual"
+			and not DirAccess.dir_exists_absolute(fresh), "instalar.ps1 copia por cima (%d %s)" % [code, output]):
+		return false
+	# Sem a lista de arquivos: o ZIP inteiro
+	var zip_path := FOLDER + "servido.zip"
+	var packer := ZIPPacker.new()
+	packer.open(zip_path)
+	for name: String in ["HotelSemSaida.exe", "HotelSemSaida.pck"]:
+		packer.start_file("HotelSemSaida/" + name)
+		packer.write_file(("zip " + name).to_utf8_buffer())
+		packer.close_file()
+	packer.close()
+	_files["/jogo.zip"] = FileAccess.get_file_as_bytes(zip_path)
+	_files["/versao.json"] = JSON.stringify({"version": "99.0.0", "base": "99.0.0", "patch": null,
+			"zip": url + "jogo.zip"}).to_utf8_buffer()
+	updater.state = Updater.State.OFF
+	updater.check()
+	await updater.changed
+	updater.download_full()
+	while updater.state == Updater.State.DOWNLOADING:  # um aviso por arquivo
+		await updater.changed
+	return _check(updater.state == Updater.State.READY
+			and FileAccess.get_file_as_string(fresh + "HotelSemSaida.pck") == "zip HotelSemSaida.pck",
+			"completa pelo ZIP: %s" % updater.state)
