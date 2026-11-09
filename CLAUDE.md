@@ -13,7 +13,7 @@ Jogo de enigmas **em primeira pessoa, 3D**, para PC (Windows), feito no **Godot 
 
 ## O jogo em uma frase
 
-O Grand Hotel Aurora existe em duas épocas, 1923 e hoje. O jogador alterna com uma tecla entre **Helena** (1923, hóspede) e **Lia** (hoje, a neta dela). O que Helena faz no passado muda o que Lia encontra no presente.
+O Grand Hotel Aurora existe em duas épocas, 1923 e hoje. O jogador alterna com uma tecla entre **Helena** (1923, hóspede) e **Lia** (hoje, a bisneta dela). O que Helena faz no passado muda o que Lia encontra no presente.
 
 ## Regras de design que o código precisa respeitar
 
@@ -280,6 +280,12 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `Updater` (`scripts/core/updater.gd`, filho da recepção): lê `versao.json` do último Release do GitHub (`version`, `base`, `patch {url, size, sha256}`, `page`), baixa para `.part`, confere tamanho e sha256 e só então grava `remendo-novo.*`. Base diferente: o botão abre a página do Release para baixar o ZIP novo. No editor não procura (só com `-- --procurar-atualizacao`).
 - Publicar: `tools/publicar_versao.sh completa` (ZIP; `VERSION` = base) ou `tools/publicar_versao.sh remendo` (`VERSION` maior que a base). Precisa de commit e push feitos e do `gh` logado; cria o Release `v<VERSION>` com os arquivos e o `versao.json`. O remendo é sempre em relação ao ZIP base (`--export-patch --patches`), então quem pula versões baixa um só. **Mudou `project.godot` (autoload, Input Map, configurações), `addons/` ou a versão do Godot? Versão completa** (o remendo não carrega isso; o script recusa). Os builds ficam em `build/` (fora do git).
 - Teste `tools/test_atualizacao.gd` (versões, decisão, download por um servidor HTTP local, sha256 errado, instalação e descarte do remendo).
+
+## Site (09/11/2026)
+
+- Landing page estática em `site/` (um `index.html` com CSS e JS embutidos, imagens em `site/img/`), publicada pelo Roberto na Vercel com Root Directory `site` e sem build. Divisores 1923 | hoje com as prévias do Saguão, da Cozinha e da Biblioteca, Helena e Lia, o livro de hóspedes, a dupla e a instalação.
+- O botão de download pega o `.zip` do Release mais novo que tem um (API do GitHub, no navegador); sem resposta, leva à página do último Release. Remendos não mudam o link.
+- Para ver localmente: `.claude/launch.json` (servidor `site`, porta 4173).
 
 ## Testes
 
