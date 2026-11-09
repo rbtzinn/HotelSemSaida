@@ -243,13 +243,13 @@ func _begin(data: Dictionary) -> void:
 	WorldState.load_dict(data.get("flags", {}))
 	EraManager.set_era(local_era)
 	var spot: Dictionary = data.get(Era.character_name(local_era), {})
-	get_tree().change_scene_to_file(spot.get("room", HOTEL))
-	await get_tree().scene_changed
-	if phase == Phase.PLAYING and not spot.is_empty():
-		var motor := get_tree().current_scene.get_node(Era.character_name(local_era)) as FirstPersonMotor
-		motor.position = spot.position
-		motor.rotation.y = spot.yaw
-		motor.get_node("Head").rotation.x = spot.pitch
+	var place := func(room: Node) -> void:
+		if phase == Phase.PLAYING and not spot.is_empty():
+			var motor := room.get_node(Era.character_name(local_era)) as FirstPersonMotor
+			motor.position = spot.position
+			motor.rotation.y = spot.yaw
+			motor.get_node("Head").rotation.x = spot.pitch
+	await RoomManager.open_scene(spot.get("room", HOTEL), place)
 
 func _publish(key: String, value: Variant) -> void:
 	if phase != Phase.PLAYING or _receiving:
@@ -374,8 +374,7 @@ func leave(reason: String = "", notify_partner: bool = true) -> void:
 		get_tree().paused = false
 		while RoomManager.is_changing():
 			await get_tree().process_frame
-		get_tree().change_scene_to_file(LOBBY)
-		await get_tree().scene_changed
+		await RoomManager.open_scene(LOBBY)
 		_returning = false
 	_message(reason)
 

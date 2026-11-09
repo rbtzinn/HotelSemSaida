@@ -92,8 +92,8 @@ func _leave() -> void:
 		NetSession.leave("Fim desta versão.")
 		return
 	get_tree().paused = false
-	get_tree().change_scene_to_file(NetSession.LOBBY)
 	queue_free()
+	RoomManager.open_scene(NetSession.LOBBY)
 
 
 func _make_label(text: String, font_size: int, color: Color) -> Label:

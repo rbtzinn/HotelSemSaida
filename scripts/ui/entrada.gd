@@ -134,6 +134,8 @@ func _ready() -> void:
 	_refresh_update()
 	NetSession.lobby_changed.connect(_refresh)
 	_refresh()
+	# Chegou à recepção: o remendo (se houver) funciona
+	get_node("/root/PatchLoader").confirm()
 
 func _process(_delta: float) -> void:
 	if _updater.state == Updater.State.DOWNLOADING:
@@ -196,7 +198,7 @@ func _play_solo() -> void:
 	RoomManager.clear_away()
 	WorldState.clear()
 	EraManager.set_era(Era.Id.PAST_1923)
-	get_tree().change_scene_to_file(NetSession.HOTEL)
+	RoomManager.open_scene(NetSession.HOTEL)
 
 func _save_name() -> void:
 	var name_text := NetSession.clean_name(_name.text)

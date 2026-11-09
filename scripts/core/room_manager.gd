@@ -1,5 +1,6 @@
 extends Node
-## Autoload: troca de sala. Escurece a tela, abre a nova cena e posiciona as personagens.
+## Autoload: troca de sala. Escurece a tela, abre a nova cena (com a tela de carregamento, LoadingScreen)
+## e posiciona as personagens. Toda troca de cena do jogo passa por open_scene.
 ## 2D: Helena e Lia mudam de sala juntas. 3D (pedido do Roberto, 04/11/2026): só a
 ## personagem ativa passa pela porta; a outra fica onde foi deixada, na sala dela.
 ## Cada cena tem os dois nós de personagem; o da que está em outra sala fica parado ali
@@ -9,7 +10,10 @@ extends Node
 const FADE_DURATION: float = 0.2
 
 var _is_changing: bool = false
+## Abrindo uma cena (com a tela de carregamento), mesmo fora de go_to.
+var _opening: bool = false
 var _fade_rect: ColorRect
+var _loading: LoadingScreen
 ## Personagens que ficaram em outra sala: era -> {"scene", "position", "yaw"}.
 var _away: Dictionary = {}
 
@@ -25,10 +29,53 @@ func _ready() -> void:
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(_fade_rect)
+	var loading_layer := CanvasLayer.new()
+	loading_layer.layer = 100
+	add_child(loading_layer)
+	_loading = LoadingScreen.new()
+	loading_layer.add_child(_loading)
 
 
 func is_changing() -> bool:
-	return _is_changing
+	return _is_changing or _opening
+
+
+## Abre a cena com a tela de carregamento: carrega em segundo plano (o sol gira), troca a cena,
+## chama `on_open(sala)` logo que ela existe e espera o primeiro quadro (sombras e shaders) antes de
+## esconder o carregamento. Use no lugar de change_scene_to_file.
+func open_scene(scene_path: String, on_open: Callable = Callable()) -> void:
+	_opening = true
+	if DisplayServer.get_name() == "headless":
+		# Sem janela (testes, servidor) não há o que mostrar: troca direta, no mesmo ritmo de antes
+		get_tree().change_scene_to_file(scene_path)
+		await get_tree().scene_changed
+		if on_open.is_valid():
+			on_open.call(get_tree().current_scene)
+		_opening = false
+		return
+	_loading.begin(scene_path)
+	# Dois quadros: o carregamento precisa aparecer antes de a montagem da sala travar o jogo
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var packed: PackedScene = null
+	if ResourceLoader.load_threaded_request(scene_path) == OK:
+		var progress := []
+		while ResourceLoader.load_threaded_get_status(scene_path, progress) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			_loading.progress = progress[0] if not progress.is_empty() else 0.0
+			await get_tree().process_frame
+		packed = ResourceLoader.load_threaded_get(scene_path) as PackedScene
+	_loading.progress = 1.0
+	if packed != null:
+		get_tree().change_scene_to_packed(packed)
+	else:
+		get_tree().change_scene_to_file(scene_path)
+	await get_tree().scene_changed
+	if on_open.is_valid():
+		on_open.call(get_tree().current_scene)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_loading.end()
+	_opening = false
 
 
 ## Vai para outra sala e coloca as duas personagens no ponto de entrada (2D).
@@ -104,9 +151,7 @@ func go_to(scene_path: String, place_characters: Callable, before_load: Callable
 	await _fade(1.0)
 	if before_load.is_valid():
 		before_load.call()
-	get_tree().change_scene_to_file(scene_path)
-	await get_tree().scene_changed
-	place_characters.call(get_tree().current_scene)
+	await open_scene(scene_path, place_characters)
 	await _fade(0.0)
 	_is_changing = false
 

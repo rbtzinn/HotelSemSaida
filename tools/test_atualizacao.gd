@@ -93,6 +93,19 @@ func _run() -> void:
 	if not _check(FileAccess.file_exists(FOLDER + LOADER.PACK) and not FileAccess.file_exists(FOLDER + LOADER.NEW_PACK),
 			"remendo-novo vira remendo"):
 		return
+	# Remendo que não deixou o jogo chegar à recepção é descartado na abertura seguinte
+	if not _check(LOADER.startup(FOLDER) == next and FileAccess.file_exists(FOLDER + LOADER.OPENING),
+			"abertura com remendo marca o arquivo"):
+		return
+	FileAccess.open(FOLDER + LOADER.OPENING, FileAccess.WRITE).close()
+	DirAccess.copy_absolute(FOLDER + "servido.pck", FOLDER + LOADER.PACK)
+	if not _check(LOADER.startup(FOLDER) == "" and not FileAccess.file_exists(FOLDER + LOADER.PACK)
+			and not FileAccess.file_exists(FOLDER + LOADER.OPENING), "remendo quebrado é descartado"):
+		return
+	DirAccess.copy_absolute(FOLDER + "servido.pck", FOLDER + LOADER.PACK)
+	var again := FileAccess.open(FOLDER + LOADER.INFO, FileAccess.WRITE)
+	again.store_string(JSON.stringify({"version": next, "base": base}))
+	again.close()
 	# Remendo de outro ZIP é descartado
 	var info := FileAccess.open(FOLDER + LOADER.INFO, FileAccess.WRITE)
 	info.store_string(JSON.stringify({"version": next, "base": "0.0.1"}))

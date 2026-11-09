@@ -12,6 +12,9 @@ const INFO := "remendo.json"
 ## então não dá para trocá-lo com o jogo rodando).
 const NEW_PACK := "remendo-novo.pck"
 const NEW_INFO := "remendo-novo.json"
+## Existe enquanto o jogo abre com um remendo; a recepção o apaga (confirm). Se ele ainda existir na
+## abertura seguinte, o remendo impediu o jogo de chegar à recepção e é descartado.
+const OPENING := "remendo.abrindo"
 
 ## Versão do remendo carregado (vazio sem remendo).
 var loaded_version := ""
@@ -20,9 +23,28 @@ var loaded_version := ""
 func _init() -> void:
 	if not OS.has_feature("template"):
 		return
-	loaded_version = load_patch(DIR)
+	loaded_version = startup(DIR)
 	if loaded_version != "":
 		print("Remendo %s carregado." % loaded_version)
+
+
+## A recepção abriu: o remendo carregado funciona.
+func confirm() -> void:
+	DirAccess.remove_absolute(DIR + OPENING)
+
+
+## Abertura do jogo: descarta o remendo que não deixou o jogo chegar à recepção da última vez, carrega o
+## atual e marca que o jogo está abrindo com ele.
+static func startup(folder: String) -> String:
+	if FileAccess.file_exists(folder + OPENING):
+		push_warning("O remendo não deixou o jogo abrir da última vez; voltando à versão instalada.")
+		DirAccess.remove_absolute(folder + PACK)
+		DirAccess.remove_absolute(folder + INFO)
+		DirAccess.remove_absolute(folder + OPENING)
+	var version := load_patch(folder)
+	if version != "":
+		FileAccess.open(folder + OPENING, FileAccess.WRITE).close()
+	return version
 
 
 ## Instala o remendo novo, se houver, e carrega o atual. Devolve a versão carregada ou "".

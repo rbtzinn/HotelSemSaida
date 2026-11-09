@@ -45,7 +45,7 @@ func _ready() -> void:
 		_add_button(column, "Carregar", _load)
 		_add_button(column, "Voltar à recepção", func() -> void:
 			get_tree().paused = false
-			get_tree().change_scene_to_file(NetSession.LOBBY))
+			RoomManager.open_scene(NetSession.LOBBY))
 	_add_button(column, "Sair do jogo", func() -> void: Audio.quit())
 
 
