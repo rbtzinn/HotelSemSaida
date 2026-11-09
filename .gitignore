@@ -8,3 +8,4 @@ graft/
 
 # Chaves da Epic (modelo em epic_credentials.example.cfg)
 epic_credentials.cfg
+__pycache__/
