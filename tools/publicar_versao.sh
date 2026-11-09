@@ -68,8 +68,18 @@ manifest() {  # $1 = JSON do remendo ou null
 EOF
 }
 
+HEAD_AT_START=$(git rev-parse HEAD)
 export_quiet() {  # o editor aberto prende a DLL de debug do plugin: o aviso não atrapalha o release
-	"$GODOT" --headless --path . "$@" 2>&1 | grep -E "^ERROR" | grep -v "template_debug\|~libeosg" || true
+	local log
+	log=$("$GODOT" --headless --path . "$@" 2>&1 | grep -E "^ERROR|SCRIPT ERROR" | grep -v "template_debug\|~libeosg" || true)
+	[ -z "$log" ] || echo "$log"
+	# Script com erro iria para o jogo de todo mundo (foi o que quebrou a primeira 1.0.2)
+	if grep -qiE "parse error|not compiling|compile error|failed to load script" <<< "$log"; then
+		fail "há script com erro no projeto; nada foi publicado"
+	fi
+	# O export lê a pasta do projeto: se algo mudou enquanto ele rodava, o pacote não é o do commit
+	[ -z "$(git status --porcelain)" ] && [ "$(git rev-parse HEAD)" = "$HEAD_AT_START" ] \
+		|| fail "a pasta do projeto mudou durante o export; nada foi publicado. Rode de novo sem mexer nos arquivos"
 }
 
 if [ "$MODE" = completa ]; then
