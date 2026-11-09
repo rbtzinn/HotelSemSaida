@@ -67,7 +67,7 @@ func _build_room() -> void:
 # --- Paredes ---------------------------------------------------------------------------------
 
 ## Parede ao longo de x, em z, com vãos (x0, x1, altura do vão).
-func _wall_x(z: float, x0: float, x1: float, height: float, gaps: Array, role: String = "wallpaper") -> void:
+func _wall_x(z: float, x0: float, x1: float, height: float, gaps: Array, role: String = "wallpaper_ballroom") -> void:
 	var x := x0
 	for gap: Vector3 in gaps:
 		if gap.x > x:
@@ -85,7 +85,7 @@ func _wall_x(z: float, x0: float, x1: float, height: float, gaps: Array, role: S
 		_solid(Vector3(x, 0, z - 0.1), Vector3(x1, height, z + 0.1), "Wall")
 
 
-func _wall_z(x: float, z0: float, z1: float, height: float, role: String = "wallpaper") -> void:
+func _wall_z(x: float, z0: float, z1: float, height: float, role: String = "wallpaper_ballroom") -> void:
 	_part(Vector3(x - 0.1, 0, z0), Vector3(x + 0.1, height, z1), role)
 	_solid(Vector3(x - 0.1, 0, z0), Vector3(x + 0.1, height, z1), "Wall")
 
@@ -106,8 +106,8 @@ func _build_vestibule() -> void:
 		_part(Vector3(WEST, 0, z - 0.01), Vector3(EAST, 0.18, z + 0.01), "dark_wood")
 		_part(Vector3(WEST, 1.0, z - 0.012), Vector3(EAST, 1.04, z + 0.012), "brass")
 	var sign_color := Color("#C9973B") if not present else Color("#6E5A34")
-	_label("SALÃO DE BAILE", Vector3((HALL_DOOR.x + HALL_DOOR.y) / 2.0, 3.0, SOUTH - 0.13), 0.08, sign_color, 180.0)
-	_label("3º ANDAR", Vector3(14.6, 2.0, NORTH + 0.12), 0.06, sign_color)
+	_plaque("SALÃO DE BAILE", Vector3((HALL_DOOR.x + HALL_DOOR.y) / 2.0, 3.0, SOUTH - 0.13), 0.08, sign_color, 180.0)
+	_plaque("3º ANDAR", Vector3(14.6, 2.0, NORTH + 0.12), 0.06, sign_color)
 	# Chapeleira encostada na parede oeste (sólida)
 	_solid(Vector3(0.1, 0, 3.0), Vector3(0.6, 1.8, 3.6), "Coat")
 	_part(Vector3(0.1, 0, 3.0), Vector3(0.6, 1.0, 3.6), "dark_wood" if not present else "plank")
@@ -177,7 +177,7 @@ func _build_hall() -> void:
 	_part(Vector3(WEST, HALL_H, SOUTH), Vector3(EAST, HALL_H + 0.2, BACK), "coffer")
 	# Parede entre o vestíbulo e o salão, com a porta dupla aberta
 	_wall_x(SOUTH, WEST, EAST, H, [Vector3(HALL_DOOR.x, HALL_DOOR.y, HALL_DOOR_TOP)])
-	_part(Vector3(WEST, H, SOUTH - 0.1), Vector3(EAST, HALL_H, SOUTH + 0.1), "wallpaper")
+	_part(Vector3(WEST, H, SOUTH - 0.1), Vector3(EAST, HALL_H, SOUTH + 0.1), "wallpaper_ballroom")
 	_wall_z(WEST, SOUTH, BACK, HALL_H)
 	_wall_z(EAST, SOUTH, BACK, HALL_H)
 	_wall_x(BACK, WEST, EAST, HALL_H, [], "panel")
@@ -346,17 +346,21 @@ func _build_chandeliers() -> void:
 func _build_lights() -> void:
 	if not present:
 		for at: Vector3 in CHANDELIERS:
-			_omni(at + Vector3(0, -0.3, 0), WARM, 3.2, 13.0, true)
+			_omni(at + Vector3(0, -0.3, 0), WARM, 4.2, 14.0, true)
 		_spot(Vector3(10.0, 5.2, 11.0), Vector3(12.5, 1.2, 15.5), WARM, 3.0, 12.0, 40.0)
 		# Arandelas nas paredes laterais
 		for z: float in [5.6, 8.0, 11.0]:
 			for x: float in [WEST + 0.35, EAST - 0.35]:
-				_omni(Vector3(x, 2.6, z), WARM, 0.9, 5.0)
+				_omni(Vector3(x, 2.6, z), WARM, 1.3, 6.0)
 				var side := 1.0 if x < 10.0 else -1.0
 				_part(Vector3(x - side * 0.25 - 0.04, 2.45, z - 0.04), Vector3(x - side * 0.25 + 0.04, 2.7, z + 0.04), "brass")
 				_sphere(Vector3(x - side * 0.15, 2.72, z), 0.06, "bulb").cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		for x: float in [3.0, 10.0, 17.0]:
-			_omni(Vector3(x, H - 0.4, (NORTH + SOUTH) / 2.0), WARM, 0.9, 5.0)
+		# Vestíbulo: arandelas dos dois lados e um resto de luz no teto
+		for x: float in [7.0, 12.5, 18.6]:
+			_wall_lamp(Vector3(x, 2.05, NORTH + 0.1), 0.0, 1.3, 5.5)
+		for x: float in [3.0, 6.6, 13.4, 17.0]:
+			_wall_lamp(Vector3(x, 2.05, SOUTH - 0.1), 180.0, 1.3, 5.5)
+		_omni(Vector3(10.0, H - 0.5, (NORTH + SOUTH) / 2.0), WARM, 0.35, 14.0)
 	else:
 		for z: float in [6.5, 9.5, 12.5]:
 			_spot(Vector3(EAST - 0.3, 4.2, z), Vector3(12.0, 0, z + 1.0), MOON, 1.4, 12.0, 28.0)

@@ -57,6 +57,9 @@ const MODELS := "res://art/models/"
 ## Hoje: madeira velha e ferragens enferrujadas.
 const AGED := {"oak": "plank", "brass": "iron", "mahogany": "plank"}
 
+## Sinetas do quadro de chamadas, uma por salão.
+const BELLS: Array[String] = ["SAGUÃO", "SALÃO", "BIBLIOT.", "2º AND.", "GERÊNCIA", "ENTRADA"]
+
 const WARM := Color("#F2D49B")
 const FIRE := Color("#FF8A3A")
 const COLD := Color("#9FB4C8")
@@ -67,6 +70,8 @@ func _build_room() -> void:
 	_build_partition()
 	_build_stairs()
 	_build_kitchen_wall_dressing()
+	_build_service_board()
+	_build_spice_shelf()
 	_build_counter()
 	_build_stove_hood()
 	if not present:
@@ -300,6 +305,58 @@ func _build_kitchen_wall_dressing() -> void:
 	_block(clock_at + Vector3(0.0, 0.07, -0.068), Vector3(0.01, 0.15, 0.005), "lacquer", Vector3(0, 0, -10 + hands))
 
 
+## Quadro de campainhas dos andares, na parede da escada: é a primeira coisa que se vê ao
+## entrar pela porta do Saguão. Em 1923, sinetas de latão sob o nome de cada salão; hoje,
+## metade caiu e o resto está verde de azinhavre. Fica acima da cabeça, rente à parede.
+func _build_service_board() -> void:
+	var z := PARTITION.y
+	var board := Vector3(3.3, K + 2.45, z)
+	var wood := "dark_wood" if not present else "plank"
+	_part(board + Vector3(-1.05, -0.38, 0), board + Vector3(1.05, 0.38, 0.03), wood)
+	_part(board + Vector3(-1.1, 0.38, 0), board + Vector3(1.1, 0.44, 0.05), wood)
+	_part(board + Vector3(-1.1, -0.44, 0), board + Vector3(1.1, -0.38, 0.05), wood)
+	var ink := Color("#C9973B") if not present else Color("#5A5040")
+	for i in BELLS.size():
+		var x := board.x - 0.84 + i * 0.336
+		_label(BELLS[i], Vector3(x, board.y + 0.25, z + 0.035), 0.04, ink)
+		if present and i in [1, 4]:
+			# Caiu: sobrou o gancho torto
+			_block(Vector3(x, board.y + 0.08, z + 0.05), Vector3(0.012, 0.1, 0.012), "iron", Vector3(0, 0, 20))
+			continue
+		_block(Vector3(x, board.y + 0.1, z + 0.05), Vector3(0.012, 0.12, 0.012), "brass")
+		_cylinder(Vector3(x, board.y - 0.12, z + 0.07), 0.065, 0.03, 0.12, "brass", Vector3.ZERO, 12)
+		_sphere(Vector3(x, board.y - 0.14, z + 0.07), 0.018, "iron")
+	_label("CHAMADAS", Vector3(board.x, board.y + 0.56, z + 0.01), 0.07,
+		Color("#3A2A1A") if not present else Color("#2A2A26"))
+
+
+## Prateleira de temperos e réstias de alho na parede sul, depois das janelas (sólida).
+func _build_spice_shelf() -> void:
+	var x0 := 14.2
+	var x1 := 16.6
+	var wood := "oak" if not present else "plank"
+	_solid(Vector3(x0, K + 1.72, DEPTH - 0.22), Vector3(x1, K + 2.35, DEPTH), "SpiceShelf")
+	for y: float in [K + 1.75, K + 2.1]:
+		_part(Vector3(x0, y, DEPTH - 0.2), Vector3(x1, y + 0.03, DEPTH - 0.02), wood)
+	for x: float in [x0, x1 - 0.03]:
+		_part(Vector3(x, K + 1.72, DEPTH - 0.2), Vector3(x + 0.03, K + 2.35, DEPTH - 0.02), wood)
+	for i in 9:
+		if present and _random(i, 4.0) < 0.5:
+			continue
+		var x := x0 + 0.2 + i * 0.25
+		var tall := 0.14 + _random(i, 2.0) * 0.08
+		var shelf_y := K + 1.78 if i % 2 == 0 else K + 2.13
+		_cylinder(Vector3(x, shelf_y, DEPTH - 0.11), 0.05, 0.05, tall, "enamel" if i % 3 else "copper", Vector3.ZERO, 10)
+		_cylinder(Vector3(x, shelf_y + tall, DEPTH - 0.11), 0.035, 0.035, 0.025, "oak", Vector3.ZERO, 8)
+	if not present:
+		# Réstias de alho penduradas na ponta da prateleira
+		for i in 2:
+			var x := x1 + 0.25 + i * 0.3
+			_block(Vector3(x, K + 2.25, DEPTH - 0.03), Vector3(0.02, 0.02, 0.05), "iron")
+			for k in 5:
+				_sphere(Vector3(x + (0.03 if k % 2 else -0.03), K + 2.15 - k * 0.09, DEPTH - 0.07), 0.045, "ivory")
+
+
 # --- Móveis da cozinha --------------------------------------------------------------------
 
 ## Bancada com pia ao longo da parede norte (hoje desabou na ponta leste).
@@ -453,6 +510,7 @@ func _build_lobby_door() -> void:
 		{"mahogany": "plank"} if present else {})
 	_label("SAGUÃO", Vector3((x0 + x1) / 2.0, K + 2.68, face - 0.01), 0.09, Color("#3A2A1A") if not present else Color("#2A2A26"), 180)
 	_solid(Vector3(x0, K, face + 0.1), Vector3(x1, K + 2.4, face + 0.2), "LobbyDoor")
+	_door_light(Vector3((x0 + x1) / 2.0, K + 2.2, face), 180.0)
 
 
 func _build_windows() -> void:
@@ -664,7 +722,8 @@ func _build_lights() -> void:
 			_cylinder(at + Vector3(0, 0.25, 0), 0.006, 0.006, TOP - K - 2.8, "dark", Vector3.ZERO, 4)
 			_cylinder(at + Vector3(0, 0.05, 0), 0.28, 0.06, 0.2, "enamel", Vector3.ZERO, 16)
 			_sphere(at + Vector3(0, 0.02, 0), 0.07, "bulb")
-			_omni(at - Vector3(0, 0.1, 0), WARM, 1.5, 8.0, i == 1)
+			# A luz fica abaixo da cúpula: colada nela, o esmalte estourava numa mancha branca
+			_omni(at - Vector3(0, 0.45, 0), WARM, 1.5, 8.0, i == 1)
 		# Brasa do fogão e uma luz quente na despensa
 		_omni(Vector3(STOVE.x + 0.5, K + 0.4, 1.3), FIRE, 0.8, 2.5)
 		for at: Vector3 in [Vector3(4.5, 3.6, 3.4), Vector3(11.0, 3.6, 2.2), Vector3(16.0, 3.6, 3.4)]:

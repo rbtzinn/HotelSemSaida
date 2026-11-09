@@ -8,6 +8,8 @@ extends WorldEnvironment
 ## que tingia o céu e a silhueta da cidade de 1923.
 @export var outdoor: bool = false
 
+const NIGHT_SKY := preload("res://shaders/sky_env_night.gdshader")
+
 var _past: Environment
 var _present: Environment
 
@@ -35,8 +37,8 @@ func _make_past() -> Environment:
 	env.ambient_light_color = Color("#8A5A3E")
 	env.ambient_light_energy = 0.35
 	env.tonemap_exposure = 1.05
-	env.glow_intensity = 0.9
-	env.glow_bloom = 0.08
+	env.glow_intensity = 0.8
+	env.glow_bloom = 0.04
 	env.fog_enabled = true
 	env.fog_light_color = Color("#3A2014")
 	env.fog_density = 0.008
@@ -45,6 +47,7 @@ func _make_past() -> Environment:
 		env.background_color = Color("#04060C")
 		env.fog_light_color = Color("#141A28")
 		env.fog_density = 0.004
+		_use_night_sky(env, 1.0)
 	return env
 
 
@@ -70,7 +73,27 @@ func _make_present() -> Environment:
 	env.adjustment_contrast = 1.08
 	if outdoor:
 		env.background_color = Color("#030409")
+		# Hoje o céu é o mesmo, um pouco mais apagado pela bruma
+		_use_night_sky(env, 0.7)
 	return env
+
+
+## Céu com lua e estrelas no lugar da cor chapada. Só o fundo: a luz ambiente continua a cor
+## da época, e a névoa não cobre o céu (senão a lua sumia atrás dela).
+func _use_night_sky(env: Environment, energy: float) -> void:
+	var material := ShaderMaterial.new()
+	material.shader = NIGHT_SKY
+	material.set_shader_parameter("star_energy", 0.9 * energy)
+	material.set_shader_parameter("moon_energy", 1.6 * energy)
+	var sky := Sky.new()
+	sky.sky_material = material
+	sky.radiance_size = Sky.RADIANCE_SIZE_32
+	sky.process_mode = Sky.PROCESS_MODE_INCREMENTAL
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+	env.fog_sky_affect = 0.0
+	env.volumetric_fog_sky_affect = 0.0
 
 
 func _base() -> Environment:

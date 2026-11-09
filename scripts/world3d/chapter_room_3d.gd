@@ -68,8 +68,9 @@ func label(parent: Node3D, value: String, at: Vector3, size: int = 30) -> Label3
 	result.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	result.text = value
 	result.position = at
-	result.font_size = size
-	result.pixel_size = 0.002
+	# O dobro de pontos por metro: a fonte dos letreiros não é MSDF e de perto ficava borrada
+	result.font_size = size * 2
+	result.pixel_size = 0.001
 	result.modulate = Color("#D4BD87")
 	result.outline_size = 0
 	result.shaded = true

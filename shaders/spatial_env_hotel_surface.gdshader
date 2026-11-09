@@ -26,6 +26,18 @@ const int PATTERN_PLASTER = 6;
 const int PATTERN_CLOTH = 7;
 const int PATTERN_PAINTING = 8;
 
+// Desenho dentro da faixa larga do papel de parede: um por andar do hotel.
+const int MOTIF_DIAMOND = 0;
+const int MOTIF_FAN = 1;
+const int MOTIF_FLOWER = 2;
+// Rachaduras do reboco: células por metro, meia-largura do traço (em células) e quanto a
+// poeira entorta as linhas (sem isso elas saem retas, como vidro trincado).
+// Raios do leque do papel de parede do Salão.
+const float FAN_RAYS = 5.0;
+const float CRACK_CELLS = 2.3;
+const float CRACK_WIDTH = 0.016;
+const float CRACK_WARP = 0.9;
+
 group_uniforms base;
 uniform int pattern : hint_range(0, 8) = 0;
 uniform vec4 color_a : source_color = vec4(0.5, 0.5, 0.5, 1.0);
@@ -40,6 +52,8 @@ uniform float seed = 0.0;
 // Tapete: centro e meia-extensão no plano do piso (x, z), em metros.
 uniform vec2 rug_center = vec2(0.0);
 uniform vec2 rug_half_size = vec2(1.0);
+// Papel de parede: 0 losango (Saguão e Biblioteca), 1 leque (Salão), 2 flor (Quartos).
+uniform int wallpaper_motif : hint_range(0, 2) = 0;
 group_uniforms;
 
 group_uniforms aging;
@@ -116,10 +130,29 @@ vec3 wallpaper(vec2 uv, float fade) {
 	float band = fract(p.x);
 	float wide = soft_band(band, 0.01, 0.47, pixel);
 	float pin = soft_band(band, 0.625, 0.655, pixel);
-	// Losangos discretos dentro da faixa larga
-	vec2 cell = fract(vec2(p.x * 2.0, p.y * 2.4)) - 0.5;
-	float diamond_pixel = fwidth(p.x * 2.0) + fwidth(p.y * 2.4);
-	float diamond = 1.0 - smoothstep(0.29 - diamond_pixel, 0.29 + diamond_pixel, abs(cell.x) + abs(cell.y));
+	// Desenho discreto dentro da faixa larga, um por andar
+	vec2 grid = vec2(p.x * 2.0, p.y * 2.4);
+	vec2 cell = fract(grid) - 0.5;
+	float motif_pixel = fwidth(grid.x) + fwidth(grid.y);
+	float diamond = 0.0;
+	if (wallpaper_motif == MOTIF_FAN) {
+		// Leque art déco: meia-lua de cinco raios aberta para cima (v cresce para baixo)
+		vec2 fan = cell - vec2(0.0, 0.3);
+		float radius = length(fan);
+		float turn = atan(-fan.y, fan.x) / PI * FAN_RAYS;
+		float rays = soft_band(fract(turn), 0.22, 0.78, motif_pixel * FAN_RAYS / max(radius * PI, 0.05));
+		diamond = rays * (1.0 - smoothstep(0.44 - motif_pixel, 0.44 + motif_pixel, radius))
+			* smoothstep(0.1 - motif_pixel, 0.1 + motif_pixel, radius)
+			* smoothstep(0.0, motif_pixel, -fan.y);
+	} else if (wallpaper_motif == MOTIF_FLOWER) {
+		// Flor de quatro pétalas com miolo vazado
+		float radius = length(cell);
+		float petal = 0.2 + 0.11 * cos(4.0 * atan(cell.y, cell.x));
+		diamond = (1.0 - smoothstep(petal - motif_pixel, petal + motif_pixel, radius))
+			* smoothstep(0.05 - motif_pixel, 0.05 + motif_pixel, radius);
+	} else {
+		diamond = 1.0 - smoothstep(0.29 - motif_pixel, 0.29 + motif_pixel, abs(cell.x) + abs(cell.y));
+	}
 	vec3 base = mix(color_b.rgb, color_a.rgb, wide);
 	base = mix(base, color_c.rgb, pin * 0.85 * (1.0 - fade));
 	base = mix(base, mix(base, color_c.rgb, 0.35), diamond * wide * 0.5 * (1.0 - fade));
@@ -265,8 +298,16 @@ void fragment() {
 	float dust = fbm(uv * 0.8 + seed + 3.7);
 	float stains = smoothstep(0.55, 0.78, fbm(vec2(uv.x * 1.6, uv.y * 0.5) + seed * 1.3));
 	float moss = smoothstep(0.62, 0.8, fbm(uv * 1.1 + seed + 11.0)) * (0.4 + 0.6 * grout);
-	float cracks = 1.0 - smoothstep(0.0, 0.025, voronoi_edge(uv * 1.4 + seed));
-	cracks *= smoothstep(0.45, 0.7, fbm(uv * 0.6 + seed + 5.0));
+	// Rachaduras só no que racha: reboco, azulejo e mármore inteiros, o papel de parede de
+	// leve (é o reboco por baixo). Madeira, metal e pano não trincam. Finas e tortas; ao longe
+	// o traço engrossa e clareia até sumir, em vez de cintilar.
+	float crack_amount = (pattern == PATTERN_PLASTER || pattern == PATTERN_MARBLE_TILES) ? 1.0
+		: (pattern == PATTERN_WALLPAPER ? 0.4 : 0.0);
+	float crack_pixel = footprint * CRACK_CELLS;
+	float crack_edge = voronoi_edge(uv * CRACK_CELLS + (dust - 0.5) * CRACK_WARP + seed);
+	float cracks = (1.0 - smoothstep(0.0, CRACK_WIDTH + crack_pixel, crack_edge))
+		* CRACK_WIDTH / (CRACK_WIDTH + crack_pixel);
+	cracks *= smoothstep(0.5, 0.72, fbm(uv * 0.6 + seed + 5.0)) * crack_amount;
 	vec3 aged = mix(albedo, vec3(dot(albedo, vec3(0.33))), 0.45) * (0.75 + 0.2 * dust);
 	if (pattern == PATTERN_WALLPAPER) {
 		// Papel rasgado mostrando o reboco por baixo
@@ -275,6 +316,12 @@ void fragment() {
 	}
 	if (pattern == PATTERN_METAL) {
 		aged = mix(aged, color_c.rgb, smoothstep(0.4, 0.75, fbm(uv * 3.0 + seed)));
+	}
+	if (pattern == PATTERN_WOOD) {
+		// Madeira gasta: veios lavados e claros ao longo das tábuas, largos o bastante para
+		// não cintilar
+		float worn = smoothstep(0.55, 0.85, value_noise(vec2(uv.x * 1.5, uv.y * 22.0) + seed));
+		aged = mix(aged, aged * 1.35 + 0.02, worn * 0.45);
 	}
 	aged = mix(aged, stain_color.rgb, stains * 0.65);
 	aged = mix(aged, moss_color.rgb, moss);

@@ -38,6 +38,10 @@ const MODELS := "res://art/models/"
 ## Hoje, os móveis dos modelos ficam com madeira velha e panos cobertos de pó.
 const AGED := {"mahogany": "plank", "dark_wood": "plank", "velvet": "tarp", "paper": "tarp", "brass": "iron"}
 
+## Arandelas do corredor (x), entre as portas de cada parede.
+const LAMPS_NORTH: Array[float] = [5.6, 10.0, 14.2, 18.6]
+const LAMPS_SOUTH: Array[float] = [1.2, 5.2, 9.5, 15.0]
+
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
 
@@ -55,7 +59,7 @@ func _build_room() -> void:
 # --- Paredes ---------------------------------------------------------------------------------
 
 ## Parede ao longo de x, em z, com vãos de porta (altura DOOR_TOP) ou abertos até o teto.
-func _wall_x(z: float, x0: float, x1: float, doors: Array, open_gaps: Array = [], role: String = "wallpaper") -> void:
+func _wall_x(z: float, x0: float, x1: float, doors: Array, open_gaps: Array = [], role: String = "wallpaper_rooms") -> void:
 	var cuts: Array = []
 	for gap: Vector2 in doors:
 		cuts.append([gap, DOOR_TOP])
@@ -82,7 +86,7 @@ func _wall_x(z: float, x0: float, x1: float, doors: Array, open_gaps: Array = []
 
 
 ## Parede ao longo de z, em x, sem vãos.
-func _wall_z(x: float, z0: float, z1: float, role: String = "wallpaper") -> void:
+func _wall_z(x: float, z0: float, z1: float, role: String = "wallpaper_rooms") -> void:
 	_part(Vector3(x - 0.1, 0, z0), Vector3(x + 0.1, H, z1), role)
 	_solid(Vector3(x - 0.1, 0, z0), Vector3(x + 0.1, H, z1), "Wall")
 
@@ -114,13 +118,13 @@ func _build_corridor() -> void:
 		var gap: Vector2 = DECOR_DOORS[i]
 		_model(MODELS + "porta_100x230.glb", Vector3((gap.x + gap.y) / 2.0, 0, SOUTH))
 		_solid(Vector3(gap.x, 0, SOUTH - 0.1), Vector3(gap.y, DOOR_TOP, SOUTH + 0.1), "ClosedDoor")
-		_label(DECOR_NUMBERS[i], Vector3((gap.x + gap.y) / 2.0, 1.75, SOUTH - 0.06), 0.09,
+		_plaque(DECOR_NUMBERS[i], Vector3((gap.x + gap.y) / 2.0, 1.75, SOUTH - 0.06), 0.09,
 			Color("#C9973B") if not present else Color("#6E5A34"), 180.0)
-	_label("207", Vector3(ROOM_207.y + 0.35, 1.6, SOUTH - 0.12), 0.09,
+	_plaque("207", Vector3(ROOM_207.y + 0.35, 1.6, SOUTH - 0.12), 0.09,
 		Color("#C9973B") if not present else Color("#6E5A34"), 180.0)
-	_label("214", Vector3(ROOM_214.y + 0.35, 1.6, NORTH + 0.12), 0.09,
+	_plaque("214", Vector3(ROOM_214.y + 0.35, 1.6, NORTH + 0.12), 0.09,
 		Color("#C9973B") if not present else Color("#6E5A34"))
-	_label("ROUPARIA", Vector3((LINEN.x + LINEN.y) / 2.0, 2.6, NORTH + 0.12), 0.06,
+	_plaque("ROUPARIA", Vector3((LINEN.x + LINEN.y) / 2.0, 2.6, NORTH + 0.12), 0.06,
 		Color("#C9973B") if not present else Color("#6E5A34"))
 	# Moldura do espelho (o espelho em si é do nível)
 	_part(MIRROR + Vector3(-0.55, -0.7, -0.03), MIRROR + Vector3(0.55, 0.7, 0.0), "brass")
@@ -296,12 +300,20 @@ func _build_shaft() -> void:
 
 func _build_lights() -> void:
 	if not present:
-		for x: float in [2.0, 6.0, 10.0, 14.0, 18.0]:
-			_omni(Vector3(x, H - 0.4, (NORTH + SOUTH) / 2.0), WARM, 1.1, 5.0)
-			_part(Vector3(x - 0.12, H - 0.2, NORTH + 0.1), Vector3(x + 0.12, H - 0.05, NORTH + 0.2), "brass")
+		# Corredor: arandelas dos dois lados, entre as portas, e um resto de luz no teto
+		for x: float in LAMPS_NORTH:
+			_wall_lamp(Vector3(x, 2.05, NORTH + 0.1), 0.0, 1.3, 5.5)
+		for x: float in LAMPS_SOUTH:
+			_wall_lamp(Vector3(x, 2.05, SOUTH - 0.1), 180.0, 1.3, 5.5)
+		_omni(Vector3(10.0, H - 0.5, (NORTH + SOUTH) / 2.0), WARM, 0.35, 14.0)
 		_omni(Vector3(7.75, 2.6, 7.0), WARM, 1.2, 6.0, true)
 		_omni(Vector3(12.5, 2.6, -0.3), WARM, 0.8, 5.0)
 		_omni(Vector3(7.5, 2.4, 0.7), WARM, 0.6, 3.0)
 	else:
+		# As ferragens das arandelas continuam na parede
+		for x: float in LAMPS_NORTH:
+			_wall_lamp(Vector3(x, 2.05, NORTH + 0.1), 0.0)
+		for x: float in LAMPS_SOUTH:
+			_wall_lamp(Vector3(x, 2.05, SOUTH - 0.1), 180.0)
 		_spot(Vector3(8.1, 2.6, 9.6), Vector3(8.0, 0, 6.5), MOON, 1.2, 8.0, 25.0)
 		_omni(Vector3(10.0, 2.5, 3.3), MOON, 0.25, 12.0)
