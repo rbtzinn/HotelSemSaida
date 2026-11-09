@@ -48,7 +48,8 @@ EOF
 
 if [ "$MODE" = completa ]; then
 	[ "$VERSION" = "$BASE" ] || fail "numa versão completa, config/version do project.godot ($BASE) precisa ser igual a VERSION ($VERSION)"
-	grep -q "^application/file_version=\"$VERSION.0\"" export_presets.cfg \n		|| fail "suba application/file_version e product_version no export_presets.cfg para $VERSION.0"
+	grep -q "^application/file_version=\"$VERSION.0\"" export_presets.cfg \
+		|| fail "suba application/file_version e product_version no export_presets.cfg para $VERSION.0"
 	GAME="$OUT/HotelSemSaida"
 	mkdir -p "$GAME"
 	"$GODOT" --headless --path . --export-release "$PRESET" "$GAME/HotelSemSaida.exe" 2>&1 \
