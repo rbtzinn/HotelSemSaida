@@ -270,6 +270,7 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 
 - `export_presets.cfg` tem o preset "Windows x64" (`.pck` separado do `.exe`, para os remendos; ficam de fora `tools/`, prévias e fontes de arte). Precisa dos modelos de exportação do Godot 4.7.2 (Editor > Gerenciar modelos de exportação > Baixar; ~1 GB uma vez só).
 - Gerar: no Godot, Projeto > Exportar > Windows x64 > Exportar projeto; ou sem janela: `Godot --headless --path . --export-release "Windows x64" build/HotelSemSaida.exe`. Saem o `.exe` (~110 MB, o motor), o `HotelSemSaida.pck` (~30 MB, o jogo) e as DLLs da Epic (`libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll`, `xaudio2_9redist.dll`): o ZIP precisa da pasta inteira. O `epic_credentials.cfg` entra no pacote pelo `include_filter`. Com o editor aberto, o export acusa que não copiou a DLL de *debug* do plugin (arquivo preso pelo editor); não atrapalha o release.
+- Ícone (09/11/2026): imagem feita no ChatGPT (`art/incoming/icone/icone_chatgpt.webp`, fachada do hotel dividida entre 1923 e hoje com a fechadura acesa). `python tools/make_icon.py` tira os cantos pretos e gera `art/icon/icone.png` (janela, `config/icon`) e `art/icon/icone.ico` (16 a 256 px; `config/windows_native_icon` e `application/icon` do export, com `modify_resources` ligado). O export também grava nome e versão no `.exe` (`application/file_version` e `product_version`): suba os dois a cada versão completa (o `tools/publicar_versao.sh` confere).
 
 ## Atualização pelo jogo (09/11/2026)
 
