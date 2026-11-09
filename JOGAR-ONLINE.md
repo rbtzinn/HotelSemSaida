@@ -1,6 +1,8 @@
 # Jogar em dupla
 
-Os dois jogadores usam a mesma versão de **Hotel Sem Saída**. No Windows, extraia o ZIP inteiro (o `.exe` precisa das DLLs da Epic que vêm ao lado dele) e abra `HotelSemSaida.exe`.
+Os dois jogadores usam a mesma versão de **Hotel Sem Saída**. No Windows, extraia o ZIP inteiro (o `.exe` precisa do `HotelSemSaida.pck` e das DLLs da Epic que vêm ao lado dele) e abra `HotelSemSaida.exe`. Se o Windows avisar "O Windows protegeu o computador", clique em **Mais informações > Executar assim mesmo**.
+
+A versão aparece embaixo, na recepção. Quando sair uma nova, clique em **Atualizar** e depois em **Reiniciar o jogo**; não precisa baixar o ZIP de novo. Na dupla, os dois precisam estar na mesma versão.
 
 ## Com código de sala (normal)
 
@@ -53,4 +55,4 @@ Copie `epic_credentials.example.cfg` para `epic_credentials.cfg` na raiz do proj
 
 - **No mesmo PC**: abra duas cópias do jogo (ou rode duas vezes o `.exe`); uma cria a sala e a outra entra com o código. Cada cópia ganha uma identidade anônima própria na Epic, então não precisa de outro PC nem da DevAuthTool. Sem janela: `Godot_console.exe --headless --path . --script res://tools/test_epic_sala.gd -- criar` num terminal e `-- entrar CODIGO` em outro.
 - **Com o amigo**: mande o ZIP e teste pela internet de verdade (é o que confere a rede dele).
-- **Gerar o `.exe`**: Projeto > Exportar > Windows x64 > Exportar projeto, numa pasta vazia (ex.: `build/`). Saem o `HotelSemSaida.exe` e três DLLs: `libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll` e `xaudio2_9redist.dll`. Zipe a pasta inteira; sem as DLLs, o jogo abre mas a sala por código diz que falta o plugin.
+- **Gerar o `.exe`**: Projeto > Exportar > Windows x64 > Exportar projeto, numa pasta vazia (ex.: `build/`). Saem o `HotelSemSaida.exe`, o `HotelSemSaida.pck` e três DLLs: `libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll` e `xaudio2_9redist.dll`. Zipe a pasta inteira; sem as DLLs, o jogo abre mas a sala por código diz que falta o plugin. Para publicar uma versão (com o botão Atualizar do jogo), use `tools/publicar_versao.sh` (ver CLAUDE.md, "Atualização pelo jogo").

@@ -153,15 +153,18 @@ func join(address: String) -> void:
 
 func _connected() -> void:
 	if phase == Phase.JOINING:
-		_check_in.rpc_id(1, PROTOCOL, player_name())
+		_check_in.rpc_id(1, PROTOCOL, player_name(), GameVersion.VERSION)
 
 @rpc("any_peer", "call_remote", "reliable")
-func _check_in(version: int, guest_name: String = "") -> void:
+func _check_in(version: int, guest_name: String = "", game_version: String = "") -> void:
 	var guest := multiplayer.get_remote_sender_id()
 	if not is_host or phase != Phase.HOSTING or guest <= 1:
 		return
-	if version != PROTOCOL:
-		_refuse.rpc_id(guest)
+	if version != PROTOCOL or game_version != GameVersion.VERSION:
+		# Remendos diferentes podem ter enigmas diferentes: as duas cópias precisam ser da mesma versão
+		_refuse.rpc_id(guest, GameVersion.VERSION)
+		_message("%s tentou entrar com a versão %s do jogo; a sua é %s. Atualizem na recepção." % [
+				_shown_name(guest_name), game_version if game_version != "" else "antiga", GameVersion.VERSION])
 		return
 	partner = guest
 	partner_name = _shown_name(guest_name)
@@ -202,8 +205,9 @@ func _guest_text() -> String:
 	return "Você está na sala de %s e fica com %s. Aguardando começar." % [partner_name, _role_text(local_era)]
 
 @rpc("authority", "call_remote", "reliable")
-func _refuse() -> void:
-	leave.call_deferred("As versões dos jogos são diferentes.", false)
+func _refuse(host_version: String = "") -> void:
+	leave.call_deferred("As versões dos jogos são diferentes (a sua é %s; a do anfitrião, %s). Atualizem na recepção." % [
+			GameVersion.VERSION, host_version if host_version != "" else "outra"], false)
 
 @rpc("authority", "call_remote", "reliable")
 func _welcome(era: int, host_name: String = "") -> void:

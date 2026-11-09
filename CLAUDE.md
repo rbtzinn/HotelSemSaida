@@ -124,7 +124,7 @@ Ações do Input Map (em `project.godot`):
 - Se Roberto encontrar erro na aba **Saída** ou **Depurador** do Godot, ele vai colar o texto aqui.
 - Não adicione plugins nem addons sem perguntar antes.
 - Salve `.tscn`, `.tres` e `.gd` com quebras de linha **LF**. Com CRLF, o `\r` vira linha em branco extra nos textos de várias linhas das cenas (bilhetes, cardápio).
-- Prefira código simples e legível a padrões complexos. Autoloads só para `Settings`, `EraManager`, `WorldState`, `SaveSystem`, `RoomManager`, `NetSession` e `Audio` (e algo novo só com motivo claro).
+- Prefira código simples e legível a padrões complexos. Autoloads só para `PatchLoader` (o primeiro da lista), `Settings`, `EraManager`, `WorldState`, `SaveSystem`, `RoomManager`, `NetSession` e `Audio` (e algo novo só com motivo claro).
 - Antes de decisões de design que não estejam neste arquivo, **pergunte ao Roberto** em vez de decidir sozinho.
 
 ## Etapas do protótipo
@@ -268,8 +268,17 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 
 ## Versão para Windows (08/11/2026)
 
-- `export_presets.cfg` tem o preset "Windows x64" (pck embutido no `.exe`; ficam de fora `tools/`, prévias e fontes de arte). Precisa dos modelos de exportação do Godot 4.7.2 (Editor > Gerenciar modelos de exportação > Baixar; ~1 GB uma vez só).
-- Gerar: no Godot, Projeto > Exportar > Windows x64 > Exportar projeto; ou sem janela: `Godot --headless --path . --export-release "Windows x64" build/HotelSemSaida.exe`. Sai um `.exe` de ~130 MB e, ao lado dele, as DLLs da Epic (`libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll`, `xaudio2_9redist.dll`): o ZIP precisa da pasta inteira. O `epic_credentials.cfg` entra no pacote pelo `include_filter`. Com o editor aberto, o export acusa que não copiou a DLL de *debug* do plugin (arquivo preso pelo editor); não atrapalha o release.
+- `export_presets.cfg` tem o preset "Windows x64" (`.pck` separado do `.exe`, para os remendos; ficam de fora `tools/`, prévias e fontes de arte). Precisa dos modelos de exportação do Godot 4.7.2 (Editor > Gerenciar modelos de exportação > Baixar; ~1 GB uma vez só).
+- Gerar: no Godot, Projeto > Exportar > Windows x64 > Exportar projeto; ou sem janela: `Godot --headless --path . --export-release "Windows x64" build/HotelSemSaida.exe`. Saem o `.exe` (~110 MB, o motor), o `HotelSemSaida.pck` (~30 MB, o jogo) e as DLLs da Epic (`libeosg.windows.template_release.x86_64.dll`, `EOSSDK-Win64-Shipping.dll`, `xaudio2_9redist.dll`): o ZIP precisa da pasta inteira. O `epic_credentials.cfg` entra no pacote pelo `include_filter`. Com o editor aberto, o export acusa que não copiou a DLL de *debug* do plugin (arquivo preso pelo editor); não atrapalha o release.
+
+## Atualização pelo jogo (09/11/2026)
+
+- Pedido do Roberto: ninguém baixa ZIP nem `.exe` de novo a cada versão. O ZIP (`.exe` + `.pck` + DLLs) é baixado uma vez; depois, a recepção mostra a versão e, se houver uma nova, **Atualizar** baixa só um remendo (`.pck` com o que mudou) e **Reiniciar o jogo** a instala.
+- `GameVersion` (`scripts/core/game_version.gd`): `VERSION` sobe a cada versão publicada. A "base" é `application/config/version` no `project.godot` (a versão do ZIP; só muda numa versão completa). Na dupla, o anfitrião recusa quem tem outra `VERSION` e os dois veem as duas versões.
+- `PatchLoader` (primeiro autoload, `scripts/core/patch_loader.gd`): no `_init`, só no jogo exportado (feature `template`), instala `user://atualizacao/remendo-novo.pck` por cima de `remendo.pck` e o carrega com `ProjectSettings.load_resource_pack`. Por ser o primeiro, os outros autoloads e as cenas já saem do remendo (conferido no 4.7.2, inclusive `class_name` novo). Remendo de outra base (ZIP novo instalado) é apagado. Mudanças nele só valem num ZIP novo.
+- `Updater` (`scripts/core/updater.gd`, filho da recepção): lê `versao.json` do último Release do GitHub (`version`, `base`, `patch {url, size, sha256}`, `page`), baixa para `.part`, confere tamanho e sha256 e só então grava `remendo-novo.*`. Base diferente: o botão abre a página do Release para baixar o ZIP novo. No editor não procura (só com `-- --procurar-atualizacao`).
+- Publicar: `tools/publicar_versao.sh completa` (ZIP; `VERSION` = base) ou `tools/publicar_versao.sh remendo` (`VERSION` maior que a base). Precisa de commit e push feitos e do `gh` logado; cria o Release `v<VERSION>` com os arquivos e o `versao.json`. O remendo é sempre em relação ao ZIP base (`--export-patch --patches`), então quem pula versões baixa um só. **Mudou `project.godot` (autoload, Input Map, configurações), `addons/` ou a versão do Godot? Versão completa** (o remendo não carrega isso; o script recusa). Os builds ficam em `build/` (fora do git).
+- Teste `tools/test_atualizacao.gd` (versões, decisão, download por um servidor HTTP local, sha256 errado, instalação e descarte do remendo).
 
 ## Testes
 

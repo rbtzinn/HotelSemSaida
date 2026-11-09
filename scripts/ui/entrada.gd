@@ -25,6 +25,9 @@ var _resume: Button
 var _cancel: Button
 var _solo: Button
 var _create: Button
+var _version := Label.new()
+var _update: Button
+var _updater := Updater.new()
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -114,8 +117,68 @@ func _ready() -> void:
 	_status.add_theme_font_size_override("font_size", 11)
 	_status.modulate = GOLD
 	_form.add_child(_status)
+	_options.add_child(HSeparator.new())
+	var update_row := HBoxContainer.new()
+	_options.add_child(update_row)
+	_version.add_theme_font_size_override("font_size", 10)
+	_version.modulate = GOLD
+	_version.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_version.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	update_row.add_child(_version)
+	_update = _button(update_row, "", _on_update)
+	add_child(_updater)
+	_updater.changed.connect(_refresh_update)
+	# Só o jogo exportado procura (no editor, os arquivos já são os atuais); o argumento serve para testar
+	if OS.has_feature("template") or "--procurar-atualizacao" in OS.get_cmdline_user_args():
+		_updater.check()
+	_refresh_update()
 	NetSession.lobby_changed.connect(_refresh)
 	_refresh()
+
+func _process(_delta: float) -> void:
+	if _updater.state == Updater.State.DOWNLOADING:
+		_refresh_update()
+
+func _refresh_update() -> void:
+	var version := GameVersion.VERSION
+	var next := str(_updater.manifest.get("version", ""))
+	var caption := ""
+	var text := "Versão %s" % version
+	match _updater.state:
+		Updater.State.CHECKING:
+			text += " · procurando atualização…"
+		Updater.State.UP_TO_DATE:
+			text += " · em dia"
+		Updater.State.PATCH:
+			caption = "Atualizar para %s (%s MB)" % [next, ("%.1f" % _updater.patch_megabytes()).replace(".", ",")]
+		Updater.State.NEW_ZIP:
+			text += ". A %s precisa do jogo novo (ZIP)." % next
+			caption = "Baixar a versão %s" % next
+		Updater.State.DOWNLOADING:
+			text = "Baixando a versão %s… %d%%" % [next, roundi(_updater.progress()*100.0)]
+		Updater.State.READY:
+			text = "Versão %s baixada." % next
+			caption = "Reiniciar o jogo"
+		Updater.State.FAILED:
+			if _updater.download_failed:
+				text = "Não deu para baixar a atualização."
+				caption = "Tentar de novo"
+			else:
+				text += " · não deu para procurar atualização"
+	_version.text = text
+	_update.text = caption
+	_update.visible = caption != ""
+
+func _on_update() -> void:
+	match _updater.state:
+		Updater.State.PATCH:
+			_updater.download()
+		Updater.State.NEW_ZIP:
+			_updater.open_page()
+		Updater.State.READY:
+			_updater.restart()
+		Updater.State.FAILED:
+			_updater.check()
 
 func _fill_roles(button: OptionButton) -> void:
 	button.add_item("Helena · 1923", Era.Id.PAST_1923)

@@ -12,3 +12,6 @@ __pycache__/
 
 # Cópias que o editor faz das DLLs do plugin para recarregar a extensão
 addons/**/~*
+
+# Versões geradas por tools/publicar_versao.sh
+build/
