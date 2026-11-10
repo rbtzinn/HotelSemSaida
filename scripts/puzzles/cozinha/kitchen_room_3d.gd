@@ -57,6 +57,8 @@ const MODELS := "res://art/models/"
 ## Hoje: madeira velha e ferragens enferrujadas.
 const AGED := {"oak": "plank", "brass": "iron", "mahogany": "plank"}
 
+## Cepo de açougue entre a porta do Saguão e a mesa (x, z, largura, profundidade).
+const BUTCHER_BLOCK := Rect2(5.0, 2.75, 1.0, 0.75)
 ## Sinetas do quadro de chamadas, uma por salão.
 const BELLS: Array[String] = ["SAGUÃO", "SALÃO", "BIBLIOT.", "2º AND.", "GERÊNCIA", "ENTRADA"]
 
@@ -72,6 +74,7 @@ func _build_room() -> void:
 	_build_kitchen_wall_dressing()
 	_build_service_board()
 	_build_spice_shelf()
+	_build_work_furniture()
 	_build_counter()
 	_build_stove_hood()
 	if not present:
@@ -328,6 +331,87 @@ func _build_service_board() -> void:
 		_sphere(Vector3(x, board.y - 0.14, z + 0.07), 0.018, "iron")
 	_label("CHAMADAS", Vector3(board.x, board.y + 0.56, z + 0.01), 0.07,
 		Color("#3A2A1A") if not present else Color("#2A2A26"))
+
+
+## Móveis de trabalho que quebram o corredor comprido sem mexer nos enigmas: cepo de açougue
+## com as panelas penduradas por cima (entre a porta e a mesa), aparador sob a primeira
+## janela, guarda-louça entre as janelas e barril com sacas no canto. Todos sólidos; sobram
+## mais de 1,1 m de passagem de cada lado do cepo.
+func _build_work_furniture() -> void:
+	var wood := "oak" if not present else "plank"
+	var metal := "brass" if not present else "iron"
+	# Cepo de açougue
+	var block := BUTCHER_BLOCK
+	var a := Vector3(block.position.x, K, block.position.y)
+	var b := Vector3(block.end.x, K + 0.88, block.end.y)
+	_solid(a, b, "ButcherBlock")
+	_part(Vector3(a.x, K + 0.6, a.z), b, wood)
+	_part(Vector3(a.x + 0.06, K + 0.2, a.z + 0.06), Vector3(b.x - 0.06, K + 0.24, b.z - 0.06), wood)
+	for corner: Vector2 in [Vector2(a.x, a.z), Vector2(b.x - 0.09, a.z), Vector2(a.x, b.z - 0.09), Vector2(b.x - 0.09, b.z - 0.09)]:
+		_part(Vector3(corner.x, K, corner.y), Vector3(corner.x + 0.09, K + 0.6, corner.y + 0.09), "dark_wood" if not present else "plank")
+	if not present:
+		_block(Vector3(a.x + 0.3, K + 0.895, a.z + 0.35), Vector3(0.34, 0.012, 0.08), "iron", Vector3(0, 25, 0))
+		_block(Vector3(a.x + 0.47, K + 0.895, a.z + 0.27), Vector3(0.12, 0.02, 0.035), "dark_wood", Vector3(0, 25, 0))
+		_cylinder(Vector3(b.x - 0.28, K + 0.88, b.z - 0.3), 0.14, 0.1, 0.09, "enamel", Vector3.ZERO, 14)
+	# Grade de panelas pendurada do teto, acima do cepo (fora do alcance da cabeça)
+	var rack_y := K + 2.25
+	var rack_a := Vector3(a.x - 0.1, rack_y, a.z + 0.1)
+	var rack_b := Vector3(b.x + 0.1, rack_y + 0.03, b.z - 0.1)
+	_solid(Vector3(rack_a.x, rack_y - 0.4, rack_a.z), rack_b, "PotRack")
+	for z: float in [rack_a.z, rack_b.z - 0.03]:
+		_part(Vector3(rack_a.x, rack_y, z), Vector3(rack_b.x, rack_y + 0.03, z + 0.03), "cast_iron")
+	for x: float in [rack_a.x, rack_b.x - 0.03]:
+		_part(Vector3(x, rack_y, rack_a.z), Vector3(x + 0.03, rack_y + 0.03, rack_b.z), "cast_iron")
+		for z: float in [rack_a.z + 0.01, rack_b.z - 0.02]:
+			_part(Vector3(x + 0.01, rack_y, z), Vector3(x + 0.02, TOP, z + 0.01), "cast_iron")
+	for i in 5:
+		if present and i in [0, 3]:
+			continue
+		var x := rack_a.x + 0.16 + i * 0.25
+		var z := rack_a.z + 0.015 if i % 2 == 0 else rack_b.z - 0.015
+		var radius := 0.09 + _random(i, 9.0) * 0.05
+		_block(Vector3(x, rack_y - 0.06, z), Vector3(0.01, 0.12, 0.01), "iron")
+		_cylinder(Vector3(x, rack_y - 0.12 - radius * 2.0, z), radius, radius, 0.04, "copper", Vector3(90, 0, 0), 14)
+	# Aparador sob a primeira janela (parede sul)
+	var side_a := Vector3(4.7, K, DEPTH - 0.55)
+	var side_b := Vector3(6.6, K + 0.9, DEPTH - 0.02)
+	_solid(side_a, side_b, "Sideboard")
+	_part(side_a, Vector3(side_b.x, K + 0.86, side_b.z), wood)
+	_part(Vector3(side_a.x - 0.03, K + 0.86, side_a.z - 0.03), Vector3(side_b.x + 0.03, K + 0.9, side_b.z), "marble" if not present else "rubble")
+	for i in 3:
+		var dx := side_a.x + 0.06 + i * 0.61
+		_part(Vector3(dx, K + 0.1, side_a.z - 0.015), Vector3(dx + 0.55, K + 0.78, side_a.z), "panel" if not present else "plank")
+		_sphere(Vector3(dx + 0.275, K + 0.6, side_a.z - 0.03), 0.018, metal)
+	if not present:
+		for i in 4:
+			_cylinder(Vector3(side_a.x + 0.3 + i * 0.16, K + 0.9, DEPTH - 0.3), 0.07, 0.07, 0.02 + i * 0.015, "ivory", Vector3.ZERO, 14)
+		_cylinder(Vector3(side_b.x - 0.4, K + 0.9, DEPTH - 0.28), 0.1, 0.13, 0.26, "copper", Vector3.ZERO, 14)
+	# Guarda-louça alto entre as duas janelas
+	var cup_a := Vector3(9.3, K, DEPTH - 0.5)
+	var cup_b := Vector3(10.7, K + 2.1, DEPTH - 0.02)
+	_solid(cup_a, cup_b, "Cupboard")
+	_part(cup_a, cup_b, wood)
+	_part(Vector3(cup_a.x - 0.04, cup_b.y, cup_a.z - 0.04), Vector3(cup_b.x + 0.04, cup_b.y + 0.06, cup_b.z), "dark_wood" if not present else "plank")
+	for i in 2:
+		var dx := cup_a.x + 0.05 + i * 0.67
+		# Hoje uma das portas pende aberta, torta
+		var hanging := present and i == 1
+		_part(Vector3(dx, K + 0.1, cup_a.z - 0.02), Vector3(dx + 0.63, K + 0.95, cup_a.z), "panel" if not present else "plank",
+			Vector3(0, 0, 5.0) if hanging else Vector3.ZERO)
+		_part(Vector3(dx, K + 1.05, cup_a.z - 0.02), Vector3(dx + 0.63, K + 2.0, cup_a.z), "glass")
+		_sphere(Vector3(dx + (0.56 if i == 0 else 0.07), K + 1.5, cup_a.z - 0.035), 0.018, metal)
+	# Barril e sacas de farinha no canto sudeste
+	var barrel := Vector3(17.4, K, DEPTH - 0.45)
+	_solid_cylinder(barrel, 0.32, 0.86, "Barrel")
+	_cylinder(barrel, 0.27, 0.3, 0.43, wood, Vector3.ZERO, 16)
+	_cylinder(barrel + Vector3(0, 0.43, 0), 0.3, 0.27, 0.43, wood, Vector3.ZERO, 16)
+	for y: float in [0.1, 0.42, 0.74]:
+		_torus(barrel + Vector3(0, y, 0), 0.285, 0.315, "iron")
+	var sacks := Vector3(16.75, K, DEPTH - 0.38)
+	_solid(sacks + Vector3(-0.32, 0, -0.3), sacks + Vector3(0.32, 0.5 if not present else 0.24, 0.3), "Sacks")
+	_sphere(sacks + Vector3(0, 0.12, 0), 0.3, "flour", Vector3(1.0, 0.42, 0.9))
+	if not present:
+		_sphere(sacks + Vector3(0.03, 0.35, 0.02), 0.28, "flour", Vector3(1.0, 0.42, 0.9))
 
 
 ## Prateleira de temperos e réstias de alho na parede sul, depois das janelas (sólida).
@@ -720,10 +804,11 @@ func _build_lights() -> void:
 		for i in LAMPS.size():
 			var at := Vector3(LAMPS[i], K + 2.55, LAMP_Z)
 			_cylinder(at + Vector3(0, 0.25, 0), 0.006, 0.006, TOP - K - 2.8, "dark", Vector3.ZERO, 4)
-			_cylinder(at + Vector3(0, 0.05, 0), 0.28, 0.06, 0.2, "enamel", Vector3.ZERO, 16)
-			_sphere(at + Vector3(0, 0.02, 0), 0.07, "bulb")
+			# Cúpula de ferro esmaltado escuro: a branca virava uma mancha estourada vista de baixo
+			_cylinder(at + Vector3(0, 0.05, 0), 0.28, 0.06, 0.2, "cast_iron", Vector3.ZERO, 16)
+			_sphere(at + Vector3(0, 0.02, 0), 0.055, "bulb")
 			# A luz fica abaixo da cúpula: colada nela, o esmalte estourava numa mancha branca
-			_omni(at - Vector3(0, 0.45, 0), WARM, 1.5, 8.0, i == 1)
+			_omni(at - Vector3(0, 0.9, 0), WARM, 1.5, 8.0, i == 1)
 		# Brasa do fogão e uma luz quente na despensa
 		_omni(Vector3(STOVE.x + 0.5, K + 0.4, 1.3), FIRE, 0.8, 2.5)
 		for at: Vector3 in [Vector3(4.5, 3.6, 3.4), Vector3(11.0, 3.6, 2.2), Vector3(16.0, 3.6, 3.4)]:

@@ -34,6 +34,8 @@ const int MOTIF_FLOWER = 2;
 // poeira entorta as linhas (sem isso elas saem retas, como vidro trincado).
 // Raios do leque do papel de parede do Salão.
 const float FAN_RAYS = 5.0;
+// Quanto dos veios do mármore sobra depois de 100 anos.
+const float AGED_VEINS = 0.3;
 const float CRACK_CELLS = 2.3;
 const float CRACK_WIDTH = 0.016;
 const float CRACK_WARP = 0.9;
@@ -170,7 +172,9 @@ vec3 marble_tiles(vec2 uv, float fade, out float grout) {
 	vec3 base = mix(color_a.rgb, color_b.rgb, checker);
 	// Veios: senoide deformada por fbm, fina e clara
 	float veins = abs(sin((p.x + p.y) * 2.2 + fbm(p * 1.7 + tile * 3.1 + seed) * 7.0));
-	base = mix(base, mix(base, vec3(1.0), 0.35), (1.0 - smoothstep(0.0, 0.07, veins)) * 0.8 * (1.0 - fade));
+	// Com a idade os veios se apagam sob o pó (senão viravam rabiscos brancos na lanterna)
+	base = mix(base, mix(base, vec3(1.0), 0.35), (1.0 - smoothstep(0.0, 0.07, veins)) * 0.8 * (1.0 - fade)
+		* mix(1.0, AGED_VEINS, age));
 	base *= mix(0.92 + 0.12 * fbm(p * 5.0 + seed), 0.98, fade);
 	// Rejunte: faixa estreita nas bordas de cada ladrilho
 	vec2 edge = min(local, 1.0 - local);

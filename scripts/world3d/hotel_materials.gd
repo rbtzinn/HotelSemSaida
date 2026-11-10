@@ -5,6 +5,7 @@ extends RefCounted
 ## Os materiais ficam em cache: todas as peças do mesmo papel compartilham um só.
 
 const SURFACE_SHADER := preload("res://shaders/spatial_env_hotel_surface.gdshader")
+const NIGHT_SHADER := preload("res://shaders/spatial_env_night_window.gdshader")
 
 enum Pattern { PLAIN, WALLPAPER, MARBLE_TILES, WOOD, METAL, RUG, PLASTER, CLOTH, PAINTING }
 
@@ -125,6 +126,8 @@ static func get_material(role: String, present: bool) -> Material:
 			material = _emissive(Color("#8FA6C8"), 0.6)
 		"street":
 			material = _emissive(Color("#F2C27A"), 3.0)
+		"night":
+			material = _night(present)
 		"ice":
 			var ice := _glass(false)
 			ice.albedo_color = Color(0.8, 0.92, 0.98, 0.7)
@@ -206,6 +209,16 @@ static func rug_material(role: String, present: bool, center: Vector2, half_size
 	var material := (_surface(role, present) as ShaderMaterial)
 	material.set_shader_parameter("rug_center", center)
 	material.set_shader_parameter("rug_half_size", half_size)
+	return material
+
+
+## Noite atrás das janelas: degradê com estrelas (hoje, mais apagado pela bruma).
+static func _night(present: bool) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = NIGHT_SHADER
+	if present:
+		material.set_shader_parameter("low_color", Color("#060A12"))
+		material.set_shader_parameter("star_energy", 0.5)
 	return material
 
 
