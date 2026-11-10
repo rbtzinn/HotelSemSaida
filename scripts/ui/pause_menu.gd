@@ -46,6 +46,8 @@ func _ready() -> void:
 		_add_button(column, "Voltar à recepção", func() -> void:
 			get_tree().paused = false
 			RoomManager.open_scene(NetSession.LOBBY))
+	if GamePlatform.can_fullscreen():
+		_add_button(column, "Tela cheia", GamePlatform.toggle_fullscreen)
 	# No navegador não há o que fechar: sai-se pela aba
 	if not GamePlatform.is_web():
 		_add_button(column, "Sair do jogo", func() -> void: Audio.quit())
