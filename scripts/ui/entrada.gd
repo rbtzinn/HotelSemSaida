@@ -55,6 +55,8 @@ func _ready() -> void:
 	if SaveSystem.has_save():
 		_button(solo_row, "Continuar solo", SaveSystem.load_game)
 	_button(solo_row, "Configurações", _open_settings)
+	# Daqui para baixo (dupla e atualização) não existe na versão de navegador
+	var first_extra := _options.get_child_count()
 	_options.add_child(HSeparator.new())
 	_label(_options, "PARTIDA PARA DUAS PESSOAS", 10).modulate = GOLD
 	_name.placeholder_text = "Seu nome (a outra pessoa vê)"
@@ -134,11 +136,15 @@ func _ready() -> void:
 	add_child(_updater)
 	_updater.changed.connect(_refresh_update)
 	# Só o jogo exportado procura (no editor, os arquivos já são os atuais); o argumento serve para testar
-	if OS.has_feature("template") or "--procurar-atualizacao" in OS.get_cmdline_user_args():
+	if (OS.has_feature("template") and not GamePlatform.is_web()) or "--procurar-atualizacao" in OS.get_cmdline_user_args():
 		_updater.check()
 	_refresh_update()
 	NetSession.lobby_changed.connect(_refresh)
 	_refresh()
+	if GamePlatform.is_web():
+		for index in range(first_extra, _options.get_child_count()):
+			(_options.get_child(index) as Control).visible = false
+		_label(_options, "Versão de navegador %s · só o modo solo" % GameVersion.VERSION, 10).modulate = GOLD
 	# Chegou à recepção: o remendo (se houver) funciona
 	get_node("/root/PatchLoader").confirm()
 
@@ -279,7 +285,7 @@ func _refresh() -> void:
 func _button(parent: Container, caption: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = caption
-	button.custom_minimum_size.y = 25
+	button.custom_minimum_size.y = 34 if GamePlatform.is_touch() else 25
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.pressed.connect(action)
 	parent.add_child(button)

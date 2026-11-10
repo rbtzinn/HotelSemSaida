@@ -12,6 +12,8 @@ var _message_tween: Tween
 ## Primeira pessoa: mira no centro e o aviso de interação logo abaixo dela.
 var _crosshair: ColorRect
 var _prompt: Label
+## Controles na tela (só com tela de toque).
+var _touch: TouchControls
 
 
 func _ready() -> void:
@@ -105,6 +107,11 @@ func show_message(text: String) -> void:
 
 func set_first_person(enabled: bool) -> void:
 	_crosshair.visible = enabled
+	if enabled and GamePlatform.is_touch() and _touch == null:
+		_touch = TouchControls.new()
+		add_child(_touch)
+	if _touch:
+		_touch.visible = enabled
 
 
 ## Aviso de interação no centro da tela ("" esconde).

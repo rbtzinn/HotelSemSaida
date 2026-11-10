@@ -46,7 +46,9 @@ func _ready() -> void:
 		_add_button(column, "Voltar à recepção", func() -> void:
 			get_tree().paused = false
 			RoomManager.open_scene(NetSession.LOBBY))
-	_add_button(column, "Sair do jogo", func() -> void: Audio.quit())
+	# No navegador não há o que fechar: sai-se pela aba
+	if not GamePlatform.is_web():
+		_add_button(column, "Sair do jogo", func() -> void: Audio.quit())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -87,7 +89,7 @@ func _load() -> void:
 func _add_button(parent: Control, text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(150, 24)
+	button.custom_minimum_size = Vector2(150, 32 if GamePlatform.is_touch() else 24)
 	button.add_theme_font_size_override("font_size", 11)
 	button.pressed.connect(action)
 	parent.add_child(button)
