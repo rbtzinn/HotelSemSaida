@@ -2,7 +2,8 @@
 # Gera a versão de navegador (solo) em build/web/, sem tocar no project.godot do jogo de Windows.
 # Copia o projeto para build/web_src/, tira o plugin da Epic (não existe no navegador), liga os
 # ajustes do renderizador Compatibility e exporta com o preset de tools/web/export_presets.cfg.
-# Uso: tools/exportar_web.sh [caminho do Godot]   (precisa dos modelos de exportação da Web)
+# Uso: tools/exportar_web.sh [caminho do Godot] [--site]   (precisa dos modelos de exportação da Web)
+# Com --site, copia o resultado para site/jogar/, que a Vercel publica junto com o site.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 GODOT="${1:-${GODOT:-godot}}"
@@ -52,4 +53,10 @@ if grep -qE "SCRIPT ERROR|Parse Error" "$OUT/../web_export.log"; then
 fi
 [ -f "$OUT/index.wasm" ] && [ -f "$OUT/index.pck" ] || fail "o export não gerou index.wasm/index.pck"
 ls -la "$OUT"
+# Com --site, publica no site (Vercel serve a pasta site/): fica em <site>/jogar/
+if [ "${2:-}" = "--site" ]; then
+	rm -rf site/jogar
+	cp -r "$OUT" site/jogar
+	echo "Copiado para site/jogar (faça commit e push para a Vercel publicar)"
+fi
 echo "Pronto: $OUT (sirva a pasta por HTTP; abrir o index.html direto do disco não funciona)"
