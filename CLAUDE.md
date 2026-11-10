@@ -306,14 +306,16 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - `GamePlatform` (`scripts/core/game_platform.gd`; o nome `Platform` bate com uma classe do plugin da Epic): `is_web()`, `is_touch()` (tela de toque, ou `-- --toque` para testar no PC), `is_compatibility()`, `is_lite()`.
 - `TouchControls` (`scripts/ui/touch_controls.gd`, criado pelo HUD em primeira pessoa quando há tela de toque): metade esquerda é o analógico de andar, metade direita arrasta o olhar, botões Usar, Pular, Época e Pausa; com uma tela em close aberta viram quatro setas, Usar e X. Tudo sai como ações do Input Map (`InputEventAction`), então cadeado, relógio e bilhetes funcionam sem mudar. Com toque, `Room3D` não prende o mouse e os avisos mostram "Usar" (`Settings.TOUCH_LABELS`).
 - No navegador: a recepção esconde a dupla e a atualização, a pausa não tem "Sair do jogo", a qualidade padrão é Baixa, a escala do 3D mira uma altura fixa (`Settings.COMPAT_3D_HEIGHT`) e os materiais usam o caminho `lite` do shader (envelhecimento com dois ruídos, sem normal map de detalhe).
-- Publicação: `tools/exportar_web.sh <godot> --site` copia o resultado para `site/jogar/` (entra no git, ~70 MB por versão), e a Vercel o serve em `<site>/jogar/`; a página do site tem o link "Jogar no navegador". Os saves do navegador ficam no próprio aparelho.
+- Publicação web retirada a pedido do Roberto (10/11/2026): o link da landing e os arquivos de `site/jogar/` foram removidos. O protótipo técnico e `tools/exportar_web.sh` foram preservados; a opção `--site` do exportador pode recriar essa pasta. Os saves do navegador ficam no próprio aparelho.
 - Conferido no Chromium sem placa de vídeo (Playwright, toque emulado): abre, anda, olha, troca de época e pausa. **Não medido em celular de verdade**; no iPhone o Safari é o risco.
 - Limites conhecidos: barras pretas nas laterais em telas mais largas que 16:9 (o HUD usa posições fixas em 640×360), a fonte da interface cai na padrão do Godot (não há fontes do sistema no navegador) e o piano precisa de toque nas teclas.
 
 ## Site (09/11/2026)
 
-- Landing page estática em `site/` (um `index.html` com CSS e JS embutidos, imagens em `site/img/`), publicada pelo Roberto na Vercel com Root Directory `site` e sem build. Divisores 1923 | hoje com as prévias do Saguão, da Cozinha e da Biblioteca, Helena e Lia, o livro de hóspedes, a dupla e a instalação.
+- Landing page estática em `site/` (`index.html`, `styles.css`, `site.js`, imagens em `site/img/`), publicada pelo Roberto na Vercel com Root Directory `site` e sem build. É apresentação e download para Windows; não contém jogo no navegador.
+- Visual premium aprovado pelo Roberto (10/11/2026): identidade art déco vinho/dourado, fachada em portal arqueado, imagens comparáveis das épocas, Helena e Lia, livro de hóspedes, dupla online e instalação em FAQ. Fontes Poiret One, Cormorant Garamond e Manrope auto-hospedadas em `site/fonts/`, com licenças OFL. Menu móvel e FAQ nativos; conteúdo visível sem JavaScript, foco por teclado e movimento reduzido.
 - O botão de download pega o `.zip` do Release mais novo que tem um (API do GitHub, no navegador); sem resposta, leva à página do último Release. Remendos não mudam o link.
+- Validação do site (10/11/2026): desktop, tablet e celular (1440, 768, 390 e 320 px), menu/FAQ, comparadores por teclado, recursos e âncoras locais; resolver de download testado com versão completa, remendo, falha de rede e timeout.
 - Para ver localmente: `.claude/launch.json` (servidor `site`, porta 4173).
 
 ## Testes
