@@ -55,6 +55,8 @@ func _ready() -> void:
 	if SaveSystem.has_save():
 		_button(solo_row, "Continuar solo", SaveSystem.load_game)
 	_button(solo_row, "Configurações", _open_settings)
+	if GamePlatform.can_fullscreen():
+		_button(_options, "Tela cheia", GamePlatform.toggle_fullscreen)
 	# Daqui para baixo (dupla e atualização) não existe na versão de navegador
 	var first_extra := _options.get_child_count()
 	_options.add_child(HSeparator.new())
