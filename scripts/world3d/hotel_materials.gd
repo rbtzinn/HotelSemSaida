@@ -158,7 +158,7 @@ static func _surface(role: String, present: bool) -> ShaderMaterial:
 	material.set_shader_parameter("age", 0.95 if present else 0.0)
 	material.set_shader_parameter("retro", false)
 	# Reboco que aparece sob o papel rasgado: escuro, para não brilhar no escuro
-	material.set_shader_parameter("bare_color", Color("#4A4842"))
+	material.set_shader_parameter("bare_color", Color("#46403A"))
 	if DETAIL.has(role):
 		_apply_detail(material, DETAIL[role], colors[0])
 	return material

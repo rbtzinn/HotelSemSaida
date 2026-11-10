@@ -36,6 +36,12 @@ const int MOTIF_FLOWER = 2;
 const float FAN_RAYS = 5.0;
 // Quanto dos veios do mármore sobra depois de 100 anos.
 const float AGED_VEINS = 0.3;
+// Rasgos do papel de parede: limiar do ruído onde o papel some e quanto a borda é picotada.
+const float TEAR_EDGE = 0.61;
+const float TEAR_RAGGED = 0.07;
+// Ripas por metro e o tom de madeira delas em relação ao reboco em volta.
+const float LATH_ROWS = 14.0;
+const vec3 LATH_TINT = vec3(0.95, 0.82, 0.68);
 const float CRACK_CELLS = 2.3;
 const float CRACK_WIDTH = 0.016;
 const float CRACK_WARP = 0.9;
@@ -314,9 +320,22 @@ void fragment() {
 	cracks *= smoothstep(0.5, 0.72, fbm(uv * 0.6 + seed + 5.0)) * crack_amount;
 	vec3 aged = mix(albedo, vec3(dot(albedo, vec3(0.33))), 0.45) * (0.75 + 0.2 * dust);
 	if (pattern == PATTERN_WALLPAPER) {
-		// Papel rasgado mostrando o reboco por baixo
-		float torn = smoothstep(0.60, 0.63, fbm(uv * 0.55 + seed + 21.0));
-		aged = mix(aged, bare_color.rgb * (0.85 + 0.2 * dust), torn);
+		// Papel rasgado mostrando o reboco por baixo. A borda é picotada por um ruído miúdo
+		// (lisa, a falha parecia uma mancha de névoa), tem uma tira clara de papel descolado
+		// (o verso) e o reboco aparece manchado, não chapado.
+		float tear = fbm(uv * 0.55 + seed + 21.0) + (value_noise(uv * 11.0 + seed) - 0.5) * TEAR_RAGGED;
+		float torn = smoothstep(TEAR_EDGE, TEAR_EDGE + 0.012, tear);
+		float curl = smoothstep(TEAR_EDGE - 0.018, TEAR_EDGE, tear) * (1.0 - torn)
+			* (1.0 - smoothstep(0.01, 0.05, footprint));
+		aged = mix(aged, aged * 1.6 + 0.03, curl * 0.7);
+		vec3 bare = bare_color.rgb * (0.6 + 0.5 * dust) * (0.85 + 0.3 * value_noise(uv * 6.0 + seed + 9.0));
+		// No fundo do rasgo o reboco também caiu e aparecem as ripas da parede
+		float lath_row = uv.y * LATH_ROWS;
+		float lath = soft_band(fract(lath_row), 0.2, 0.8, fwidth(lath_row))
+			* (1.0 - smoothstep(0.15, 0.6, fwidth(lath_row)));
+		float deep = smoothstep(TEAR_EDGE + 0.035, TEAR_EDGE + 0.05, tear);
+		bare = mix(bare, mix(bare * 0.35, bare * LATH_TINT, lath), deep);
+		aged = mix(aged, bare, torn);
 	}
 	if (pattern == PATTERN_METAL) {
 		aged = mix(aged, color_c.rgb, smoothstep(0.4, 0.75, fbm(uv * 3.0 + seed)));

@@ -216,6 +216,21 @@ func _build_room_214() -> void:
 	_wall_z(r.position.x, r.position.y, NORTH)
 	_wall_z(r.end.x, r.position.y, NORTH)
 	_wall_x(r.position.y, r.position.x, r.end.x, [])
+	# Janela na parede do fundo (hoje com tábuas), cortinas, quadro, arandela e passadeira
+	var window := Vector3(r.end.x - 1.3, 1.6, r.position.y + 0.1)
+	_part(window + Vector3(-0.55, -0.7, 0.0), window + Vector3(0.55, 0.7, 0.02), "night")
+	_part(window + Vector3(-0.62, -0.78, 0.0), window + Vector3(0.62, -0.7, 0.06), "dark_wood")
+	_part(window + Vector3(-0.02, -0.7, 0.02), window + Vector3(0.02, 0.7, 0.04), "dark_wood")
+	if present:
+		for i in 3:
+			_block(window + Vector3(0, -0.45 + i * 0.45, 0.05), Vector3(1.3, 0.16, 0.03), "plank", Vector3(0, 0, 6.0 - i * 5.0))
+	else:
+		for side: float in [-0.85, 0.65]:
+			_part(window + Vector3(side, -0.95, 0.02), window + Vector3(side + 0.2, 0.9, 0.09), "green_velvet")
+		_part(window + Vector3(-0.88, 0.86, 0.03), window + Vector3(0.88, 0.9, 0.07), "brass")
+	_picture(Vector3(r.position.x + 0.1, 1.9, r.position.y + 3.3), 90.0, Vector2(0.7, 0.5))
+	_wall_lamp(Vector3(r.end.x - 0.1, 1.95, r.position.y + 3.6), -90.0, 0.9, 4.5)
+	_part(Vector3(r.position.x + 1.9, 0.004, r.position.y + 0.9), Vector3(r.end.x - 1.1, 0.014, r.position.y + 3.9), "runner")
 	# Cama contra a parede do fundo, mesa com cadeira à direita
 	var bed := Vector3(r.position.x + 1.2, 0, r.position.y + 1.1)
 	# A cabeceira fica contra a parede do fundo (norte)
@@ -251,6 +266,15 @@ func _build_room_207() -> void:
 	var window := Vector3(r.position.x + 2.6, 1.6, r.end.y - 0.11)
 	_part(window + Vector3(-0.6, -0.7, -0.02), window + Vector3(0.6, 0.7, 0.0), "glass" if not present else "plank")
 	_part(window + Vector3(-0.7, -0.78, -0.05), window + Vector3(0.7, -0.7, 0.0), "dark_wood")
+	# Cortinas (hoje, uma só, rasgada), quadro sobre a escrivaninha e arandela sobre a cama
+	for side: float in [-0.92, 0.72]:
+		if present and side > 0.0:
+			continue
+		_part(window + Vector3(side, -0.95, -0.09), window + Vector3(side + 0.2, 0.9 if not present else 0.5, -0.02),
+			"velvet" if not present else "tarp")
+	_part(window + Vector3(-0.95, 0.86, -0.07), window + Vector3(0.95, 0.9, -0.03), "brass" if not present else "iron")
+	_picture(Vector3(r.position.x + 0.1, 1.85, DESK.z), 90.0, Vector2(0.8, 0.55))
+	_wall_lamp(Vector3(r.end.x - 0.1, 1.95, r.position.y + 2.2), -90.0, 0.9, 4.5)
 	# Cama (leste), escrivaninha (oeste), guarda-roupa (fundo) e mala (pé da cama)
 	var bed := Vector3(r.end.x - 1.0, 0, r.position.y + 3.2)
 	_model(MODELS + "cama.glb", bed, Vector3.ZERO, 1.0, AGED if present else {})
@@ -274,6 +298,15 @@ func _build_room_207() -> void:
 	if present:
 		# O forro descosturado aparece num canto
 		_part(trunk + Vector3(0.15, 0.4, -0.2), trunk + Vector3(0.38, 0.41, 0.0), "velvet")
+
+
+## Quadro de paisagem em moldura de latão, rente à parede. `rotation_y_deg` aponta para fora dela.
+func _picture(at: Vector3, rotation_y_deg: float, size: Vector2) -> void:
+	var turn := Vector3(0, rotation_y_deg, 0)
+	var out := Basis.from_euler(Vector3(0, deg_to_rad(rotation_y_deg), 0)) * Vector3(0, 0, 1)
+	var tilt := Vector3(0, 0, 7.0) if present else Vector3.ZERO
+	_block(at + out * 0.012, Vector3(size.x + 0.1, size.y + 0.1, 0.024), "brass" if not present else "iron", turn + tilt)
+	_block(at + out * 0.027, Vector3(size.x, size.y, 0.008), "painting", turn + tilt)
 
 
 # --- Poço do elevador (leste) ----------------------------------------------------------------
