@@ -64,6 +64,10 @@ uniform vec2 rug_half_size = vec2(1.0);
 uniform int wallpaper_motif : hint_range(0, 2) = 0;
 group_uniforms;
 
+// Versão leve (celular no navegador): o envelhecimento usa dois ruídos simples em vez de
+// cinco fbm e um Voronoi, e a textura de detalhe não usa normal map.
+uniform bool lite = false;
+
 group_uniforms aging;
 // 0 = 1923, novo; 1 = 100 anos de abandono.
 uniform float age : hint_range(0.0, 1.0) = 0.0;
@@ -298,13 +302,24 @@ void fragment() {
 		}
 		TANGENT = normalize((VIEW_MATRIX * vec4(tangent, 0.0)).xyz);
 		BINORMAL = normalize((VIEW_MATRIX * vec4(binormal, 0.0)).xyz);
-		NORMAL_MAP = texture(detail_normal, detail_uv).rgb;
-		NORMAL_MAP_DEPTH = detail_normal_strength;
+		if (!lite) {
+			NORMAL_MAP = texture(detail_normal, detail_uv).rgb;
+			NORMAL_MAP_DEPTH = detail_normal_strength;
+		}
 	}
 
 	// Envelhecimento: tudo some sob camadas de pó, manchas, mofo e rachaduras.
 	// Em 1923 (age = 0) o bloco inteiro é pulado: é a parte mais cara do shader.
-	if (age > 0.0) {
+	if (age > 0.0 && lite) {
+		// Pó e manchas escorridas, sem rasgos nem rachaduras
+		float dust = value_noise(uv * 1.3 + seed + 3.7);
+		float stains = smoothstep(0.6, 0.85, value_noise(vec2(uv.x * 1.6, uv.y * 0.5) + seed * 1.3));
+		vec3 aged = mix(albedo, vec3(dot(albedo, vec3(0.33))), 0.45) * (0.7 + 0.25 * dust);
+		aged = mix(aged, stain_color.rgb, stains * 0.6);
+		albedo = mix(albedo, aged, age);
+		roughness = mix(roughness, min(1.0, roughness + 0.25), age);
+		metallic = mix(metallic, metallic * 0.3, age);
+	} else if (age > 0.0) {
 	float dust = fbm(uv * 0.8 + seed + 3.7);
 	float stains = smoothstep(0.55, 0.78, fbm(vec2(uv.x * 1.6, uv.y * 0.5) + seed * 1.3));
 	float moss = smoothstep(0.62, 0.8, fbm(uv * 1.1 + seed + 11.0)) * (0.4 + 0.6 * grout);

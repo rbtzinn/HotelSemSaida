@@ -2,6 +2,9 @@ extends Node
 ## Preferências locais, separadas do progresso da campanha.
 signal changed
 const PATH := "user://settings.cfg"
+## Nome de cada ação nos avisos quando se joga com os botões da tela (TouchControls).
+const TOUCH_LABELS := {"interact": "Usar", "jump": "Pular", "switch_era": "Época", "pause": "X",
+	"move_left": "<", "move_right": ">", "move_up": "^", "move_down": "v"}
 const ACTIONS := ["move_left", "move_right", "move_up", "move_down", "jump", "interact", "switch_era", "pause", "quick_save", "quick_load"]
 const LABELS := ["Mover à esquerda", "Mover à direita", "Mover para cima", "Mover para baixo", "Pular", "Interagir", "Trocar de época", "Pausar", "Salvar rápido", "Carregar rápido"]
 var defaults: Dictionary = {}
@@ -15,6 +18,9 @@ func _ready() -> void:
 			if event is InputEventKey:
 				defaults[action] = {"kind": "key", "code": event.physical_keycode}
 				break
+	if GamePlatform.is_web():
+		# Girar o celular muda o tamanho da página: a escala do 3D acompanha
+		get_tree().root.size_changed.connect(func() -> void: _apply_quality(int(data.quality)))
 	data = factory()
 	var cfg := ConfigFile.new()
 	if cfg.load(config_path) == OK:
@@ -28,9 +34,12 @@ func _ready() -> void:
 const QUALITY_LOW := 0
 const QUALITY_MEDIUM := 1
 const QUALITY_HIGH := 2
+## Altura do 3D (pixels) em cada qualidade no renderizador Compatibility (navegador).
+const COMPAT_3D_HEIGHT: Array[float] = [540.0, 720.0, 1080.0]
 
 func factory() -> Dictionary:
-	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true, "quality": QUALITY_MEDIUM,
+	return {"mode": 0, "resolution": Vector2i(1280,720), "vsync": true,
+		"quality": QUALITY_LOW if GamePlatform.is_web() else QUALITY_MEDIUM,
 		"fps": 60, "volume": 0.8, "music": 1.0, "mute": false, "deadzone": 0.2, "player_name": "",
 		"bindings": defaults.duplicate(true)}
 
@@ -52,7 +61,8 @@ func apply(values: Dictionary) -> void:
 	data.deadzone = clampf(float(data.deadzone),0.05,0.8)
 	data.quality = clampi(int(data.quality),QUALITY_LOW,QUALITY_HIGH)
 	_apply_quality(int(data.quality))
-	if DisplayServer.get_name() != "headless":
+	# No navegador a janela é a página: não há modo nem tamanho para mudar
+	if DisplayServer.get_name() != "headless" and not GamePlatform.is_web():
 		var modes := [DisplayServer.WINDOW_MODE_WINDOWED, DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
 		DisplayServer.window_set_mode(modes[data.mode])
 		if data.mode == 0:
@@ -87,11 +97,18 @@ func _apply_quality(level: int) -> void:
 	var root := get_tree().root if is_inside_tree() else null
 	if root == null:
 		return
-	root.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if level < QUALITY_HIGH else Viewport.SCALING_3D_MODE_BILINEAR
-	root.scaling_3d_scale = [0.6, 0.77, 1.0][level]
-	# Nitidez baixa: o FSR afiado fazia os padrões finos do cenário cintilarem
-	root.fsr_sharpness = 0.6
-	root.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
+	if GamePlatform.is_compatibility():
+		# Sem FSR nem FXAA neste renderizador. A escala mira uma altura fixa de 3D, porque a
+		# tela de um celular tem três vezes mais pixels que a de um monitor do mesmo tamanho
+		root.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+		var height := maxf(1.0, float(DisplayServer.window_get_size().y))
+		root.scaling_3d_scale = clampf(COMPAT_3D_HEIGHT[level] / height, 0.3, 1.0)
+	else:
+		root.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if level < QUALITY_HIGH else Viewport.SCALING_3D_MODE_BILINEAR
+		root.scaling_3d_scale = [0.6, 0.77, 1.0][level]
+		# Nitidez baixa: o FSR afiado fazia os padrões finos do cenário cintilarem
+		root.fsr_sharpness = 0.6
+		root.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
 	root.msaa_3d = Viewport.MSAA_2X if level == QUALITY_HIGH else Viewport.MSAA_DISABLED
 	root.positional_shadow_atlas_size = [1024, 2048, 4096][level]
 	RenderingServer.directional_shadow_atlas_set_size([1024, 2048, 4096][level], true)
@@ -111,6 +128,8 @@ func save() -> Error:
 	return cfg.save(config_path)
 
 func binding_label(action: String, values: Dictionary = {}) -> String:
+	if GamePlatform.is_touch() and TOUCH_LABELS.has(action):
+		return TOUCH_LABELS[action]
 	var source: Dictionary = data if values.is_empty() else values
 	var b: Dictionary = source.bindings.get(action,defaults.get(action,{}))
 	if b.get("kind") == "mouse":

@@ -23,7 +23,8 @@ func _update_mouse_mode() -> void:
 	# O sinal pode chegar no mesmo quadro em que a sala sai da árvore (volta à recepção)
 	if not is_inside_tree():
 		return
-	var wanted := Input.MOUSE_MODE_VISIBLE if get_tree().paused else Input.MOUSE_MODE_CAPTURED
+	# Na tela de toque não há mouse para prender: o olhar vem dos TouchControls
+	var wanted := Input.MOUSE_MODE_VISIBLE if get_tree().paused or GamePlatform.is_touch() else Input.MOUSE_MODE_CAPTURED
 	if Input.mouse_mode != wanted:
 		Input.mouse_mode = wanted
 	if get_tree().paused:

@@ -157,6 +157,7 @@ static func _surface(role: String, present: bool) -> ShaderMaterial:
 	material.set_shader_parameter("seed", float(role.hash() % 97))
 	material.set_shader_parameter("age", 0.95 if present else 0.0)
 	material.set_shader_parameter("retro", false)
+	material.set_shader_parameter("lite", GamePlatform.is_lite())
 	# Reboco que aparece sob o papel rasgado: escuro, para não brilhar no escuro
 	material.set_shader_parameter("bare_color", Color("#46403A"))
 	if DETAIL.has(role):
