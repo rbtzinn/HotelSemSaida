@@ -45,6 +45,9 @@ const CASE_H: float = 2.4
 
 const MODELS := "res://art/models/"
 
+## Distância mínima dos prédios da cidade ao centro do telhado.
+const SKYLINE_DISTANCE: float = 26.0
+
 const WARM := Color("#F2D49B")
 const MOON := Color("#8FA6BE")
 
@@ -118,6 +121,12 @@ func _build_stair_house() -> void:
 	for side: float in [STAIR_DOOR.x - 0.06, STAIR_DOOR.y]:
 		_part(Vector3(side, 0, r.end.y - 0.12), Vector3(side + 0.06, DOOR_TOP + 0.06, r.end.y + 0.12), "dark_wood")
 	_part(Vector3(r.position.x - 0.2, HOUSE_H, r.position.y - 0.2), Vector3(r.end.x + 0.2, HOUSE_H + 0.15, r.end.y + 0.2), "iron" if not present else "rubble")
+	# Por dentro: forro rebocado, rodapé e a arandela da parede do fundo (o teto era preto)
+	_part(Vector3(r.position.x + 0.1, HOUSE_H - 0.03, r.position.y + 0.1), Vector3(r.end.x - 0.1, HOUSE_H, r.end.y - 0.1), wall)
+	_part(Vector3(r.position.x + 0.1, 0, r.position.y + 0.1), Vector3(r.end.x - 0.1, 0.12, r.position.y + 0.13), "dark_wood")
+	_wall_lamp(Vector3(2.4, 1.95, r.position.y + 0.1), 0.0, 1.0, 4.0)
+	_plaque("TELHADO", Vector3((STAIR_DOOR.x + STAIR_DOOR.y) / 2.0, DOOR_TOP + 0.17, r.end.y - 0.11), 0.06,
+		Color("#C9973B") if not present else Color("#5A5040"), 180.0)
 	# Vão da escada em caracol, com o guarda-corpo em volta (sólido)
 	var hole := STAIR_HOLE
 	_part(hole + Vector3(-0.8, -0.19, -0.7), hole + Vector3(0.8, 0.005, 0.7), "dark")
@@ -178,8 +187,21 @@ func _build_tower() -> void:
 	_solid(Vector3(TOWER_DOOR.x, DOOR_TOP, z - 0.15), Vector3(TOWER_DOOR.y, TOWER_H, z + 0.15), "Lintel")
 	for side: float in [TOWER_DOOR.x - 0.08, TOWER_DOOR.y]:
 		_part(Vector3(side, 0, z - 0.17), Vector3(side + 0.08, DOOR_TOP + 0.08, z + 0.17), "dark_wood")
-	# Papel de parede por dentro
+	# Papel de parede por dentro, nas quatro paredes, com lambri de madeira até 1 m
 	_part(Vector3(r.position.x + 0.15, 0, r.end.y - 0.17), Vector3(r.end.x - 0.15, TOWER_H, r.end.y - 0.15), wall)
+	for x: float in [r.position.x + 0.15, r.end.x - 0.17]:
+		_part(Vector3(x, 0, r.position.y + 0.15), Vector3(x + 0.02, TOWER_H, r.end.y - 0.17), wall)
+	for x: Vector2 in [Vector2(r.position.x + 0.17, TOWER_DOOR.x - 0.08), Vector2(TOWER_DOOR.y + 0.08, r.end.x - 0.17)]:
+		_part(Vector3(x.x, 0, z + 0.15), Vector3(x.y, TOWER_H, z + 0.17), wall)
+	_part(Vector3(TOWER_DOOR.x - 0.08, DOOR_TOP + 0.08, z + 0.15), Vector3(TOWER_DOOR.y + 0.08, TOWER_H, z + 0.17), wall)
+	var lambri := "panel" if not present else "plank"
+	for x: float in [r.position.x + 0.17, r.end.x - 0.2]:
+		_part(Vector3(x, 0, r.position.y + 0.17), Vector3(x + 0.03, 1.0, r.end.y - 0.17), lambri)
+		_part(Vector3(x - 0.005, 1.0, r.position.y + 0.17), Vector3(x + 0.04, 1.05, r.end.y - 0.17), "dark_wood")
+	for x: Vector2 in [Vector2(r.position.x + 0.2, CASE.position.x), Vector2(CASE.end.x, r.end.x - 0.2)]:
+		_part(Vector3(x.x, 0, r.end.y - 0.2), Vector3(x.y, 1.0, r.end.y - 0.17), lambri)
+		_part(Vector3(x.x, 1.0, r.end.y - 0.21), Vector3(x.y, 1.05, r.end.y - 0.17), "dark_wood")
+	_build_tower_fittings()
 	# Telhado em pirâmide, acima do teto
 	for i in 6:
 		var inset := i * 0.45
@@ -192,6 +214,48 @@ func _build_tower() -> void:
 		var angle := TAU * h / 12.0
 		var at := BIG_DIAL + Vector3(sin(angle) * (BIG_RADIUS - 0.1), cos(angle) * (BIG_RADIUS - 0.1), -0.08)
 		_block(at, Vector3(0.04, 0.12 if h % 3 == 0 else 0.07, 0.02), "lacquer", Vector3(0, 0, -rad_to_deg(angle)))
+
+
+## O que o relojoeiro deixou: arandelas, prateleira com almotolias e caixote na parede leste,
+## escada de mão encostada no canto oeste e os pesos de reserva. Sem letreiros (nada aqui é
+## pista). O que fica à altura do corpo é sólido.
+func _build_tower_fittings() -> void:
+	var r := TOWER
+	var metal := "brass" if not present else "iron"
+	var wood := "oak" if not present else "plank"
+	_wall_lamp(Vector3(r.position.x + 0.17, 2.3, 16.0), 90.0, 1.1, 5.0)
+	_wall_lamp(Vector3(r.end.x - 0.17, 2.3, 16.0), -90.0, 1.1, 5.0)
+	# Prateleira com almotolias e latas de graxa (parede leste, perto da porta)
+	var shelf := Vector3(r.end.x - 0.2, 1.35, 14.6)
+	_solid(shelf + Vector3(-0.28, -0.05, -0.6), shelf + Vector3(0, 0.3, 0.6), "OilShelf")
+	_part(shelf + Vector3(-0.28, 0, -0.6), shelf + Vector3(0, 0.03, 0.6), wood)
+	for z: float in [-0.5, 0.5]:
+		_part(shelf + Vector3(-0.24, -0.2, z - 0.015), shelf + Vector3(0, 0, z + 0.015), "iron")
+	for i in 4:
+		if present and i % 2 == 1:
+			continue
+		var can := shelf + Vector3(-0.14, 0.03, -0.4 + i * 0.27)
+		_cylinder(can, 0.055, 0.045, 0.13, metal if i % 2 == 0 else "cast_iron", Vector3.ZERO, 10)
+		_cylinder(can + Vector3(0, 0.13, 0), 0.008, 0.004, 0.12, metal, Vector3(0, 0, -35), 6)
+	# Caixote de peças sob a prateleira
+	var crate := Vector3(r.end.x - 0.5, 0, 14.6)
+	_solid(crate + Vector3(-0.3, 0, -0.4), crate + Vector3(0.3, 0.5, 0.4), "PartsCrate")
+	_part(crate + Vector3(-0.3, 0, -0.4), crate + Vector3(0.3, 0.5, 0.4), "plank")
+	for y: float in [0.08, 0.38]:
+		_part(crate + Vector3(-0.31, y, -0.41), crate + Vector3(-0.3, y + 0.06, 0.41), wood)
+	# Escada de mão encostada no canto oeste do fundo
+	var foot := Vector3(r.position.x + 0.85, 0, 18.1)
+	_solid(Vector3(r.position.x + 0.2, 0, 17.8), Vector3(r.position.x + 1.0, 2.9, 18.4), "Ladder")
+	for z: float in [-0.22, 0.22]:
+		_block(foot + Vector3(-0.3, 1.45, z), Vector3(0.05, 3.0, 0.04), wood, Vector3(0, 0, 11.5))
+	for i in 9:
+		_block(foot + Vector3(-0.06 - i * 0.063, 0.3 + i * 0.31, 0), Vector3(0.03, 0.03, 0.44), wood)
+	# Pesos de reserva do relógio, no chão do canto leste do fundo
+	for i in 3:
+		var weight := Vector3(r.end.x - 0.55 - i * 0.05, 0, 18.4 - i * 0.3)
+		_cylinder(weight, 0.1, 0.1, 0.34 - i * 0.06, "cast_iron", Vector3.ZERO, 14)
+		_torus(weight + Vector3(0, 0.38 - i * 0.06, 0), 0.025, 0.04, "iron", Vector3(90, 0, 0))
+	_solid(Vector3(r.end.x - 0.85, 0, 17.6), Vector3(r.end.x - 0.2, 0.45, 18.6), "SpareWeights")
 
 
 func _build_machine() -> void:
@@ -218,17 +282,39 @@ func _build_machine() -> void:
 # --- Céu e luzes ------------------------------------------------------------------------------
 
 func _build_sky() -> void:
-	# A noite é o fundo do ambiente; ao longe, só a silhueta da cidade
-	for i in 7:
-		var x := -9.0 + i * 4.0
-		var height := 1.0 + _random(i) * 4.0
-		_part(Vector3(x, -6, 26), Vector3(x + 2.5, height, 28), "dark")
+	# O céu (lua e estrelas) é o fundo do ambiente; em volta, a silhueta da cidade nos quatro
+	# lados, com janelas acesas (muitas em 1923, poucas hoje)
+	var lit := 0.5 if not present else 0.12
+	for i in 34:
+		var side := i % 4
+		var along := -18.0 + _random(i, 1.0) * 46.0
+		var far := SKYLINE_DISTANCE + _random(i, 2.0) * 10.0
+		var width := 2.4 + _random(i, 3.0) * 3.0
+		var height := -1.0 + _random(i, 4.0) * 6.5
+		# Face voltada para o hotel: norte e sul ao longo de x, leste e oeste ao longo de z
+		var along_x := side < 2
+		var facing := 1.0 if side % 2 == 0 else -1.0
+		var centre := (5.0 if along_x else 9.0) + facing * far
+		var from := Vector3(along, -8, centre) if along_x else Vector3(centre, -8, along)
+		var to := from + (Vector3(width, 8 + height, 2.0) if along_x else Vector3(2.0, 8 + height, width))
+		_part(from, to, "dark")
+		var face := centre - facing * 0.02 if facing > 0 else centre + 2.02
+		for k in 6:
+			if _random(i * 7 + k, 5.0) > lit:
+				continue
+			var u := 0.3 + (k % 3) * (width - 0.6) / 3.0
+			var y := height - 0.9 - (k / 3) * 1.1
+			if y < -5.0:
+				continue
+			if along_x:
+				_part(Vector3(along + u, y, face - 0.01), Vector3(along + u + 0.3, y + 0.42, face + 0.01), "street")
+			else:
+				_part(Vector3(face - 0.01, y, along + u), Vector3(face + 0.01, y + 0.42, along + u + 0.3), "street")
 
 
 func _build_lights() -> void:
 	if not present:
 		_omni(Vector3(5.0, 3.6, 16.0), WARM, 1.8, 9.0, true)
-		_omni(Vector3(1.5, 2.2, 1.5), WARM, 0.9, 4.0)
 		_omni(Vector3(5.0, 2.6, 12.2), WARM, 1.2, 5.0)
 		_spot(Vector3(-4, 9, -6), Vector3(5, 0, 8), MOON, 1.6, 30.0, 35.0)
 	else:

@@ -16,6 +16,11 @@ extends Node3D
 ## Planta das salas 2D: 32 px = 1 m.
 const PX: float = 1.0 / 32.0
 
+## Cor das lâmpadas de 1923.
+const LAMP_WARM := Color("#F2D49B")
+## Largura média de uma letra da fonte dos letreiros, em relação à altura.
+const PLAQUE_GLYPH_WIDTH: float = 0.62
+
 ## Desligado, as peças criadas não projetam sombra (ex.: o lustre, que tem a luz por dentro).
 var _cast_shadows: bool = true
 ## Caixas da malha fixa, já sem faces brigando entre si; o nível usa para acertar as peças dele
@@ -196,6 +201,48 @@ func _label(text: String, at: Vector3, size: float, color: Color, rotation_y_deg
 	label.double_sided = false
 	_add(label)
 	return label
+
+
+## Letreiro em placa: laca preta com filete de latão atrás das letras, como as placas de porta
+## do hotel. Mesmos argumentos de `_label`; `at` é o centro das letras, a placa fica atrás.
+func _plaque(text: String, at: Vector3, size: float, color: Color, rotation_y_deg: float = 0.0) -> Label3D:
+	var normal := Basis.from_euler(Vector3(0, deg_to_rad(rotation_y_deg), 0)) * Vector3(0, 0, 1)
+	var lines := text.split("\n")
+	var longest := 0
+	for line in lines:
+		longest = maxi(longest, line.length())
+	var width := longest * size * PLAQUE_GLYPH_WIDTH + size
+	var height := lines.size() * size * 1.25 + size * 0.6
+	var turn := Vector3(0, rotation_y_deg, 0)
+	_block(at - normal * 0.006, Vector3(width, height, 0.006), "lacquer", turn)
+	_block(at - normal * 0.009, Vector3(width + size * 0.3, height + size * 0.3, 0.006),
+		"brass" if not present else "iron", turn)
+	return _label(text, at, size, color, rotation_y_deg)
+
+
+## Arandela de parede: espelho e braço de latão, cúpula de vidro leitoso. Em 1923 acende
+## (a luz fica à frente da cúpula, para a parede atrás não estourar); hoje sobra a ferragem.
+## `rotation_y_deg` aponta para fora da parede (0 = +z).
+func _wall_lamp(at: Vector3, rotation_y_deg: float, energy: float = 1.5, light_range: float = 6.0) -> void:
+	var turn := Basis.from_euler(Vector3(0, deg_to_rad(rotation_y_deg), 0))
+	var metal := "brass" if not present else "iron"
+	var angle := Vector3(0, rotation_y_deg, 0)
+	_block(at + turn * Vector3(0, 0, 0.01), Vector3(0.1, 0.22, 0.02), metal, angle)
+	_block(at + turn * Vector3(0, -0.04, 0.08), Vector3(0.025, 0.025, 0.14), metal, angle)
+	var shade_base := at + turn * Vector3(0, -0.03, 0.15)
+	_cylinder(shade_base, 0.035, 0.085, 0.14, "bulb" if not present else "glass", Vector3.ZERO, 12) \
+		.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_cylinder(shade_base + Vector3(0, -0.03, 0), 0.02, 0.035, 0.03, metal, Vector3.ZERO, 10)
+	if not present:
+		_omni(at + turn * Vector3(0, 0.12, 0.3), LAMP_WARM, energy, light_range)
+
+
+## Luz baixa sobre uma porta (1923): lê o letreiro e a folha sem clarear a sala.
+func _door_light(at: Vector3, rotation_y_deg: float) -> void:
+	if present:
+		return
+	var turn := Basis.from_euler(Vector3(0, deg_to_rad(rotation_y_deg), 0))
+	_omni(at + turn * Vector3(0, 0, 0.55), LAMP_WARM, 0.75, 3.2)
 
 
 ## Nó vazio para montar uma peça composta (sofá, relógio) e girá-la inteira.

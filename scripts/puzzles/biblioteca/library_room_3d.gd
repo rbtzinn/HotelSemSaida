@@ -57,7 +57,7 @@ func _build_room() -> void:
 	_block(Vector3(4.3, 2.05, 0.3), Vector3(2.7, 0.08, 0.08), "mahogany")
 	for x: float in [2.95, 5.65]:
 		_block(Vector3(x, 1.75, 0.45), Vector3(0.08, 1.1, 0.8), "mahogany")
-	_label("COLEÇÃO PARTICULAR", Vector3(4.3, 2.3, 0.37), 0.1, Color("#C9973B"))
+	_plaque("COLEÇÃO PARTICULAR", Vector3(4.3, 2.3, 0.37), 0.1, Color("#C9973B"))
 	# Mesas de leitura, cadeiras, candelabros e escaninho do bibliotecário.
 	for x: float in [5, 13]:
 		_table(Vector3(x, 0, 6.8))
@@ -100,7 +100,7 @@ func _build_room() -> void:
 	for x: float in [8.08, 9.92]:
 		_block(Vector3(x, 1.35, 12.85), Vector3(0.14, 2.7, 0.18), "brass")
 	_block(Vector3(9, 2.7, 12.85), Vector3(2, 0.15, 0.18), "brass")
-	_label("BIBLIOTECA", Vector3(9, 2.48, 12.72), 0.11, Color("#C9973B"), 180)
+	_plaque("BIBLIOTECA", Vector3(9, 2.48, 12.72), 0.11, Color("#C9973B"), 180)
 	# Arquivo escondido: armários, mesa e documentos, acessível pela estante móvel.
 	for x: float in [2, 5, 13, 16]:
 		_shelf(Vector3(x, 0, -2.7), 0, 2.2, 2.7, 90+int(x))
@@ -112,11 +112,18 @@ func _build_room() -> void:
 	_block(Vector3(6.95, 1.87, -2.836), Vector3(0.86, 0.22, 0.028), "lacquer")
 	_label("CALDEIRAS", Vector3(6.95, 1.87, -2.815), 0.10, Color("#E1C28C"))
 	_sphere(Vector3(7.46, 1.07, -2.80), 0.054, "brass")
-	_label("ARQUIVO RESERVADO", Vector3(9, 2.6, -2.94), 0.12, Color("#C9973B"))
+	_plaque("ARQUIVO RESERVADO", Vector3(9, 2.6, -2.94), 0.12, Color("#C9973B"))
 	for z: float in [3.0, 8.7]:
 		_model(MODELS + "lustre_biblioteca.glb", Vector3(9, H, z))
 		if not present:
 			_omni(Vector3(9, H-1.2, z), Color("#F2D49B"), 2.4, 10, true)
+	# Arandelas acima das estantes laterais (as paredes sumiam no escuro) e luz nas portas
+	for z: float in [3.0, 5.65, 8.35]:
+		_wall_lamp(Vector3(0.0, 4.35, z), 90, 1.5, 7.0)
+	for z: float in [1.3, 5.0, 8.75]:
+		_wall_lamp(Vector3(17.7, 4.35, z), -90, 1.5, 7.0)
+	_door_light(Vector3(9, 2.3, 12.75), 180)
+	_door_light(Vector3(16, 2.3, 12.75), 180)
 	if present:
 		_omni(Vector3(9, 4, 6), Color("#6A7E96"), 0.5, 16)
 		for i in 30:

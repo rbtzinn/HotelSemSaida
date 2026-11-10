@@ -11,6 +11,8 @@ const CORRIDOR_DOOR := Vector2(3.7, 5.3)
 const CORRIDOR_Z := Vector2(10.6, 12.2)
 const CORRIDOR_END: float = 27.0
 const CORRIDOR_HEIGHT: float = 2.8
+## Pilastras e vigas do trecho longo (x), entre as lâmpadas.
+const CORRIDOR_RIBS: Array[float] = [8.0, 12.8, 17.3, 21.5, 24.8]
 
 ## Modelos do Blender (tools/blender/make_props.py); hoje, madeira velha e metal enferrujado.
 const MODELS := "res://art/models/"
@@ -44,7 +46,7 @@ func _build_room() -> void:
 	# Bancada com morsa (o meio do tampo fica livre para a chave de 1951)
 	_model(MODELS + "bancada_oficina.glb", Vector3(6.4, 0, 0.7), Vector3.ZERO, 1.0, AGED if present else {})
 	_solid(Vector3(4.8, 0, 0.25), Vector3(8, 0.9, 1.15), "Workbench")
-	_label("MANUTENÇÃO", Vector3(6.4, 2.3, 0.04), 0.16, Color("#C9973B"))
+	_plaque("MANUTENÇÃO", Vector3(6.4, 2.3, 0.04), 0.16, Color("#C9973B"))
 	# Painel elétrico, manômetro e ferramentas presas na parede.
 	_block(Vector3(8.92, 1.6, 6.1), Vector3(0.08, 1.2, 0.8), "iron")
 	for i in 4:
@@ -112,8 +114,9 @@ func _build_corridor() -> void:
 			Vector3(0, 0, -90), 10)
 		for x: float in [8.0, 13.0, 18.0, 23.0]:
 			_torus(Vector3(x, y, cz.x + 0.1), 0.055, 0.075, "iron", Vector3(0, 0, 90))
+	_build_corridor_dressing()
 	# Placa na curva e placa no meio, para o jogador saber por onde passa.
-	_label("BIBLIOTECA  →", Vector3(d.x + 0.02, 1.9, mid), 0.1, Color("#C9973B"), 90)
+	_plaque("BIBLIOTECA  →", Vector3(d.x + 0.02, 1.9, mid), 0.1, Color("#C9973B"), 90)
 	_label("SOB O SAGUÃO — NÃO FUMAR", Vector3(15.5, 1.9, cz.y - 0.02), 0.08,
 		Color("#C9973B") if not present else Color("#5A5040"), 180)
 	if present:
@@ -133,10 +136,68 @@ func _build_corridor() -> void:
 	for i in 6:
 		_block(Vector3(CORRIDOR_END - 0.9 + i * 0.14, 0.07 + i * 0.14, mid), Vector3(0.3, 0.14, width), "stone")
 	_block(Vector3(CORRIDOR_END - 0.05, 1.4, mid), Vector3(0.08, 2.6, width - 0.1), "iron")
-	_label("BIBLIOTECA — SERVIÇO", Vector3(CORRIDOR_END - 0.1, 2.55, mid), 0.1, Color("#C9973B"), -90)
+	_plaque("BIBLIOTECA — SERVIÇO", Vector3(CORRIDOR_END - 0.1, 2.55, mid), 0.1, Color("#C9973B"), -90)
 	for z: float in [cz.x + 0.06, cz.y - 0.06]:
 		_block(Vector3(CORRIDOR_END - 0.1, 1.35, z), Vector3(0.12, 2.7, 0.12), "brass")
 	_solid(Vector3(CORRIDOR_END - 1.05, 0, cz.x), Vector3(CORRIDOR_END, 0.84, cz.y), "ServiceStairs")
+
+
+## O que quebra a reta de 21 m: pilastras e vigas a cada 4 m, barra pintada e rodapé, uma
+## estação de válvulas no meio, baldes de areia e caixotes. Tudo encostado nas paredes (o
+## que fica à altura do corpo é sólido); o meio do corredor continua livre, com mais de 1 m.
+func _build_corridor_dressing() -> void:
+	var d := CORRIDOR_DOOR
+	var cz := CORRIDOR_Z
+	var top := CORRIDOR_HEIGHT
+	var paint := "cast_iron" if not present else "stone"
+	# Barra escura até 1,1 m e rodapé, nas duas paredes do trecho longo
+	for side: Array in [[cz.x, 1.0], [cz.y, -1.0]]:
+		var z: float = side[0]
+		var out: float = side[1]
+		_part(Vector3(d.y + 0.3, 1.08, z), Vector3(CORRIDOR_END - 1.1, 1.13, z + out * 0.02), paint)
+		_part(Vector3(d.y + 0.3, 0, z), Vector3(CORRIDOR_END - 1.1, 0.14, z + out * 0.03), paint)
+	for x: float in CORRIDOR_RIBS:
+		_part(Vector3(x - 0.14, top - 0.2, cz.x), Vector3(x + 0.14, top, cz.y), "cast_iron")
+		for side: Array in [[cz.x, 1.0], [cz.y, -1.0]]:
+			var z: float = side[0]
+			var out: float = side[1]
+			var z_out := z + out * 0.12
+			_part(Vector3(x - 0.14, 0, minf(z, z_out)), Vector3(x + 0.14, top - 0.2, maxf(z, z_out)), "plaster_cream" if not present else "stone")
+			_solid(Vector3(x - 0.14, 0, minf(z, z_out)), Vector3(x + 0.14, top, maxf(z, z_out)), "CorridorRib")
+	# Estação de válvulas nos canos de vapor (parede norte), com manômetro
+	var valve := Vector3(11.5, 2.37, cz.x + 0.1)
+	var metal := "brass" if not present else "iron"
+	_solid(valve + Vector3(-0.45, -0.45, -0.1), valve + Vector3(0.45, 0.3, 0.22), "ValveStation")
+	for x: float in [-0.25, 0.25]:
+		_cylinder(valve + Vector3(x, -0.16, 0), 0.07, 0.07, 0.32, "iron", Vector3.ZERO, 10)
+		_cylinder(valve + Vector3(x, -0.02, 0.06), 0.012, 0.012, 0.12, "iron", Vector3(90, 0, 0), 6)
+		_torus(valve + Vector3(x, -0.02, 0.18), 0.075, 0.095, metal, Vector3(90, 0, 0))
+	_cylinder(valve + Vector3(0, -0.36, 0.02), 0.1, 0.1, 0.04, metal, Vector3(90, 0, 0), 16)
+	_cylinder(valve + Vector3(0, -0.36, 0.045), 0.085, 0.085, 0.01, "ivory", Vector3(90, 0, 0), 16)
+	_block(valve + Vector3(0.015, -0.33, 0.06), Vector3(0.01, 0.08, 0.005), "lacquer", Vector3(0, 0, -35))
+	_plaque("VAPOR — COZINHA", valve + Vector3(0, -0.62, -0.085), 0.05,
+		Color("#C9973B") if not present else Color("#5A5040"))
+	# Baldes de areia contra incêndio na parede sul (sólidos)
+	var rack := Vector3(19.0, 1.25, cz.y)
+	_solid(rack + Vector3(-0.55, -0.4, -0.3), rack + Vector3(0.55, 0.12, 0), "SandBuckets")
+	_part(rack + Vector3(-0.55, 0.02, -0.06), rack + Vector3(0.55, 0.08, 0), "dark_wood" if not present else "plank")
+	for i in 3:
+		if present and i == 1:
+			# Um balde caiu e ficou encostado no rodapé
+			_cylinder(Vector3(rack.x + 0.9, 0, cz.y - 0.2), 0.13, 0.1, 0.28, "iron", Vector3.ZERO, 12)
+			_solid_cylinder(Vector3(rack.x + 0.9, 0, cz.y - 0.2), 0.13, 0.28, "FallenBucket")
+			continue
+		var bucket := rack + Vector3(-0.36 + i * 0.36, -0.36, -0.16)
+		_cylinder(bucket, 0.1, 0.13, 0.28, "pot" if not present else "iron", Vector3.ZERO, 12)
+		_block(bucket + Vector3(0, 0.33, 0.09), Vector3(0.012, 0.12, 0.012), "iron")
+	_plaque("AREIA", rack + Vector3(0, 0.3, -0.015), 0.06, Color("#C9973B") if not present else Color("#5A5040"), 180)
+	# Caixotes de mantimentos esperando o elevador de serviço (parede sul, sólidos)
+	var crates := Vector3(9.4, 0, cz.y - 0.3)
+	_solid(crates + Vector3(-0.75, 0, -0.3), crates + Vector3(0.75, 0.95, 0.3), "CorridorCrates")
+	for i in 3:
+		var at := crates + Vector3(-0.42 + (i % 2) * 0.84, 0.24, 0) if i < 2 else crates + Vector3(-0.3, 0.71, 0)
+		_block(at, Vector3(0.66, 0.46, 0.5), "plank", Vector3(0, (_random(i, 6.0) - 0.5) * (30.0 if present else 6.0), 0))
+		_block(at + Vector3(0, 0, -0.255), Vector3(0.66, 0.06, 0.012), "oak" if not present else "plank")
 
 
 ## Relógio de ponto dos funcionários na parede oeste, com o escaninho das fichas.

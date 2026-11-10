@@ -1,16 +1,20 @@
 class_name HotelMaterials
 extends RefCounted
 ## Catálogo de materiais do hotel por papel ("wallpaper", "brass"...) e época.
-## 1923 usa o shader procedural em modo retrô (PS1); hoje, o mesmo desenho envelhecido 100 anos.
+## As duas épocas usam o mesmo shader procedural; hoje, o mesmo desenho envelhecido 100 anos.
 ## Os materiais ficam em cache: todas as peças do mesmo papel compartilham um só.
 
 const SURFACE_SHADER := preload("res://shaders/spatial_env_hotel_surface.gdshader")
+const NIGHT_SHADER := preload("res://shaders/spatial_env_night_window.gdshader")
 
 enum Pattern { PLAIN, WALLPAPER, MARBLE_TILES, WOOD, METAL, RUG, PLASTER, CLOTH, PAINTING }
 
 ## papel: [padrão, cor A, cor B, cor C, escala (m), aspereza, metálico]
 const PAST := {
 	"wallpaper": [Pattern.WALLPAPER, "#5E2329", "#401A1F", "#C9973B", 0.55, 0.85, 0.0],
+	# Um papel por andar: Quartos (flor miúda, verde-musgo e ouro velho) e Salão (leque, azul-noite)
+	"wallpaper_rooms": [Pattern.WALLPAPER, "#2F3D2E", "#263326", "#A88C50", 0.42, 0.85, 0.0],
+	"wallpaper_ballroom": [Pattern.WALLPAPER, "#23304A", "#1A2438", "#C9A45A", 0.7, 0.8, 0.0],
 	"wainscot": [Pattern.WOOD, "#3A1C12", "#25110B", "#000000", 1.4, 0.55, 0.0],
 	"panel": [Pattern.WOOD, "#2C140D", "#1A0B07", "#000000", 1.1, 0.5, 0.0],
 	"floor": [Pattern.MARBLE_TILES, "#1E3A2D", "#D6CAB0", "#0D1912", 0.8, 0.25, 0.0],
@@ -57,10 +61,12 @@ const PAST := {
 ## Hoje: as mesmas peças envelhecidas; alguns papéis ganham cor própria (lona, escombros).
 const PRESENT_COLORS := {
 	"wallpaper": ["#3C4752", "#2B343D", "#58626C"],
+	"wallpaper_rooms": ["#3E4640", "#2E3530", "#5E6458"],
+	"wallpaper_ballroom": ["#2E3644", "#222834", "#565E6C"],
 	"ceiling": ["#5A5E5C", "#000000", "#000000"],
 	"coffer": ["#2A3036", "#000000", "#000000"],
 	"brass": ["#6E5A34", "#000000", "#3F6B5A"],
-	"velvet": ["#4A2A30", "#2E1A1E", "#000000"],
+	"velvet": ["#34272A", "#211A1C", "#000000"],
 	"green_velvet": ["#2E3E36", "#1C2620", "#000000"],
 	"leaf": ["#4A3A22", "#2E2416", "#000000"],
 	"paper": ["#8C8A70", "#000000", "#000000"],
@@ -97,6 +103,8 @@ const DETAIL := {
 	"tarp": ["denim_fabric_03", 1, 0.6, 0.8], "flour": ["denim_fabric_03", 1, 0.5, 0.8],
 	"leather": ["brown_leather", 0, 0.5, 0.8],
 }
+## Desenho do papel de parede por papel (ver wallpaper_motif no shader); os outros usam o losango.
+const WALLPAPER_MOTIF := {"wallpaper_rooms": 2, "wallpaper_ballroom": 1}
 const TEXTURES := "res://art/textures/%s/%s.jpg"
 
 static var _cache: Dictionary = {}
@@ -113,11 +121,13 @@ static func get_material(role: String, present: bool) -> Material:
 		"glass":
 			material = _glass(present)
 		"bulb":
-			material = _emissive(Color("#FFD9A0") if not present else Color("#3A3A36"), 4.0 if not present else 0.0)
+			material = _emissive(Color("#FFD9A0") if not present else Color("#3A3A36"), 2.6 if not present else 0.0)
 		"moonlight":
 			material = _emissive(Color("#8FA6C8"), 0.6)
 		"street":
 			material = _emissive(Color("#F2C27A"), 3.0)
+		"night":
+			material = _night(present)
 		"ice":
 			var ice := _glass(false)
 			ice.albedo_color = Color(0.8, 0.92, 0.98, 0.7)
@@ -140,6 +150,7 @@ static func _surface(role: String, present: bool) -> ShaderMaterial:
 	material.set_shader_parameter("color_a", colors[0])
 	material.set_shader_parameter("color_b", colors[1])
 	material.set_shader_parameter("color_c", colors[2])
+	material.set_shader_parameter("wallpaper_motif", WALLPAPER_MOTIF.get(role, 0))
 	material.set_shader_parameter("pattern_scale", spec[4])
 	material.set_shader_parameter("roughness_value", spec[5])
 	material.set_shader_parameter("metallic_value", spec[6])
@@ -147,7 +158,7 @@ static func _surface(role: String, present: bool) -> ShaderMaterial:
 	material.set_shader_parameter("age", 0.95 if present else 0.0)
 	material.set_shader_parameter("retro", false)
 	# Reboco que aparece sob o papel rasgado: escuro, para não brilhar no escuro
-	material.set_shader_parameter("bare_color", Color("#4A4842"))
+	material.set_shader_parameter("bare_color", Color("#46403A"))
 	if DETAIL.has(role):
 		_apply_detail(material, DETAIL[role], colors[0])
 	return material
@@ -198,6 +209,16 @@ static func rug_material(role: String, present: bool, center: Vector2, half_size
 	var material := (_surface(role, present) as ShaderMaterial)
 	material.set_shader_parameter("rug_center", center)
 	material.set_shader_parameter("rug_half_size", half_size)
+	return material
+
+
+## Noite atrás das janelas: degradê com estrelas (hoje, mais apagado pela bruma).
+static func _night(present: bool) -> ShaderMaterial:
+	var material := ShaderMaterial.new()
+	material.shader = NIGHT_SHADER
+	if present:
+		material.set_shader_parameter("low_color", Color("#060A12"))
+		material.set_shader_parameter("star_energy", 0.5)
 	return material
 
 

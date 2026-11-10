@@ -73,15 +73,7 @@ func _ready() -> void:
 	_camera.add_child(_ray)
 
 	if flashlight:
-		var light := SpotLight3D.new()
-		light.name = "Lanterna"
-		light.light_color = Color("#E8E2D0")
-		light.light_energy = 4.0
-		light.spot_range = 16.0
-		light.spot_angle = 28.0
-		light.shadow_enabled = true
-		light.position = Vector3(0.18, -0.2, 0)
-		_camera.add_child(light)
+		_add_flashlight()
 
 	_held_view = Node3D.new()
 	_held_view.name = "HeldItem"
@@ -92,6 +84,44 @@ func _ready() -> void:
 
 	EraManager.era_changed.connect(_on_era_changed)
 	_on_era_changed(EraManager.current_era)
+
+
+## Lanterna em três camadas: miolo forte que cai aos poucos até a borda (sem o disco de
+## holofote), halo largo e fraco em volta, e um resto de luz perto do corpo para o que está
+## ao lado da Lia não sumir no preto. Só o miolo projeta sombra.
+func _add_flashlight() -> void:
+	var core := SpotLight3D.new()
+	core.name = "Lanterna"
+	core.light_color = Color("#E8E2D0")
+	# Pouca energia e queda lenta com a distância: de perto a parede não estoura em branco
+	# (o que escondia a queda suave e deixava só um disco), e de longe o facho ainda chega
+	core.light_energy = 2.4
+	core.light_specular = 0.25
+	core.spot_range = 22.0
+	core.spot_attenuation = 0.5
+	core.spot_angle = 30.0
+	core.spot_angle_attenuation = 0.55
+	core.shadow_enabled = true
+	core.position = Vector3(0.18, -0.2, 0)
+	_camera.add_child(core)
+	var halo := SpotLight3D.new()
+	halo.name = "LanternaHalo"
+	halo.light_color = Color("#C9CFD6")
+	halo.light_energy = 0.7
+	halo.spot_range = 12.0
+	halo.spot_attenuation = 0.6
+	halo.spot_angle = 58.0
+	halo.spot_angle_attenuation = 0.45
+	halo.light_specular = 0.2
+	halo.position = core.position
+	_camera.add_child(halo)
+	var spill := OmniLight3D.new()
+	spill.name = "LanternaResto"
+	spill.light_color = Color("#AEB8C4")
+	spill.light_energy = 0.3
+	spill.omni_range = 4.5
+	spill.light_specular = 0.0
+	_camera.add_child(spill)
 
 
 func get_camera() -> Camera3D:

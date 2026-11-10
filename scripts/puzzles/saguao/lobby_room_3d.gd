@@ -38,6 +38,10 @@ const MODELS := "res://art/models/"
 const PIANO_MODEL := MODELS + "piano_cauda.glb"
 const COLUMNS: Array[Vector2] = [Vector2(5, 5.5), Vector2(15, 5.5), Vector2(5, 9.5), Vector2(15, 9.5)]
 
+## Folhas das palmeiras: comprimento (m) e quantos pares de folíolos.
+const FROND_LENGTH: float = 0.95
+const FROND_STATIONS: int = 7
+
 const WARM := Color("#F2D49B")
 const COLD := Color("#9FB4C8")
 
@@ -620,7 +624,8 @@ func _build_library_door() -> void:
 	for x: float in [x0 - 0.1, x1]:
 		_part(Vector3(x, 0, NORTH), Vector3(x + 0.1, 2.55, NORTH + 0.13), "brass")
 	_part(Vector3(x0 - 0.1, 2.4, NORTH), Vector3(x1 + 0.1, 2.57, NORTH + 0.13), "brass")
-	_label("BIBLIOTECA", Vector3((x0 + x1) / 2.0, 2.18, NORTH + 0.14), 0.10, Color("#C9973B"))
+	_plaque("BIBLIOTECA", Vector3((x0 + x1) / 2.0, 2.18, NORTH + 0.14), 0.10, Color("#C9973B"))
+	_door_light(Vector3((x0 + x1) / 2.0, 2.35, NORTH + 0.1), 0.0)
 
 
 func _build_kitchen_door() -> void:
@@ -636,6 +641,8 @@ func _build_kitchen_door() -> void:
 		{"mahogany": "plank"} if present else {})
 	_part(Vector3(face - 0.15, 1.95, 7.0), Vector3(face - 0.13, 2.08, 7.5), "brass")
 	_label("SERVIÇO", Vector3(face - 0.125, 2.015, 7.25), 0.08, Color("#2A1A10"), 90)
+	# A folha fica recuada no vão e sumia no escuro
+	_door_light(Vector3(face, 2.35, 7.25), 90.0)
 	if present:
 		# Cadeado de 1979 na aldrava
 		_part(Vector3(face - 0.13, 1.0, z0 + 0.06), Vector3(face - 0.1, 1.1, z0 + 0.32), "iron")
@@ -810,11 +817,27 @@ func _palm(at: Vector3, index: int) -> void:
 	var fronds := 9 if not present else 5
 	for i in fronds:
 		var yaw := 360.0 * i / fronds + _random(i, index) * 20.0
-		var droop := 30.0 + _random(i, index + 1.0) * 20.0 + (45.0 if present else 0.0)
-		var direction := Basis.from_euler(Vector3(0, deg_to_rad(yaw), 0)) * Vector3(0, 0, 1)
-		var tip := at + Vector3(0, 1.45 - (0.35 if present else 0.0), 0) + direction * 0.45
-		_block(tip, Vector3(0.18, 0.015, 0.95), "leaf", Vector3(droop, yaw, 0))
+		var droop := 0.55 + _random(i, index + 1.0) * 0.35 + (0.9 if present else 0.0)
+		_frond(at + Vector3(0, 1.45, 0), yaw, droop)
 	_solid_cylinder(at, 0.3, 1.2, "Palm")
+
+
+## Folha de palmeira: nervura em arco (sobe e depois pende) com folíolos dos dois lados,
+## menores para a ponta. `droop` é quanto a ponta cai, em metros.
+func _frond(crown: Vector3, yaw_deg: float, droop: float) -> void:
+	var turn := Basis.from_euler(Vector3(0, deg_to_rad(yaw_deg), 0))
+	var previous := crown
+	for k in range(1, FROND_STATIONS + 1):
+		var t := float(k) / FROND_STATIONS
+		var point := crown + turn * Vector3(0, 0.28 * sin(t * PI * 0.8) - droop * t * t, FROND_LENGTH * t)
+		var span := point - previous
+		var pitch := -rad_to_deg(atan2(span.y, Vector2(span.x, span.z).length()))
+		_block((previous + point) / 2.0, Vector3(0.016, 0.012, span.length()), "leaf", Vector3(pitch, yaw_deg, 0))
+		var leaflet := 0.3 * (1.0 - 0.6 * t)
+		for side: float in [-1.0, 1.0]:
+			var center := point + turn * Vector3(side * leaflet * 0.45, -leaflet * 0.22, 0)
+			_block(center, Vector3(leaflet, 0.006, 0.07), "leaf", Vector3(pitch, yaw_deg, -side * 26.0))
+		previous = point
 
 
 func _grandfather_clock(wall: Vector3) -> void:
