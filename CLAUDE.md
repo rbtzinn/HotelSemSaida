@@ -268,9 +268,11 @@ Salas montadas por código com `ChapterRoom3D` (`scripts/world3d/chapter_room_3d
 - Fechar o jogo passa por `Audio.quit()` (menu "Sair" e o X da janela): cala os sons e só sai depois de dois quadros, senão o Godot acusa recursos presos. O volume e o mudo continuam nas Configurações (bus Master).
 - Teste `tools/test_audio.gd`: todo som citado no código existe, toda sala tem perfil e as camadas seguem a época.
 
-## Sem cutscenes (08/11/2026)
+## Abertura cinematográfica (13/11/2026)
 
-- Pedido do Roberto: **não há cutscenes no jogo, e não faça novas.** O sistema (`Cutscene`, `StoryCutscenes`, `StoryTrigger`, `tools/test_cutscenes.gd`) foi apagado; está no histórico do git (commits de 07–08/11/2026). Saves antigos podem ter flags `cena.*`: não fazem nada.
+- Roberto aprovou uma abertura de 22 s para partidas novas. Sai da câmera da Helena no Saguão de 1923, sobe até a janela e corta para um voo 3D sobre a fachada e a Torre. O mesmo enquadramento passa para hoje, o jazz e o burburinho dão lugar ao vento, e aparece “O que Helena muda em 1923, Lia encontra hoje.” A câmera desce e devolve a visão à personagem da partida.
+- `scripts/ui/opening.gd` roda no Saguão a partir de Jogar solo ou Novo jogo na dupla. Cada tela pode pular com Esc/Start ou pelo botão, e retoma na própria personagem. A sequência muda só a apresentação local e não grava flags ou troca a época da partida. Continuar e Retomar save abrem diretamente no jogo.
+- `scripts/world3d/opening_exterior_3d.gd` usa `HotelBuilder3D` para montar a fachada nas duas épocas. O sistema antigo de cutscenes de capítulo continua no histórico de 07–08/11/2026. Testes: `tools/test_opening.gd` e `tools/test_dupla_online.gd`.
 
 ## Dupla online (05/11/2026)
 

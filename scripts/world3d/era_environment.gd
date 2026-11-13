@@ -28,7 +28,11 @@ func _rebuild() -> void:
 
 
 func _apply(era: Era.Id) -> void:
-	environment = _past if era == Era.Id.PAST_1923 else _present
+	environment = for_era(era)
+
+
+func for_era(era: Era.Id) -> Environment:
+	return _past if era == Era.Id.PAST_1923 else _present
 
 
 func _make_past() -> Environment:

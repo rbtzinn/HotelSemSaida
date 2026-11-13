@@ -224,10 +224,12 @@ func _update_cover() -> void:
 		queue_redraw(), _cover, target, 0.6)
 
 func _play_solo() -> void:
+	if RoomManager.is_changing():
+		return
 	RoomManager.clear_away()
 	WorldState.clear()
 	EraManager.set_era(Era.Id.PAST_1923)
-	RoomManager.open_scene(NetSession.HOTEL)
+	RoomManager.open_scene(NetSession.HOTEL, preload("res://scripts/ui/opening.gd").start_in)
 
 func _save_name() -> void:
 	var name_text := NetSession.clean_name(_name.text)

@@ -78,6 +78,13 @@ func _run() -> void:
 	assert(eras.current_era == my_era)
 	eras.switch_era()
 	assert(not eras.is_switching())
+	assert(current_scene.has_node("Opening") != resume)
+	if not resume:
+		var skip := InputEventAction.new()
+		skip.action = &"pause"
+		skip.pressed = true
+		Input.parse_input_event(skip)
+		await _wait_for(func() -> bool: return not paused and not current_scene.has_node("Opening"), "fim da abertura")
 	var actor = current_scene.get_node(Era.character_name(my_era))
 	assert(actor.get_camera().current)
 	if resume:

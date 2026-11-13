@@ -115,10 +115,11 @@ func _make_buses() -> void:
 func _refresh() -> void:
 	var scene := get_tree().current_scene
 	_room = scene.scene_file_path.get_file().get_basename() if scene else ""
-	_apply(EraManager.current_era, FADE)
+	play_room_ambience(EraManager.current_era, FADE)
 
 
-func _apply(era: Era.Id, fade: float) -> void:
+## Aplica o ambiente da sala à época pedida, inclusive durante a abertura local.
+func play_room_ambience(era: Era.Id, fade: float) -> void:
 	var levels: Dictionary = ROOMS.get(_room, {})
 	for layer: String in _layers:
 		var player: AudioStreamPlayer = _layers[layer]
@@ -146,7 +147,7 @@ func _on_era_changed(era: Era.Id) -> void:
 	var tween := create_tween()
 	tween.tween_property(_distortion, "drive", 0.0, 0.45)
 	tween.tween_callback(func() -> void: AudioServer.set_bus_effect_enabled(ambient, 0, false))
-	_apply(era, 0.35)
+	play_room_ambience(era, 0.35)
 
 
 ## Fecha o jogo calando os sons antes (Sair do menu e o X da janela passam por aqui).

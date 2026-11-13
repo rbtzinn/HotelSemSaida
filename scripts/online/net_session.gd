@@ -244,11 +244,15 @@ func _begin(data: Dictionary) -> void:
 	EraManager.set_era(local_era)
 	var spot: Dictionary = data.get(Era.character_name(local_era), {})
 	var place := func(room: Node) -> void:
-		if phase == Phase.PLAYING and not spot.is_empty():
-			var motor := room.get_node(Era.character_name(local_era)) as FirstPersonMotor
-			motor.position = spot.position
-			motor.rotation.y = spot.yaw
-			motor.get_node("Head").rotation.x = spot.pitch
+		if phase != Phase.PLAYING:
+			return
+		if data.is_empty():
+			preload("res://scripts/ui/opening.gd").start_in(room)
+			return
+		var motor := room.get_node(Era.character_name(local_era)) as FirstPersonMotor
+		motor.position = spot.position
+		motor.rotation.y = spot.yaw
+		motor.get_node("Head").rotation.x = spot.pitch
 	await RoomManager.open_scene(spot.get("room", HOTEL), place)
 
 func _publish(key: String, value: Variant) -> void:
