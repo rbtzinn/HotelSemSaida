@@ -121,6 +121,7 @@ func _run() -> void:
 		await _capture(helena, Vector3(16.5, 0, 5.0), Vector3(8.0, 0.8, 1.0), "cozinha3d-1923-despensa")
 		await _capture(helena, Vector3(0.75, K, 3.4), Vector3(0.75, K + 1.2, 1.4), "cozinha3d-1923-porta")
 		await _capture(helena, Vector3(16.4, K, 2.7), Vector3(18.0, K + 1.5, 1.6), "cozinha3d-1923-elevador")
+		await _capture(helena, Vector3(5.5, K, 4.9), Vector3(5.5, K + 1.9, 3.1), "cozinha3d-1923-panelas")
 
 	# Hoje: forno petrificado, poço aberto, mancha no lugar do gelo
 	era_manager.set_era(1)
@@ -189,6 +190,9 @@ func _run() -> void:
 	if "--capture" in OS.get_cmdline_user_args():
 		await _capture(lia, Vector3(2.0, K, 5.4), Vector3(14.0, K + 1.0, 1.0), "cozinha3d-hoje-cozinha")
 		await _capture(lia, Vector3(16.5, 0, 5.0), Vector3(11.0, 0.0, 3.0), "cozinha3d-hoje-despensa")
+		await _capture(lia, Vector3(5.5, K, 4.9), Vector3(5.5, K + 1.9, 3.1), "cozinha3d-hoje-panelas")
+		await _capture(lia, Vector3(0.75, K, 3.4), Vector3(0.75, K + 1.0, 1.4), "cozinha3d-hoje-porta")
+		await _capture(lia, Vector3(11.75, 0, 4.5), Vector3(11.75, -0.6, 3.2), "cozinha3d-hoje-buraco")
 
 	# O buraco no piso leva à sala de manutenção sob a despensa
 	lia.position = Vector3(11.75, 0, 4.1)

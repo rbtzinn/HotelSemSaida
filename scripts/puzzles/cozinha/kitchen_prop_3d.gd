@@ -229,10 +229,35 @@ func _hole() -> void:
 		_cylinder(Vector3(-0.35, -0.62+i*0.28, -0.37), 0.022, 0.022, 0.70, "iron", Vector3(0, 0, -90), 8)
 	_part(Vector3(-0.55, -0.77, -0.6), Vector3(0.55, -0.67, 0.6), "stone")
 	_solid(Vector3(-0.55, -0.77, -0.6), Vector3(0.55, -0.67, 0.6), "Landing")
+	# Pontas de tábua partidas, presas na borda e caídas para dentro do buraco. A ponta de
+	# fora fica rente ao piso (some dentro dele); nada sobe acima do chão nem flutua.
+	var half := Vector2(0.55, 0.6)
 	for i in 8:
-		var angle := TAU * i / 8.0 + _random(i) * 0.4
-		var at := Vector3(cos(angle), 0, sin(angle)) * 0.62
-		_block(at + Vector3(0, -0.04, 0), Vector3(0.12, 0.04, 0.45), "floorboards", Vector3(-25.0 - _random(i, 1.0) * 30.0, -rad_to_deg(angle) + 90.0, 0))
+		var side := i % 4
+		var along := (_random(i) - 0.5) * (0.6 if side % 2 == 0 else 0.5)
+		var inward: Vector3
+		var edge: Vector3
+		match side:
+			0:
+				edge = Vector3(half.x, 0, along)
+				inward = Vector3(-1, 0, 0)
+			1:
+				edge = Vector3(along, 0, half.y)
+				inward = Vector3(0, 0, -1)
+			2:
+				edge = Vector3(-half.x, 0, along)
+				inward = Vector3(1, 0, 0)
+			_:
+				edge = Vector3(along, 0, -half.y)
+				inward = Vector3(0, 0, 1)
+		var tilt := deg_to_rad(20.0 + _random(i, 1.0) * 25.0)
+		var length := 0.22 + _random(i, 2.0) * 0.12
+		# Ponta de fora 2 cm dentro do piso, logo abaixo da superfície.
+		var outer := edge - inward * 0.02 + Vector3(0, -0.025, 0)
+		var dir := inward * cos(tilt) + Vector3(0, -sin(tilt), 0)
+		var yaw := rad_to_deg(atan2(inward.x, inward.z))
+		_block(outer + dir * length / 2.0, Vector3(0.11, 0.035, length), "floorboards",
+			Vector3(rad_to_deg(tilt), yaw, 0))
 
 
 ## Grade sanfonada fechando a portinhola (origem no centro do vão, na base). Sólida.

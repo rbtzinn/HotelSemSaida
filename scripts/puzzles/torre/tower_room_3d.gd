@@ -69,6 +69,13 @@ func _build_decks() -> void:
 	for band: Vector2 in [FRONT, BACK]:
 		_part(Vector3(WEST, -0.2, band.x), Vector3(EAST, 0, band.y), deck)
 		_solid(Vector3(WEST, -0.2, band.x), Vector3(EAST, 0, band.y), "Deck")
+	# Paredes do prédio sob os terraços, até o telhado de baixo: sem elas, as lajes e os
+	# parapeitos pareciam flutuar sobre o vazio.
+	for band: Vector2 in [FRONT, BACK]:
+		_part(Vector3(WEST - 0.2, DROP, band.x), Vector3(WEST, -0.2, band.y), "stone")
+		_part(Vector3(EAST, DROP, band.x), Vector3(EAST + 0.2, -0.2, band.y), "stone")
+	_part(Vector3(WEST - 0.2, DROP, FRONT.y - 0.1), Vector3(EAST + 0.2, -0.2, FRONT.y + 0.1), "stone")
+	_part(Vector3(WEST - 0.2, DROP, BACK.x - 0.1), Vector3(EAST + 0.2, -0.2, BACK.x + 0.1), "stone")
 	# Fundo do vão: o telhado de baixo, longe
 	_part(Vector3(WEST - 2, DROP - 0.2, FRONT.y), Vector3(EAST + 2, DROP, BACK.x), "rubble" if present else "dark_wood")
 	for i in 6:

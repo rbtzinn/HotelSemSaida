@@ -38,7 +38,7 @@ const PAST := {
 	"pot": [Pattern.PLAIN, "#7A3A22", "#000000", "#000000", 1.0, 0.7, 0.0],
 	"painting": [Pattern.PAINTING, "#3A5A7A", "#2E3A22", "#E0B070", 1.2, 0.7, 0.0],
 	"night": [Pattern.PLAIN, "#0A1020", "#000000", "#000000", 1.0, 1.0, 0.0],
-	"rubble": [Pattern.PLASTER, "#6B665C", "#000000", "#000000", 1.0, 1.0, 0.0],
+	"rubble": [Pattern.PLASTER, "#57524A", "#000000", "#000000", 1.0, 1.0, 0.0],
 	"plank": [Pattern.WOOD, "#5A4A38", "#3E3226", "#000000", 1.2, 0.9, 0.0],
 	"tarp": [Pattern.CLOTH, "#6E7A84", "#4C565E", "#000000", 1.2, 0.95, 0.0],
 	"dark": [Pattern.PLAIN, "#050608", "#000000", "#000000", 1.0, 1.0, 0.0],
@@ -61,6 +61,9 @@ const PAST := {
 ## Hoje: as mesmas peças envelhecidas; alguns papéis ganham cor própria (lona, escombros).
 const PRESENT_COLORS := {
 	"wallpaper": ["#3C4752", "#2B343D", "#58626C"],
+	# Tapetes desbotados e cobertos de pó (com as cores de 1923 pareciam novos)
+	"rug": ["#3E2A2C", "#5C5038", "#283028"],
+	"runner": ["#3A2628", "#45302F", "#5E553E"],
 	"wallpaper_rooms": ["#3E4640", "#2E3530", "#5E6458"],
 	"wallpaper_ballroom": ["#2E3644", "#222834", "#565E6C"],
 	"ceiling": ["#5A5E5C", "#000000", "#000000"],
@@ -94,7 +97,7 @@ const DETAIL := {
 	"floorboards": ["wood_floor", 0, 2.0, 1.0], "plank": ["old_planks_02", 0, 1.6, 1.0],
 	"ceiling": ["plastered_wall_02", 0, 2.5, 0.6], "coffer": ["plastered_wall_02", 0, 2.5, 0.6],
 	"plaster_cream": ["plastered_wall_02", 0, 2.0, 0.7], "stone": ["plastered_stone_wall", 0, 2.0, 1.0],
-	"rubble": ["chipped_concrete", 0, 1.5, 1.0], "petrified": ["chipped_concrete", 0, 1.0, 1.0],
+	"rubble": ["plastered_stone_wall", 0, 0.9, 1.0], "petrified": ["chipped_concrete", 0, 1.0, 1.0],
 	"floor": ["marble_01", 1, 1.2, 0.5], "marble": ["marble_01", 1, 1.5, 0.5], "column": ["marble_01", 1, 1.5, 0.5],
 	"tile": ["marble_01", 1, 0.8, 0.4], "kitchen_floor": ["marble_01", 1, 1.0, 0.4],
 	"brass": ["metal_plate_02", 1, 0.8, 0.4], "iron": ["metal_plate_02", 1, 0.8, 0.6],

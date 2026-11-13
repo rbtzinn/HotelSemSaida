@@ -253,10 +253,44 @@ func _build_stairs() -> void:
 		for i in 6:
 			_block(Vector3(4.6 + _random(i, 7.0) * 2.4, 0.15, 0.3 + _random(i, 8.0) * 0.9), Vector3(0.5, 0.3, 0.4), "rubble", Vector3(0, _random(i, 9.0) * 90.0, 0))
 		_solid(Vector3(4.2, 0, 0.1), Vector3(7.6, 0.45, 1.4), "StairsRubble")
-		for i in 8:
-			var at := Vector3(PANTRY_DOOR.x + 0.1 + _random(i, 10.0) * 0.8, K + 0.15 + _random(i, 11.0) * 1.6, PARTITION.x + _random(i, 12.0) * 0.4)
-			_block(at, Vector3(0.4, 0.3 + _random(i, 13.0) * 0.3, 0.35), "rubble" if i % 2 else "plank", Vector3(_random(i, 14.0) * 40.0, _random(i, 15.0) * 90.0, _random(i, 16.0) * 40.0))
+		_build_door_rubble()
 		_solid(Vector3(PANTRY_DOOR.x, K, PARTITION.x - 0.2), Vector3(PANTRY_DOOR.y, K + DOOR_HEIGHT, PARTITION.y + 0.3), "DoorRubble")
+
+
+## Hoje: a porta da despensa pregada com tábuas e um monte de entulho na soleira.
+## As pedras ficam empilhadas umas sobre as outras (cada camada apoiada na de baixo) e as
+## tábuas pregadas no batente; tudo cabe na colisão DoorRubble.
+func _build_door_rubble() -> void:
+	var mid := (PANTRY_DOOR.x + PANTRY_DOOR.y) / 2.0
+	var front := PARTITION.y
+	# [x, z, largura, altura, profundidade, apoio (y acima do piso)]
+	var stones: Array = [
+		[mid - 0.33, front - 0.05, 0.36, 0.34, 0.32, 0.0],
+		[mid + 0.02, front - 0.02, 0.4, 0.38, 0.34, 0.0],
+		[mid + 0.36, front - 0.06, 0.32, 0.3, 0.3, 0.0],
+		[mid - 0.2, front + 0.17, 0.34, 0.24, 0.26, 0.0],
+		[mid + 0.22, front + 0.16, 0.3, 0.2, 0.26, 0.0],
+		[mid - 0.17, front - 0.04, 0.34, 0.3, 0.3, 0.34],
+		[mid + 0.2, front - 0.03, 0.3, 0.26, 0.28, 0.3],
+		[mid + 0.02, front - 0.05, 0.3, 0.24, 0.26, 0.6],
+	]
+	for i in stones.size():
+		var s: Array = stones[i]
+		var size := Vector3(s[2], s[3], s[4])
+		var center := Vector3(s[0], K + s[5] + size.y / 2.0, s[1])
+		# Alvenaria da parede que caiu (a mesma pedra da despensa), com um ou outro caco de reboco
+		_block(center, size, "rubble" if i in [3, 7] else "stone", Vector3(_random(i, 20.0) * 6.0 - 3.0, _random(i, 21.0) * 30.0 - 15.0, _random(i, 22.0) * 6.0 - 3.0))
+	# Tábua comprida escorada na diagonal, dentro do vão
+	_block(Vector3(mid, K + 1.15, PARTITION.x + 0.07), Vector3(0.16, 2.3, 0.03), "plank", Vector3(0, 0, 24))
+	# Tábuas pregadas no batente, do lado da cozinha
+	var z := front + 0.075
+	for i in 3:
+		var y := K + 1.15 + i * 0.42
+		var tilt := (_random(i, 23.0) - 0.5) * 12.0
+		_block(Vector3(mid, y, z), Vector3(PANTRY_DOOR.y - PANTRY_DOOR.x + 0.2, 0.15, 0.025), "plank", Vector3(0, 0, tilt))
+		for end: float in [-1.0, 1.0]:
+			var dx := end * (PANTRY_DOOR.y - PANTRY_DOOR.x + 0.08) / 2.0
+			_sphere(Vector3(mid + dx, y + dx * tan(deg_to_rad(tilt)), z + 0.014), 0.009, "iron")
 
 
 func _build_kitchen_wall_dressing() -> void:
@@ -357,7 +391,7 @@ func _build_work_furniture() -> void:
 	var rack_y := K + 2.25
 	var rack_a := Vector3(a.x - 0.1, rack_y, a.z + 0.1)
 	var rack_b := Vector3(b.x + 0.1, rack_y + 0.03, b.z - 0.1)
-	_solid(Vector3(rack_a.x, rack_y - 0.4, rack_a.z), rack_b, "PotRack")
+	_solid(Vector3(rack_a.x, rack_y - 0.5, rack_a.z), rack_b, "PotRack")
 	for z: float in [rack_a.z, rack_b.z - 0.03]:
 		_part(Vector3(rack_a.x, rack_y, z), Vector3(rack_b.x, rack_y + 0.03, z + 0.03), "cast_iron")
 	for x: float in [rack_a.x, rack_b.x - 0.03]:
@@ -370,8 +404,17 @@ func _build_work_furniture() -> void:
 		var x := rack_a.x + 0.16 + i * 0.25
 		var z := rack_a.z + 0.015 if i % 2 == 0 else rack_b.z - 0.015
 		var radius := 0.09 + _random(i, 9.0) * 0.05
-		_block(Vector3(x, rack_y - 0.06, z), Vector3(0.01, 0.12, 0.01), "iron")
-		_cylinder(Vector3(x, rack_y - 0.12 - radius * 2.0, z), radius, radius, 0.04, "copper", Vector3(90, 0, 0), 14)
+		# Gancho em S na barra, cabo da panela no gancho e a panela logo abaixo do cabo:
+		# tudo encostado, nada flutua. A panela fica de pé, com o fundo para fora da grade.
+		var outward := -1.0 if i % 2 == 0 else 1.0
+		_block(Vector3(x, rack_y - 0.03, z), Vector3(0.012, 0.07, 0.012), "iron")
+		_torus(Vector3(x, rack_y - 0.075, z), 0.008, 0.022, "iron", Vector3(90, 0, 0))
+		_block(Vector3(x, rack_y - 0.15, z), Vector3(0.03, 0.14, 0.014), "copper")
+		var center_y := rack_y - 0.21 - radius
+		_cylinder(Vector3(x, center_y, z - outward * 0.025), radius, radius * 0.92, 0.05, "copper",
+			Vector3(90 * outward, 0, 0), 16)
+		_cylinder(Vector3(x, center_y, z - outward * 0.031), radius * 0.92, radius * 0.92, 0.006, "cast_iron",
+			Vector3(90 * outward, 0, 0), 16)
 	# Aparador sob a primeira janela (parede sul)
 	var side_a := Vector3(4.7, K, DEPTH - 0.55)
 	var side_b := Vector3(6.6, K + 0.9, DEPTH - 0.02)

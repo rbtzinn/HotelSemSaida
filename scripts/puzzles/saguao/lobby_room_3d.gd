@@ -312,10 +312,16 @@ func _build_stairs() -> void:
 	if present:
 		# Escombros: degraus quebrados e reboco caído na base da escada
 		_solid(Vector3(x0, 0, front), Vector3(x1, 0.8, front + 0.7), "Rubble")
+		# Em camadas: cada pedaço apoiado no chão ou na camada de baixo (nada fica no ar), mais
+		# alto perto da escada, dentro da colisão Rubble.
 		for i in 14:
-			var center := Vector3(x0 + 0.2 + _random(i, 1.0) * (x1 - x0 - 0.4), 0.1 + _random(i, 2.0) * 0.4, front - 0.4 + _random(i, 3.0) * 1.1)
-			var size := Vector3(0.2 + _random(i, 4.0) * 0.6, 0.12 + _random(i, 5.0) * 0.25, 0.2 + _random(i, 6.0) * 0.5)
-			_block(center, size, "rubble" if i % 3 != 0 else "plank", Vector3(_random(i, 7.0) * 40.0, _random(i, 8.0) * 180.0, _random(i, 9.0) * 30.0))
+			var layer := 0 if i < 7 else (1 if i < 11 else 2)
+			var size := Vector3(0.25 + _random(i, 4.0) * 0.45, 0.16 + _random(i, 5.0) * 0.18, 0.2 + _random(i, 6.0) * 0.2)
+			var z_span := 0.4 - layer * 0.1
+			var center := Vector3(x0 + 0.25 + _random(i, 1.0) * (x1 - x0 - 0.5),
+				[0.0, 0.26, 0.48][layer] + size.y * 0.42, front + 0.1 + _random(i, 3.0) * z_span)
+			_block(center, size, "rubble" if i % 3 != 0 else "plank",
+				Vector3(_random(i, 7.0) * 16.0 - 8.0, _random(i, 8.0) * 180.0, _random(i, 9.0) * 12.0 - 6.0))
 		for i in 3:
 			_block(Vector3(x0 + 0.6 + i * 0.9, 2.2 - i * 0.3, NORTH + 0.1), Vector3(0.18, 0.18, 3.2), "plank", Vector3(35 + i * 8, 10 - i * 12, 0))
 
@@ -951,8 +957,10 @@ func _build_ruin_details() -> void:
 	# Montes de reboco caído junto às paredes
 	for pile: Vector3 in [Vector3(0.9, 0, 3.0), Vector3(19.0, 0, 7.0), Vector3(7.5, 0, 10.3), Vector3(6.3, 0, 2.45)]:
 		for k in 6:
-			var at := pile + Vector3((_random(k, pile.x) - 0.5) * 1.0, 0.08 + _random(k, pile.z) * 0.15, (_random(k, pile.x + 1.0) - 0.5) * 0.8)
-			_block(at, Vector3(0.15 + _random(k, 2.0) * 0.35, 0.1 + _random(k, 3.0) * 0.2, 0.15 + _random(k, 4.0) * 0.3), "rubble", Vector3(_random(k) * 30.0, _random(k, 5.0) * 180.0, 0))
+			# Cacos assentados no chão (um pouco enterrados, sem ponta no ar)
+			var size := Vector3(0.15 + _random(k, 2.0) * 0.35, 0.06 + _random(k, 3.0) * 0.12, 0.15 + _random(k, 4.0) * 0.3)
+			var at := pile + Vector3((_random(k, pile.x) - 0.5) * 1.0, size.y * 0.4, (_random(k, pile.x + 1.0) - 0.5) * 0.8)
+			_block(at, size, "rubble", Vector3(_random(k) * 10.0 - 5.0, _random(k, 5.0) * 180.0, 0))
 	# Poeira em suspensão nos fachos de luz
 	var dust := CPUParticles3D.new()
 	dust.amount = 220

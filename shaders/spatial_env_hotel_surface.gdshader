@@ -220,10 +220,13 @@ vec3 rug(vec2 world_xz) {
 	float frame = soft_band(box, 0.86, 0.96, fwidth(box));
 	float radius = length(local * vec2(1.0, rug_half_size.y / rug_half_size.x));
 	float ring_pixel = fwidth(radius * 4.0);
-	float rings = 1.0 - smoothstep(0.42 - ring_pixel, 0.42 + ring_pixel, abs(fract(radius * 4.0) - 0.5));
+	// Anéis finos (16% de cada período) sobre o fundo: antes o anel ocupava 84% e a cor B
+	// virava o fundo do tapete inteiro.
+	float rings = smoothstep(0.42 - ring_pixel, 0.42 + ring_pixel, abs(fract(radius * 4.0) - 0.5));
 	float medallion = 1.0 - smoothstep(0.31 - fwidth(radius), 0.31 + fwidth(radius), radius);
 	float sector = fract(atan(local.y, local.x) / 6.2832 * 12.0);
-	float petals = soft_band(sector, 0.5, 1.0, 0.04) * medallion;
+	// Pétalas estreitas no medalhão (um terço de cada setor), sem o efeito de cata-vento.
+	float petals = soft_band(sector, 0.35, 0.65, 0.04) * medallion;
 	vec3 base = color_a.rgb;
 	base = mix(base, color_b.rgb, max(rings * (1.0 - medallion), petals));
 	base = mix(base, color_c.rgb, frame);
@@ -353,7 +356,11 @@ void fragment() {
 		aged = mix(aged, bare, torn);
 	}
 	if (pattern == PATTERN_METAL) {
-		aged = mix(aged, color_c.rgb, smoothstep(0.4, 0.75, fbm(uv * 3.0 + seed)));
+		// Ferrugem em manchas menores, com tom variado e sem cobrir o metal inteiro: as manchas
+		// grandes e chapadas pareciam camuflagem nos armários e painéis.
+		float rust_mask = smoothstep(0.45, 0.8, fbm(uv * 6.0 + seed));
+		vec3 rust_tone = color_c.rgb * (0.6 + 0.5 * fbm(uv * 18.0 + seed));
+		aged = mix(aged, rust_tone, rust_mask * 0.75);
 	}
 	if (pattern == PATTERN_WOOD) {
 		// Madeira gasta: veios lavados e claros ao longo das tábuas, largos o bastante para

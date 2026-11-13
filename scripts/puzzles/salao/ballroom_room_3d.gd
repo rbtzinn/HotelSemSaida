@@ -344,13 +344,19 @@ func _build_chandeliers() -> void:
 	for i in CHANDELIERS.size():
 		var at: Vector3 = CHANDELIERS[i]
 		if present and i == 0:
-			# Caído: aro amassado e cristais espalhados
+			# Caído: o mesmo lustre, tombado de lado no chão (o aro grande apoiado no piso),
+			# com os cristais espalhados em volta. Antes era um aro solto e cubos de vidro.
 			var down := FALLEN_CHANDELIER
-			_torus(down + Vector3(0, 0.12, 0), 0.6, 0.75, "iron", Vector3(8, 0, 6))
-			_cylinder(down, 0.25, 0.1, 0.55, "iron", Vector3(0, 0, 70), 8)
-			for k in 10:
-				_block(down + Vector3(_random(k) * 2.4 - 1.2, 0.03, _random(k, 1.0) * 2.0 - 1.0), Vector3(0.06, 0.06, 0.06), "glass")
-			_solid_cylinder(down, 0.85, 0.55, "Chandelier")
+			var yaw := 30.0
+			var along := Vector3(1, 0, 0).rotated(Vector3.UP, deg_to_rad(yaw))
+			var hook := down - along * 0.8 + Vector3(0, 0.84, 0)
+			_model(CHANDELIER_MODEL, hook, Vector3(0, yaw, 84), 1.2, {"brass": "iron"})
+			for k in 24:
+				var angle := _random(k, 2.0) * TAU
+				var distance := 0.5 + pow(_random(k, 3.0), 0.7) * 1.8
+				_sphere(down + Vector3(cos(angle) * distance, 0.02, sin(angle) * distance), 0.026, "glass",
+					Vector3(1, 0.6, 1))
+			_solid_cylinder(down, 0.85, 1.45, "Chandelier")
 			_part(Vector3(at.x - 0.01, at.y, at.z - 0.01), Vector3(at.x + 0.01, HALL_H, at.z + 0.01), "iron")
 			continue
 		# Lustre modelado no Blender, pendurado do teto
